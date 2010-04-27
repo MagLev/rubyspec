@@ -29,11 +29,11 @@ describe "StringIO#<< when passed [Object]" do
     @io.string.should == "example\000\000\000\000\000\000\000\000just testing"
   end
   
-  it "taints self's String when the passed argument is tainted" do
-    (@io << "test".taint)
-    @io.string.tainted?.should be_true
-  end
-  
+# it "taints self's String when the passed argument is tainted" do # Maglev, no taint propag.
+#   (@io << "test".taint)
+#   @io.string.tainted?.should be_true
+# end
+# 
   it "does not taint self when the passed argument is tainted" do
     (@io << "test".taint)
     @io.tainted?.should be_false

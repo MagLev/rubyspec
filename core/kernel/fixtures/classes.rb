@@ -52,18 +52,6 @@ module KernelSpecs
     def juu_san; end
   end
 
-  class PrivateSup
-    def public_in_sub
-    end
-
-    private :public_in_sub
-  end
-
-  class PublicSub < PrivateSup
-    def public_in_sub
-    end
-  end
-
   class A
     # 1.9 as Kernel#public_method, so we don't want this one to clash:
     def pub_method; :public_method; end
@@ -122,12 +110,14 @@ module KernelSpecs
   end
 
   module KernelBlockGiven
-    def self.accept_block
-      Kernel.block_given?
+    def self.accept_block(&blk)
+      # Kernel.block_given?
+      Kernel.block_given?(&blk) # Maglev deviation, must pass arg explicitly
     end
 
     def self.accept_block_as_argument(&block)
-      Kernel.block_given?
+      # Kernel.block_given?
+      Kernel.block_given?(&block)  # Maglev deviation, must pass arg explicitly
     end
 
     class << self
@@ -153,21 +143,7 @@ module KernelSpecs
     end
   end
 
-  module KernelBlockGiven
-    def self.accept_block
-      Kernel.block_given?
-    end
-
-    def self.accept_block_as_argument(&block)
-      Kernel.block_given?
-    end
-
-    class << self
-      define_method(:defined_block) do
-        Kernel.block_given?
-      end
-    end
-  end
+# Maglev, delete duplicate implementation of KernelBlockGiven 
 
   class IVars
     def initialize
@@ -190,14 +166,16 @@ module KernelSpecs
   end
 
   class InstEvalConst
-    INST_EVAL_CONST_X = 2
+    INST_EVAL_CONST_X = 23 # maglev debugging
   end
 
   module InstEvalOuter
     module Inner
       obj = InstEvalConst.new
-      X_BY_STR = obj.instance_eval("INST_EVAL_CONST_X") rescue nil
-      X_BY_BLOCK = obj.instance_eval { INST_EVAL_CONST_X } rescue nil
+      # following eval should succeed # maglev notes
+      X_BY_STR = obj.instance_eval("xx=self; INST_EVAL_CONST_X") # rescue nil
+      # following expected to raise error, INST_EVAL_CONST_X not resolvable
+      X_BY_BLOCK = obj.instance_eval { 100 + INST_EVAL_CONST_X } rescue nil
     end
   end
 
@@ -301,7 +279,7 @@ class EvalSpecs
   class A
     eval "class B; end"
     def c
-      eval "class C; end"
+      eval "class C; end"  # maglev C created as a singleton::C, not A::C
     end
   end
 

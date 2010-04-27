@@ -83,8 +83,11 @@ ruby_version_is ""..."1.9" do
     end
 
     it "returns Array with year and month set, given a String like nn-nn" do
-      ParseDate.parsedate("08-09").should == [8,9] + [nil] * 6
-      ParseDate.parsedate("08-09",true).should == [2008,9] + [nil] * 6
+      #ParseDate.parsedate("08-09").should == [8,9] + [nil] * 6
+      #ParseDate.parsedate("08-09",true).should == [2008,9] + [nil] * 6
+      # MRI 1.8.7 behavior:
+      ParseDate.parsedate("08-09").should == [nil, nil, 8, nil, nil, nil, "-09", nil] 
+      ParseDate.parsedate("08-09",true).should == [nil, nil, 8, nil, nil, nil, "-09", nil] 
     end
 
     it "returns Array with day and hour set, given a String like n-nn" do

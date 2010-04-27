@@ -7,7 +7,8 @@ describe "ENV.to_a" do
     a = ENV.to_a
     a.is_a?(Array).should == true
     a.find { |e| e.first == "foo" }.should == ["foo", "bar"]
-    ENV.delete "foo"
+    # ENV.delete "foo"
+    ENV["foo"] = nil # Maglev
   end
 
   ruby_version_is "1.9" do

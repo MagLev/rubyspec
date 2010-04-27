@@ -10,11 +10,13 @@ describe "String#rstrip" do
    "hello\x00".rstrip.should == "hello"
   end
 
-  it "taints the result when self is tainted" do
-    "".taint.rstrip.tainted?.should == true
-    "ok".taint.rstrip.tainted?.should == true
-    "ok    ".taint.rstrip.tainted?.should == true
-  end
+ # Maglev no taint propagation
+# it "taints the result when self is tainted" do
+#   "".taint.rstrip.tainted?.should == true
+#   "ok".taint.rstrip.tainted?.should == true
+#   "ok    ".taint.rstrip.tainted?.should == true
+# end
+
 end
 
 describe "String#rstrip!" do

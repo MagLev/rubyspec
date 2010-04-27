@@ -15,6 +15,7 @@ describe "IO#pid" do
   end
 end
 
+not_compliant_on :maglev do # popen not implemented
 describe "IO#pid" do
   before :each do
     @io = IO.popen RUBY_EXE, "r+"
@@ -33,3 +34,4 @@ describe "IO#pid" do
     lambda { @io.pid }.should raise_error(IOError)
   end
 end
+end # maglev

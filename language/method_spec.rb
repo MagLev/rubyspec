@@ -246,8 +246,9 @@ describe "Calling a private setter method" do
   end
 end
 
-describe "Calling a private getter method" do
-  it "does not permit self as a receiver" do
+describe "Calling a private getter method" do #
+ not_compliant_on :maglev do  #
+  it "does not permit self as a receiver" do #
     module MethodSpecs
       class PrivateGetter
         attr_reader :foo
@@ -264,9 +265,10 @@ describe "Calling a private getter method" do
     end
 
     receiver = MethodSpecs::PrivateGetter.new
-    lambda { receiver.call_self_foo }.should raise_error(NoMethodError)
+    lambda { receiver.call_self_foo }.should raise_error(NoMethodError) # maglev does not raise an exception
     lambda { receiver.call_self_foo_or_equals(6) }.should raise_error(NoMethodError)
   end
+ end #
 end
 
 language_version __FILE__, "method"

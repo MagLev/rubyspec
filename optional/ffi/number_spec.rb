@@ -117,18 +117,18 @@ describe "Function with primitive integer arguments" do
     [ 0.0, 0.1, 1.1, 1.23 ].each do |f|
       it ":float call(:double (#{f}))" do
         FFISpecs::LibTest.set_float(f)
-        (FFISpecs::LibTest.get_float - f).abs.should < 0.001
+        ((fa = FFISpecs::LibTest.get_float) - f).abs.should < 0.001
       end
     end
 
     [ 0.0, 0.1, 1.1, 1.23 ].each do |f|
       it ":double call(:double (#{f}))" do
         FFISpecs::LibTest.set_double(f)
-        (FFISpecs::LibTest.get_double - f).abs.should < 0.001
+        ((fa = FFISpecs::LibTest.get_double ) - f).abs.should < 0.001
       end
     end
   end
-end
+end 
 
 describe "Integer parameter range checking" do
   [ 128, -129 ].each do |i|
@@ -171,7 +171,9 @@ end
 describe "Three different size Integer arguments" do
   def self.verify(p, off, t, v)
     if t == 'f32'
-      p.get_float32(off).should == v
+      act = p.get_float32(off)	# maglev uses native float to double rounding in CByteArray prims
+      err = ((act - v) / v)     #
+      err.should <= 1.0e-7      #
     elsif t == 'f64'
       p.get_float64(off).should == v
     else
@@ -179,23 +181,33 @@ describe "Three different size Integer arguments" do
     end
   end
 
-  FFISpecs::PACK_VALUES.keys.each do |t1|
-    FFISpecs::PACK_VALUES.keys.each do |t2|
-      FFISpecs::PACK_VALUES.keys.each do |t3|
-        FFISpecs::PACK_VALUES[t1].each do |v1|
-          FFISpecs::PACK_VALUES[t2].each do |v2|
-            FFISpecs::PACK_VALUES[t3].each do |v3|
-              it "call(#{FFISpecs::TYPE_MAP[t1]} (#{v1}), #{FFISpecs::TYPE_MAP[t2]} (#{v2}), #{FFISpecs::TYPE_MAP[t3]} (#{v3}))" do
+ it "test PACK_VALUES" do
+  vdict = FFISpecs::PACK_VALUES
+  pvkeys = vdict.keys
+  a1 = 5
+  a2 = 5
+  a3 = 5
+  pvkeys.each do |t1|
+    pvkeys.each do |t2|
+      pvkeys.each do |t3|
+        (a1 = vdict[t1]).each do |v1|
+          (a2 = vdict[t2]).each do |v2|
+            (a3 = vdict[t3]).each do |v3|
+#              puts "call(#{FFISpecs::TYPE_MAP[t1]} (#{v1}), #{FFISpecs::TYPE_MAP[t2]} (#{v2}), #{FFISpecs::TYPE_MAP[t3]} (#{v3}))"  # do
                 p = FFI::Buffer.new :long_long, 3
-                FFISpecs::LibTest.send("pack_#{t1}#{t2}#{t3}_s64", v1, v2, v3, p)
+                bxx = [a1, a2, a3]
+                axx = [v1, v2, v3]
+                fct_name = "pack_#{t1}#{t2}#{t3}_s64"
+                FFISpecs::LibTest.send(fct_name , v1, v2, v3, p)
                 verify(p, 0, t1, v1)
                 verify(p, 8, t2, v2)
                 verify(p, 16, t3, v3)
-              end
+              # 
             end
           end
         end
       end
     end
   end
+ end
 end

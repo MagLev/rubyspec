@@ -6,7 +6,9 @@ describe "Bignum#hash" do
   end
 
   it "is stable" do
-    bignum_value.hash.should == bignum_value.hash
-    bignum_value.hash.should_not == bignum_value(1).hash
+    aa = bignum_value
+    aa.hash.should == aa.hash
+    bb = bignum_value(1000000)  # Maglev varitions on hash function
+    aa.hash.should_not == bb.hash
   end
 end

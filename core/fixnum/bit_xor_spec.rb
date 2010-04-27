@@ -14,7 +14,8 @@ describe "Fixnum#^" do
   ruby_version_is "" ... "1.9" do
     ruby_bug "#", "1.8.6" do
       it "doesn't raise an error if passed a Float out of Fixnum range" do
-        lambda { 1 ^ bignum_value(10000).to_f }.should_not raise_error()
+        # lambda { 1 ^ bignum_value(10000).to_f }.should_not raise_error()
+        1 ^ bignum_value(10000).to_f 
         lambda { 1 ^ -bignum_value(10000).to_f }.should_not raise_error()
       end
     end

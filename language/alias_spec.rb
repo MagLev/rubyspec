@@ -26,17 +26,18 @@ describe "The alias keyword" do
   it "adds the new method to the list of methods" do
     original_methods = @obj.methods
     @meta.class_eval do
-      alias __value value
+     # alias __value value # Maglev methods() excludes those with '__' prefix
+     alias x_value value  
     end
-    (@obj.methods - original_methods).map {|m| m.to_s }.should == ["__value"]
+    (@obj.methods - original_methods).map {|m| m.to_s }.should == ["x_value"] #
   end
 
-  it "adds the new method to the list of public methods" do
+  it "adds the new method to the list of public methods" do  
     original_methods = @obj.public_methods
     @meta.class_eval do
-      alias __value value
+      alias x_value value  # Maglev methods() excludes those with '__' prefix
     end
-    (@obj.public_methods - original_methods).map {|m| m.to_s }.should == ["__value"]
+    (@obj.public_methods - original_methods).map {|m| m.to_s }.should == ["x_value"] #
   end
 
   it "overwrites an existing method with the target name" do

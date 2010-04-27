@@ -67,6 +67,8 @@ describe "File.new" do
     File.read(@file).should == "test\n"
   end
 
+# Maglev does not support File.new(fd_integer) yet
+not_compliant_on :maglev do  
   it "returns a new File with modus fd " do
     begin
       @fh_orig = File.new(@file)
@@ -80,6 +82,7 @@ describe "File.new" do
       @fh_orig = nil
     end
   end
+end
 
   it "creates a new file when use File::EXCL mode " do
     @fh = File.new(@file, File::EXCL)
@@ -149,14 +152,18 @@ describe "File.new" do
     lambda { File.new(nil) }.should raise_error(TypeError)
   end
   
+not_compliant_on :maglev do  # Maglev does not raise any exception
   it "raises an Errno::EBADF if the first parameter is an invalid file descriptor" do
     lambda { File.new(-1) }.should raise_error(Errno::EBADF)
   end
+end
 
+not_compliant_on :maglev do  # Maglev File.new(fd_integer) not supported yet
   it "can't alter mode or permissions when opening a file" do
     @fh = File.new(@file)
     lambda { File.new(@fh.fileno, @flags) }.should raise_error(Errno::EINVAL)
   end
-  
+end  
+
   it_behaves_like :open_directory, :new
 end

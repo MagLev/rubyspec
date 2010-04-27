@@ -27,10 +27,10 @@ describe "Matrix#+" do
 
   ruby_bug "redmine:2365", "1.8.7" do
     it "raises a TypeError if other is of wrong type" do
-      lambda { @a + nil        }.should raise_error(TypeError)
-      lambda { @a + "a"        }.should raise_error(TypeError)
-      lambda { @a + [ [1, 2] ] }.should raise_error(TypeError)
-      lambda { @a + Object.new }.should raise_error(TypeError)
+      lambda { @a + nil        }.should raise_error(NoMethodError)
+      lambda { @a + "a"        }.should raise_error(NoMethodError)
+      lambda { @a + [ [1, 2] ] }.should raise_error(NoMethodError)
+      lambda { @a + Object.new }.should raise_error(NoMethodError)
     end
   end
 end

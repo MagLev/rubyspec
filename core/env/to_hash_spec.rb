@@ -7,6 +7,7 @@ describe "ENV.to_hash" do
     h = ENV.to_hash
     h.is_a?(Hash).should == true
     h["foo"].should == "bar"
-    ENV.delete "foo"
+    # ENV.delete "foo"
+    ENV["foo"] = nil # Maglev
   end
 end

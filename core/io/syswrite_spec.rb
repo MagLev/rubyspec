@@ -29,7 +29,7 @@ describe "IO#syswrite on a file" do
     end
   end
 
-  not_compliant_on :rubinius do
+  not_compliant_on :rubinius, :maglev do
     it "warns if called immediately after a buffered IO#write" do
       @file.write("abcde")
       lambda { @file.syswrite("fghij") }.should complain(/syswrite/)

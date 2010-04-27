@@ -3,6 +3,9 @@ require 'cgi'
 require File.expand_path('../fixtures/common', __FILE__)
 
 describe "CGI::HtmlExtension#a" do
+  # maglev patch for this and all subsequently run library/cgi/* specs
+  ENV['REQUEST_METHOD'] = "GET"  # 
+
   before(:each) do
     @html = CGISpecs.cgi_new
   end

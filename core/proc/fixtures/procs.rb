@@ -1,6 +1,7 @@
 module ProcSpecs
-  def self.new_proc_in_method
-    Proc.new
+  def self.new_proc_in_method(&blk) #
+    # Maglev, you must pass the block explicitly
+    Proc.new(&blk) #
   end
   class SourceLocation
     def self.my_proc

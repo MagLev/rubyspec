@@ -19,7 +19,7 @@ describe "Digest::MD5.file" do
     end
   
     it 'returns a Digest::MD5 object with the correct digest' do
-      Digest::MD5.file(@file).digest.should == MD5Constants::Digest
+      (ax = Digest::MD5.file((fx = @file)).digest).should == (bx = MD5Constants::Digest)
     end
 
     it "calls #to_str on an object and returns the Digest::MD5 with the result" do

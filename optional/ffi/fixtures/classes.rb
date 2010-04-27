@@ -2,7 +2,7 @@ module FFISpecs
   #
   # Callback fixtures
   #
-  module LibTest
+  module LibTest # [
     callback :cbVrS8, [ ], :char
     callback :cbVrU8, [ ], :uchar
     callback :cbVrS16, [ ], :short
@@ -19,7 +19,7 @@ module FFISpecs
     callback :cbIrV, [ :int ], :void
     callback :cbLrV, [ :long ], :void
     callback :cbULrV, [ :ulong ], :void
-    callback :cbLrV, [ :long_long ], :void
+    callback :cbLLrV, [ :long_long ], :void  # bug in spec was duplicate of cbLrV
 
     attach_function :testCallbackVrS8, :testClosureVrB, [ :cbVrS8 ], :char
     attach_function :testCallbackVrU8, :testClosureVrB, [ :cbVrU8 ], :uchar
@@ -33,21 +33,25 @@ module FFISpecs
     attach_function :testCallbackVrU64, :testClosureVrLL, [ :cbVrU64 ], :ulong_long
     attach_function :testCallbackVrP, :testClosureVrP, [ :cbVrP ], :pointer
     attach_function :testCallbackCrV, :testClosureBrV, [ :cbCrV, :char ], :void
-    attach_variable :cbVrS8, :gvar_pointer, :cbVrS8
-    attach_variable :pVrS8, :gvar_pointer, :pointer
+# maglev no support for attach_variable yet
+#    attach_variable :cbVrS8, :gvar_pointer, :cbVrS8
+#    attach_variable :pVrS8, :gvar_pointer, :pointer
     attach_function :testGVarCallbackVrS8, :testClosureVrB, [ :pointer ], :char
     attach_function :testOptionalCallbackCrV, :testOptionalClosureBrV, [ :cbCrV, :char ], :void
 
-    attach_function :testCallbackVrS8, :testClosureVrB, [ callback([ ], :char) ], :char
+# maglev, anonymous callback not supported yet
+#    attach_function :testCallbackVrS8, :testClosureVrB, [ callback([ ], :char) ], :char
+    attach_function :testCallbackVrS8, :testClosureVrB, [  :cbVrS8 ], :char
 
-    callback :cb_return_type, [ :int ], :int
-    callback :cb_lookup, [ ], :cb_return_type
-    attach_function :testReturnsCallback, :testReturnsClosure, [ :cb_lookup, :int ], :int
+# maglev callback as  return type not implem yet
+#    callback( :cb_return_type, [ :int ], :int )
+#    callback( :cb_lookup, [ ], :cb_return_type )
+#    attach_function( :testReturnsCallback, :testReturnsClosure, [ :cb_lookup, :int ], :int )
+#
+#    callback( :funcptr, [ :int ], :int )
+#    attach_function( :testReturnsFunctionPointer, [  ], :funcptr )
 
-    callback :funcptr, [ :int ], :int
-    attach_function :testReturnsFunctionPointer, [  ], :funcptr
-
-    callback :cbS8rV, [ :char ], :void
+    # callback :cbS8rV, [ :char ], :void  # duplicates cbCrV
     callback :cbU8rV, [ :uchar ], :void
     callback :cbS16rV, [ :short ], :void
     callback :cbU16rV, [ :ushort ], :void
@@ -55,11 +59,11 @@ module FFISpecs
     callback :cbS32rV, [ :int ], :void
     callback :cbU32rV, [ :uint ], :void
 
-    callback :cbLrV, [ :long ], :void
-    callback :cbULrV, [ :ulong ], :void
+#    callback :cbLrV, [ :long ], :void  # duplicate callback type
+#    callback :cbULrV, [ :ulong ], :void  # duplicate callback type
 
     callback :cbS64rV, [ :long_long ], :void
-    attach_function :testCallbackCrV, :testClosureBrV, [ :cbS8rV, :char ], :void
+    # attach_function :testCallbackCrV, :testClosureBrV, [ :cbS8rV, :char ], :void # duplicate defn of testCallbackCrV
     attach_function :testCallbackU8rV, :testClosureBrV, [ :cbU8rV, :uchar ], :void
     attach_function :testCallbackSrV, :testClosureSrV, [ :cbS16rV, :short ], :void
     attach_function :testCallbackU16rV, :testClosureSrV, [ :cbU16rV, :ushort ], :void
@@ -70,7 +74,7 @@ module FFISpecs
     attach_function :testCallbackULrV, :testClosureULrV, [ :cbULrV, :ulong ], :void
 
     attach_function :testCallbackLLrV, :testClosureLLrV, [ :cbS64rV, :long_long ], :void
-  end
+  end # ]
 
   #
   # Enum fixtures
@@ -81,7 +85,8 @@ module FFISpecs
 
   module TestEnum1
     extend FFI::Library
-    ffi_lib LIBRARY
+    lx = LIBRARY
+    ffi_lib( lx )
 
     enum [:c1, :c2, :c3, :c4]
     enum [:c5, 42, :c6, :c7, :c8]
@@ -120,6 +125,7 @@ module FFISpecs
     attach_function :ptr_from_address, [ FFI::Platform::ADDRESS_SIZE == 32 ? :uint : :ulong_long ], :pointer
   end
 
+if false # Maglev , ManagedStruct not impl yet
   class NoRelease < ManagedStruct
     layout :i, :int
   end
@@ -149,6 +155,7 @@ module FFISpecs
       end
     end
   end
+end # Maglev
 
   #
   # Number fixtures
@@ -182,14 +189,16 @@ module FFISpecs
     'sL' => [ 0x1f2e3d4c ],
     'uL' => [ 0xf7e8d9ca ],
     's64' => [ 0x1eafdeadbeefa1b2 ],
-    #'f32' => [ 1.234567 ], # TODO: Why is this disabled?
+    'f32' => [ 1.234567 ],  
     'f64' => [ 9.87654321 ]
   }
 
   TYPE_MAP = {
     's8' => :char, 'u8' => :uchar, 's16' => :short, 'u16' => :ushort,
     's32' => :int, 'u32' => :uint, 's64' => :long_long, 'u64' => :ulong_long,
-    'sL' => :long, 'uL' => :ulong, 'f32' => :float, 'f64' => :double
+    'sL' => :long, 'uL' => :ulong, 
+    'f32' => :float,    
+     'f64' => :double
   }
   TYPES = TYPE_MAP.keys
 
@@ -227,6 +236,7 @@ module FFISpecs
     end
   end
 
+if false # Maglev, Pointer not impl
   require 'delegate'
   class PointerDelegate < DelegateClass(FFI::Pointer)
     def initialize(ptr)
@@ -237,6 +247,7 @@ module FFISpecs
       @ptr
     end
   end
+end
 
   class AutoPointerTestHelper
     @@count = 0
@@ -304,7 +315,9 @@ module FFISpecs
     attach_function :ptr_ret_int32_t, [ :pointer, :int ], :int
     attach_function :ptr_from_address, [ :ulong ], :pointer
     attach_function :string_equals, [ :string, :string ], :int
-    [ 's8', 's16', 's32', 's64', 'f32', 'f64', 'long' ].each do |t|
+    aa = [ 's8', 's16', 's32', 's64', 'f32', 'f64', 'long' ]
+
+    aa.each do |t|
       attach_function "struct_align_#{t}", [ :pointer ], StructTypes[t]
     end
   end
@@ -314,23 +327,23 @@ module FFISpecs
   end
 
   class StringMember < FFI::Struct
+    sx = self
     layout :string, :string
   end
 
-  module CallbackMember
-    extend FFI::Library
-    ffi_lib LIBRARY
-    callback :add, [ :int, :int ], :int
-    callback :sub, [ :int, :int ], :int
+# module CallbackMember # maglev, callback as field of struct not implem yet
+#   extend FFI::Library
+#   ffi_lib LIBRARY
+#   callback( :add, [ :int, :int ], :int )
+#   callback( :sub, [ :int, :int ], :int )
 
-    class TestStruct < FFI::Struct
-      layout :add, :add,
-        :sub, :sub
-    end
+#   class TestStruct < FFI::Struct
+#     layout( :add, :add, :sub, :sub )
+#   end
 
-    attach_function :struct_call_add_cb, [TestStruct, :int, :int], :int
-    attach_function :struct_call_sub_cb, [TestStruct, :int, :int], :int
-  end
+#   attach_function( :struct_call_add_cb, [TestStruct, :int, :int], :int )
+#   attach_function( :struct_call_sub_cb, [TestStruct, :int, :int], :int )
+# end
 
   module LibTest
     class NestedStruct < FFI::Struct
@@ -384,10 +397,9 @@ module FFISpecs
       's32' => [:int, :i, 0xff00],
       's64' => [:long_long, :j, 0xffff00],
       'long' => [:long, :l, 0xffff],
-      'f32' => [:float, :f, 1.0001],
+      'f32' => [:float, :f, 1.0001], 
       'f64' => [:double, :d, 1.000000001]
     }
-
     class TestUnion < FFI::Union
       layout( :a, [:char, 10],
               :i, :int, 
@@ -428,11 +440,12 @@ module FFISpecs
       'f' => [ 1.23456789 ],
       'd' => [ 9.87654321 ]
     }
-
     TYPE_MAP = {
       'c' => :char, 'C' => :uchar, 's' => :short, 'S' => :ushort,
       'i' => :int, 'I' => :uint, 'j' => :long_long, 'J' => :ulong_long,
-      'l' => :long, 'L' => :ulong, 'f' => :float, 'd' => :double
+      'l' => :long, 'L' => :ulong, 
+      'f' => :float,
+      'd' => :double
     }
   end
 end

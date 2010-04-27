@@ -1,5 +1,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+# Maglev, ENV.clear not supported, so Environment never empty
+
 describe "ENV.empty?" do
 
   it "return true if the Environment is empty" do

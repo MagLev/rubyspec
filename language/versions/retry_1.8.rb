@@ -6,7 +6,8 @@ describe "The retry statement" do
   end
 
   # block retry has been officially deprecated by matz and is unsupported in 1.9
-  not_compliant_on :rubinius, :jruby do
+  # Maglev  not supported, raises   LocalJumpError, retry outside of rescue clause
+  not_compliant_on :rubinius, :jruby , :maglev do
     it "re-executes the entire enumeration" do
       list = []
       [1,2,3].each do |x|

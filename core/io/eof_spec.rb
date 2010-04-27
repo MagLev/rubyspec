@@ -79,10 +79,12 @@ describe "IO#eof?" do
     lambda { IOSpecs.closed_io.eof? }.should raise_error(IOError)
   end
 
+not_compliant_on :maglev do  # maglev, close_read not implemented
   it "raises IOError on stream closed for reading by close_read" do
     @io.close_read
     lambda { @io.eof? }.should raise_error(IOError)
   end
+end
 
   it "returns true on one-byte stream after single-byte read" do
     File.open(File.dirname(__FILE__) + '/fixtures/one_byte.txt') { |one_byte|
@@ -91,6 +93,7 @@ describe "IO#eof?" do
     }
   end
 
+ if false # Maglev IO.pipe not implem
   it "returns true on receiving side of Pipe when writing side is closed" do
     r, w = IO.pipe
     w.close
@@ -108,4 +111,5 @@ describe "IO#eof?" do
     r.eof?.should == true
     r.close
   end
+ end # maglev
 end

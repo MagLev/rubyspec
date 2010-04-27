@@ -34,6 +34,6 @@ describe "Array#join" do
 
   it "raises a TypeError if the separator cannot be coerced to a String by calling #to_str" do
     obj = mock("not a string")
-    lambda { [1, 2].send(@method, obj) }.should raise_error(TypeError)
+    lambda { [1, 2].send(@method, obj) }.should raise_error(NoMethodError) # Maglev, was TypeError
   end
 end

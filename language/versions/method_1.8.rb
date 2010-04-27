@@ -38,6 +38,7 @@ describe "Calling a method" do
     b.should == nil
   end
 
+# Maglev bugs
   it "with splat operator * and non-Array value attempts to coerce it to Array if the object respond_to?(:to_ary)" do
     def fooP3(a,b,c); a+b+c end
     def fooP4(a,b,c,d); a+b+c+d end
@@ -46,11 +47,12 @@ describe "Calling a method" do
     class << obj
       def to_ary; [2,3,4] end
     end
-    fooP3(*obj).should == 9
-    fooP4(1,*obj).should == 10
+    fooP3(*obj).should == 9  # Maglev bug , too few args
+    fooP4(1,*obj).should == 10  # Maglev bug , too few args
   end
 
   it "with splat operator * and non-Array value uses value unchanged if it does not respond_to?(:to_ary)" do
+    # Maglev, this spec works with RubyParser only
     def fooP0R(*args); args.length end
 
     obj = Object.new

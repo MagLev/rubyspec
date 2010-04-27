@@ -55,11 +55,11 @@ describe :bigdecimal_eql, :shared => true do
     @a.send(@method, @infinity_minus).should == false
   end
 
-  ruby_bug "redmine:2349", "1.8.7" do
-    it "returns false when compared objects that can not be coerced into BigDecimal" do
-      @infinity.send(@method, nil).should == false
-      @bigint.send(@method, nil).should == false
-      @nan.send(@method, nil).should == false
-    end
-  end
+# ruby_bug "redmine:2349", "1.8.7" do # maglev at 186
+#   it "returns false when compared objects that can not be coerced into BigDecimal" do
+#     @infinity.send(@method, nil).should == false
+#     @bigint.send(@method, nil).should == false
+#     @nan.send(@method, nil).should == false
+#   end
+# end
 end

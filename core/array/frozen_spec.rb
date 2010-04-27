@@ -11,10 +11,12 @@ describe "Array#frozen?" do
 
   not_compliant_on :rubinius do
     ruby_version_is "" .. "1.9" do
-      it "returns true for an array being sorted by #sort!" do
+     not_compliant_on :maglev do  # Maglev does not freeze the array during sort!
+      it "returns true for an array being sorted by #sort!" do #
         a = [1, 2, 3]
         a.sort! { |x,y| a.frozen?.should == true; x <=> y }
       end
+     end
     end
 
     ruby_version_is "1.9" do

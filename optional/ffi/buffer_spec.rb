@@ -4,10 +4,13 @@ FFISpecs::LongSize = FFI::Platform::LONG_SIZE / 8
 
 describe "FFI::Buffer#total" do
   [1,2,3].each do |i|
-    { :char => 1, :uchar => 1, :short => 2, :ushort => 2, :int => 4,
+    h = { :char => 1, :uchar => 1, :short => 2, :ushort => 2, :int => 4,
       :uint => 4, :long => FFISpecs::LongSize, :ulong => FFISpecs::LongSize,
-      :long_long => 8, :ulong_long => 8, :float => 4, :double => 8
-    }.each_pair do |t, s|
+      :long_long => 8, :ulong_long => 8, 
+      :float => 4,
+       :double => 8
+    }
+    h.each_pair do |t, s|
       it "FFI::Buffer.alloc_in(#{t}, #{i}).total == #{i * s}" do
         FFI::Buffer.alloc_in(t, i).total.should == i * s
       end
@@ -142,6 +145,7 @@ describe "Reading/Writing binary strings" do
 
   it "FFI::Buffer#put_bytes with index and length" do
     str = "hello\0world"
+    bx = str[5..-1]
     buf = FFI::Buffer.new 1024
     buf.put_bytes(0, str, 5, 6);
     s2 = buf.get_bytes(0, 6);
@@ -204,11 +208,11 @@ end
 describe "FFI::Buffer#put_pointer" do
   it "put_pointer(0, p).get_pointer(0) == p" do
     p = FFI::MemoryPointer.new :ulong_long
-    p.put_uint(0, 0xdeadbeef)
+    p.put_ulong(0, 0xdeadbeef)
     buf = FFI::Buffer.alloc_inout 8
     p2 = buf.put_pointer(0, p).get_pointer(0)
     p2.should_not be_nil
+    (ax = p2.get_ulong(0)).should == 0xdeadbeef	# Maglev debugging
     p2.should == p
-    p2.get_uint(0).should == 0xdeadbeef
   end
 end

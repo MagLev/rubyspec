@@ -46,13 +46,14 @@ describe "String#center with length, padding" do
     "radiology".center(8, '-').should == "radiology"
   end
 
-  it "taints result when self or padstr is tainted" do
-    "x".taint.center(4).tainted?.should == true
-    "x".taint.center(0).tainted?.should == true
-    "".taint.center(0).tainted?.should == true
-    "x".taint.center(4, "*").tainted?.should == true
-    "x".center(4, "*".taint).tainted?.should == true
-  end
+# Maglev, no taint propagatation
+# it "taints result when self or padstr is tainted" do
+#   "x".taint.center(4).tainted?.should == true
+#   "x".taint.center(0).tainted?.should == true
+#   "".taint.center(0).tainted?.should == true
+#   "x".taint.center(4, "*").tainted?.should == true
+#   "x".center(4, "*".taint).tainted?.should == true
+# end
   
   it "calls #to_int to convert length to an integer" do
     "_".center(3.8, "^").should == "^_^"

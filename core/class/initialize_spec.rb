@@ -38,6 +38,7 @@ describe "Class#new" do
 end
 
 describe "Class#initialize" do
+ not_compliant_on :maglev do #  we do not raise errors yet
   it "raises a TypeError when called on already initialized classes" do
     lambda{
       Fixnum.send :initialize
@@ -47,6 +48,7 @@ describe "Class#initialize" do
       Object.send :initialize
     }.should raise_error(TypeError)
   end
+ end #
 
   ruby_version_is "1.9" do
     # See [redmine:2601]

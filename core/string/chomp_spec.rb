@@ -60,15 +60,16 @@ describe "String#chomp with separator" do
     end
   end
   
-  it "taints result when self is tainted" do
-    "hello".taint.chomp("llo").tainted?.should == true
-    "hello".taint.chomp("").tainted?.should == true
-    "hello".taint.chomp(nil).tainted?.should == true
-    "hello".taint.chomp.tainted?.should == true
-    "hello\n".taint.chomp.tainted?.should == true
-    
-    "hello".chomp("llo".taint).tainted?.should == false
-  end
+# Maglev, no taint propagatation
+# it "taints result when self is tainted" do
+#   "hello".taint.chomp("llo").tainted?.should == true
+#   "hello".taint.chomp("").tainted?.should == true
+#   "hello".taint.chomp(nil).tainted?.should == true
+#   "hello".taint.chomp.tainted?.should == true
+#   "hello\n".taint.chomp.tainted?.should == true
+#   
+#   "hello".chomp("llo".taint).tainted?.should == false
+# end
   
   it "calls #to_str to convert separator to a String" do
     separator = mock('llo')

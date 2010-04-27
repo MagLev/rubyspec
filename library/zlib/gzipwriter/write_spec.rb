@@ -17,7 +17,8 @@ describe "GzipWriter#write" do
     end
 
     # skip gzip header for now
-    @io.string[10..-1].should == @zip[10..-1]
+    #@io.string[10..-1].should == @zip[10..-1]
+    @io.string[12..-1].should == @zip[10..-1]  # maglev gzip header variations
   end
 
 end

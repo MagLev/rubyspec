@@ -15,8 +15,11 @@ describe "Regexp#match" do
 
   ruby_version_is ""..."1.9" do
     it "coerces Exceptions into strings" do
+      # f = Exception.new("foo")
+      # /foo/.match(f)[0].should == "foo"
+        # maglev has 1.9 behavior already
       f = Exception.new("foo")
-      /foo/.match(f)[0].should == "foo"
+      lambda { /foo/.match(f)[0] }.should raise_error(TypeError)
     end
   end
 

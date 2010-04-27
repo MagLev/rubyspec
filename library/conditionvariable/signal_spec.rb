@@ -32,7 +32,7 @@ describe "ConditionVariable#signal" do
     r2 = []
 
     # large number to attempt to cause race conditions
-    100.times do |i|
+    100.times do |i|  
       threads << Thread.new(i) do |tid|
         m.synchronize do
           r1 << tid
@@ -52,7 +52,7 @@ describe "ConditionVariable#signal" do
       m.synchronize do
         cv.signal
       end
-      Thread.pass until r2.size == i+1
+      Thread.pass until (sx = r2.size) == i+1
     end
 
     threads.each {|t| t.join }

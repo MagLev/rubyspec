@@ -30,11 +30,15 @@ describe "File.umask" do
     end
   end
 
+# Maglev gives RangeError if value < 0 or > 0777
   it "always succeeds with any integer values" do
-    vals = [-2**30, -2**16, -2**8, -2,
-      -1.5, -1, 0.5, 0, 1, 2, 7.77777, 16, 32, 64, 2**8, 2**16, 2**30]
+    vals = [ 0.5, 0, 1, 2, 7.77777, 16, 32, 64, 2**8 ] # Maglev
     vals.each { |v|
       lambda { File.umask(v) }.should_not raise_error
+    }
+    vals = [-2**30, -2**16, -2**8, -2, -1.5, -1, 2**16, 2**30]  # Maglev
+    vals.each { |v|
+      lambda { File.umask(v) }.should raise_error(RangeError)  # Maglev
     }
   end
 

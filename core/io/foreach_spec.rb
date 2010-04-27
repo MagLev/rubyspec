@@ -37,9 +37,11 @@ describe "IO.foreach" do
       ScratchPad.recorded.should == IOSpecs.lines
     end
 
+   not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
       IO.foreach(@name) { $..should == @count += 1 }
     end
+   end
   end
 
   describe "with nil as the separator argument" do
@@ -48,9 +50,15 @@ describe "IO.foreach" do
       ScratchPad.recorded.should == [IOSpecs.lines.join]
     end
 
+   not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
-      IO.foreach(@name, nil) { $..should == @count += 1 }
+      count = 1
+      IO.foreach(@name, nil) { 
+        $..should == count  # maglev $.  not implem yet
+        count += 1
+      }
     end
+   end #
   end
 
   describe "with an empty String as the separator argument" do
@@ -59,9 +67,11 @@ describe "IO.foreach" do
       ScratchPad.recorded.should == IOSpecs.lines_empty_separator
     end
 
+   #not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
       IO.foreach(@name, "") { $..should == @count += 1 }
     end
+   #end
   end
 
   describe "with an arbitrary String as the separator argument" do
@@ -70,15 +80,17 @@ describe "IO.foreach" do
       ScratchPad.recorded.should == IOSpecs.lines_r_separator
     end
 
+   #not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
       IO.foreach(@name, "la") { $..should == @count += 1 }
     end
-
+   #end
+   not_compliant_on :maglev do # maglev non-ASCII separator not implem
     it "accepts non-ASCII data as separator" do
       IO.foreach(@name, "\303\250") { |l| ScratchPad << l }
       ScratchPad.recorded.should == IOSpecs.lines_arbitrary_separator
     end
-
+   end #
   end
 
   describe "with an object as the separator argument" do
@@ -107,7 +119,8 @@ describe "IO.foreach" do
     end
   end
 
-  describe "when the filename starts with |" do
+not_compliant_on :maglev do
+  describe "when the filename starts with |" do #
     it "gets data from the standard out of the subprocess" do
       IO.foreach("|sh -c 'echo hello;echo line2'") { |l| ScratchPad << l }
       ScratchPad.recorded.should == ["hello\n", "line2\n"]
@@ -127,5 +140,6 @@ describe "IO.foreach" do
       end
     end
   end
+end #
 
 end

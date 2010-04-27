@@ -3,10 +3,12 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe FFI::Library, "#attach_function" do
   before :all do
     @klass = Class.new(FFI::Struct)
-    @klass.layout :tv_sec, :ulong, 0, :tv_usec, :ulong, 4
+    #@klass.layout :tv_sec, :ulong, 0, :tv_usec, :ulong, 4
+    @klass.layout :tv_sec, :ulong, 0, :tv_usec, :ulong, 8 # maglev,  longs are 8 bytes
 
     @libc = Module.new do
       extend FFI::Library
+      ffi_lib('libc.so') # maglev needs
       attach_function :gettimeofday, [:pointer, :pointer], :int
     end
   end

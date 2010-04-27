@@ -9,7 +9,8 @@ describe :rational_to_i, :shared => true do
 
   ruby_bug "#", "1.8.6" do
     it "converts self to an Integer by truncation" do
-      Rational(-7, 4).to_i.should eql(-1)
+      Rational(-7, 4).to_i.should eql(-1) # 1.8.7 behavior
+      # Rational(-7, 4).to_i.should eql(-2)   # 1.8.6
     end
   end
 end

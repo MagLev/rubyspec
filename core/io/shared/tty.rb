@@ -12,7 +12,9 @@ describe :io_tty, :shared => true do
     File.open(__FILE__) {|f| f.send @method }.should == false
   end
 
-  it "raises IOError on closed stream" do
+ not_compliant_on :maglev do 
+  it "raises IOError on closed stream" do #
     lambda { IOSpecs.closed_io.send @method }.should raise_error(IOError)
   end
+ end #
 end

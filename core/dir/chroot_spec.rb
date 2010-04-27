@@ -3,12 +3,13 @@ require File.expand_path('../fixtures/common', __FILE__)
 require File.expand_path('../shared/chroot', __FILE__)
 
 platform_is_not :windows do
-  not_supported_on :jruby do
+  not_supported_on :jruby , :maglev do
     as_superuser do
       describe "Dir.chroot as root" do
         it_behaves_like :dir_chroot_as_root, :chroot
       end
     end
+  end #
 
     platform_is_not :os => :cygwin do
       as_user do
@@ -22,11 +23,11 @@ platform_is_not :windows do
           end
 
           it "raises an Errno::EPERM exception if the directory exists" do
-            lambda { Dir.chroot('.') }.should raise_error(Errno::EPERM)
+            lambda { Dir.chroot('.') }.should raise_error(SecurityError) # Maglev deviation, was (Errno::EPERM)
           end
 
           it "raises a SystemCallError if the directory doesn't exist" do
-            lambda { Dir.chroot('xgwhwhsjai2222jg') }.should raise_error(SystemCallError)
+            lambda { Dir.chroot('xgwhwhsjai2222jg') }.should raise_error(SecurityError) # Maglev deviation, was SystemCallError
           end
 
           ruby_version_is "1.9" do
@@ -47,5 +48,5 @@ platform_is_not :windows do
         end
       end
     end
-  end
+# end
 end

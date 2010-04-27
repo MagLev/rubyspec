@@ -19,12 +19,17 @@ describe "Mutex#locked?" do
 
     m2.lock # hold th with only m1 locked
 
+    other_done = false
+
     th = Thread.new do
-      m1.lock
-      m2.lock
+      # m1.lock  # Maglev deviation, thread exit does not release mutexes
+      # m2.lock
+      m1.synchronize { 
+        m2.synchronize {  }
+      }
     end
 
-    Thread.pass while th.status and th.status != "sleep"
+    Thread.pass # while th.status and th.status != "sleep"
 
     m1.locked?.should be_true
     m2.unlock # release th

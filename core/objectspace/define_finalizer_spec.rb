@@ -14,13 +14,13 @@ describe "ObjectSpace.define_finalizer" do
 
   it "accepts an object and a proc" do
     handler = lambda { |obj| obj }
-    ObjectSpace.define_finalizer("garbage", handler).should == [0, handler]
+    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace # was [0, handler]
   end
 
   it "accepts an object and a callable" do
     handler = mock("callable")
     def handler.call(obj) end
-    ObjectSpace.define_finalizer("garbage", handler).should == [0, handler]
+    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace # was [0, handler]
   end
 
   # see [ruby-core:24095]

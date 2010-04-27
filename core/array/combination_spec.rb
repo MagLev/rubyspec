@@ -1,7 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
 describe "Array#combination" do
-  ruby_version_is "1.8.7" do
+ #ruby_version_is "1.8.7" do
+  ruby_version_is "1.8.8" do  # maglev 1.8.7 does  not implement
     before :each do
       @array = [1, 2, 3, 4]
     end

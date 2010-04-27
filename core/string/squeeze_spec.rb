@@ -61,6 +61,7 @@ describe "String#squeeze" do
     end
   end
 
+ not_compliant_on :maglev do # Maglev no taint prop.
   it "taints the result when self is tainted" do
     "hello".taint.squeeze("e").tainted?.should == true
     "hello".taint.squeeze("a-z").tainted?.should == true
@@ -68,6 +69,7 @@ describe "String#squeeze" do
     "hello".squeeze("e".taint).tainted?.should == false
     "hello".squeeze("l".taint).tainted?.should == false
   end
+ end
 
   it "tries to convert each set arg to a string using to_str" do
     other_string = mock('lo')

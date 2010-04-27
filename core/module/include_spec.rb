@@ -2,35 +2,37 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Module#include" do
-  it "calls #append_features(self) in reversed order on each module" do
-    $appended_modules = []
+# Pickaxe documents append_features as deprecated , Maglev does not implement append_features
+# it "calls #append_features(self) in reversed order on each module" do
+#   $appended_modules = []
 
-    m = Module.new do
-      def self.append_features(mod)
-        $appended_modules << [ self, mod ]
-      end
-    end
+#   m = Module.new do
+#     def self.append_features(mod)
+#       $appended_modules << [ self, mod ]
+#     end
+#   end
 
-    m2 = Module.new do
-      def self.append_features(mod)
-        $appended_modules << [ self, mod ]
-      end
-    end
+#   m2 = Module.new do
+#     def self.append_features(mod)
+#       $appended_modules << [ self, mod ]
+#     end
+#   end
 
-    m3 = Module.new do
-      def self.append_features(mod)
-        $appended_modules << [ self, mod ]
-      end
-    end
+#   m3 = Module.new do
+#     def self.append_features(mod)
+#       $appended_modules << [ self, mod ]
+#     end
+#   end
 
-    c = Class.new { include(m, m2, m3) }
+#   c = Class.new { include(m, m2, m3) }
 
-    $appended_modules.should == [ [ m3, c], [ m2, c ], [ m, c ] ]
-  end
+#   $appended_modules.should == [ [ m3, c], [ m2, c ], [ m, c ] ]
+# end
 
   it "adds all ancestor modules when a previously included module is included again" do
-    ModuleSpecs::MultipleIncludes.ancestors.should include(ModuleSpecs::MA, ModuleSpecs::MB)
-    ModuleSpecs::MB.send(:include, ModuleSpecs::MC)
+    (mm = ModuleSpecs::MultipleIncludes).ancestors.should include( (ma = ModuleSpecs::MA), 
+			(mb = ModuleSpecs::MB))
+    ModuleSpecs::MB.send(:include, (mc = ModuleSpecs::MC))
     ModuleSpecs::MultipleIncludes.send(:include, ModuleSpecs::MB)
     ModuleSpecs::MultipleIncludes.ancestors.should include(ModuleSpecs::MA, ModuleSpecs::MB, ModuleSpecs::MC)
   end
@@ -68,7 +70,7 @@ describe "Module#include" do
   ruby_version_is ""..."1.9" do
     it "imports instance methods to modules and classes" do
       ModuleSpecs::A.instance_methods.should include("ma")
-      ModuleSpecs::B.instance_methods.should include("ma","mb")
+      (bx = ModuleSpecs::B).instance_methods.should include("ma","mb")
       ModuleSpecs::C.instance_methods.should include("ma","mb")
     end
   end
@@ -88,10 +90,11 @@ describe "Module#include" do
 
   ruby_version_is ""..."1.9" do
     it "does not import methods to modules and classes" do
-      ModuleSpecs::A.methods.include?("cma").should == true
-      ModuleSpecs::B.methods.include?("cma").should == false
+      (ma = ModuleSpecs::A)	# Maglev debugging
+      (mam = ma.methods).include?("cma").should == true
+      (mb = ModuleSpecs::B).methods.include?("cma").should == false
       ModuleSpecs::B.methods.include?("cmb").should == true
-      ModuleSpecs::C.methods.include?("cma").should == false
+      (mc = ModuleSpecs::C).methods.include?("cma").should == false
       ModuleSpecs::C.methods.include?("cmb").should == false
     end
   end
@@ -182,13 +185,15 @@ describe "Module#include" do
     end
   end
 
-  it "detects cyclic includes" do
+ not_compliant_on :maglev do #  Maglev no exception, would conflict with include-self implementation
+  it "detects cyclic includes" do #
     lambda {
       module ModuleSpecs::M
         include ModuleSpecs::M
       end
     }.should raise_error(ArgumentError)
   end
+ end #
 
   it "accepts no-arguments" do
     lambda {
@@ -265,6 +270,7 @@ describe "Module#include?" do
 
   it "raises a TypeError when no module was given" do
     lambda { ModuleSpecs::Child.include?("Test") }.should raise_error(TypeError)
-    lambda { ModuleSpecs::Child.include?(ModuleSpecs::Parent) }.should raise_error(TypeError)
+    ma = nil
+    lambda { ModuleSpecs::Child.include?( (ma = ModuleSpecs::Parent) ) }.should raise_error(TypeError)
   end
 end

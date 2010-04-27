@@ -57,7 +57,6 @@ describe "Module#define_method" do
 
   it "calls #method_added after the method is added to the Module" do
     DefineMethodSpecClass.should_receive(:method_added).with(:test_ma)
-
     class DefineMethodSpecClass
       define_method(:test_ma) { true }
     end
@@ -125,7 +124,9 @@ describe "Module#define_method" do
     klass.new.string_test.should == "string_test result"
   end
 
-  it "is private" do
+ not_compliant_on :maglev do #
+  it "is private" do 
     Module.should have_private_instance_method(:define_method)
   end
+ end #
 end

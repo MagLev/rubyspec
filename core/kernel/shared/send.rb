@@ -95,7 +95,7 @@ describe :kernel_send, :shared => true do
     end
   end
 
-  not_compliant_on :rubinius do
+  not_compliant_on :rubinius , :maglev  do
     # Confirm commit r24306
     it "has an arity of -1" do
       method(:__send__).arity.should == -1
@@ -105,6 +105,11 @@ describe :kernel_send, :shared => true do
   deviates_on :rubinius do
     it "has an arity of -2" do
       method(:__send__).arity.should == -2
+    end
+  end
+  deviates_on :maglev do
+    it "has an arity of 3" do
+      method(:__send__).arity.should == 3
     end
   end
 end

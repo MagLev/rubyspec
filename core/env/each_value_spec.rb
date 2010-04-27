@@ -6,14 +6,16 @@ describe "ENV.each_value" do
     e = []
     orig = ENV.to_hash
     begin
-      ENV.clear
+      # ENV.clear # Maglev, not supported
       ENV["1"] = "3"
       ENV["2"] = "4"
       ENV.each_value { |v| e << v }
       e.should include("3")
       e.should include("4")
     ensure
-      ENV.replace orig
+      # ENV.replace orig
+      ENV["1"] = "" # Maglev
+      ENV["2"] = ""
     end
   end
 

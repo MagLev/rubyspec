@@ -30,20 +30,24 @@
 int 
 string_equals(const char* s1, const char* s2)
 {
-    return strcmp(s1, s2) == 0;
+    int res = strcmp(s1, s2) == 0;
+    return res;
 }
 
 void 
 string_set(char* s1, const char* s2)
 {
     strcpy(s1, s2);
+    return;
 }
 void
 string_concat(char* dst, const char* src)
 {
     strcat(dst, src);
+    return;
 }
 void
 string_dummy(char* dummy)
 {
+   return;
 }

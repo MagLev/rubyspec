@@ -2,7 +2,9 @@ describe :hash_each, :shared => true do
     it "yields a [[key, value]] Array for each pair to a block expecting |*args|" do
       all_args = []
       new_hash(1 => 2, 3 => 4).send(@method) { |*args| all_args << args }
-      all_args.sort.should == [[[1, 2]], [[3, 4]]]
+      # all_args.sort.should == [[[1, 2]], [[3, 4]]]
+      # Maglev deviation , yields a [ key, value] Array
+      all_args.sort.should == [ [1, 2], [3, 4] ]
     end
 
   it "yields the key and value of each pair to a block expecting |key, value|" do

@@ -31,14 +31,15 @@ describe "String#+" do
     ("hello" + StringSpecs::MyString.new("")).should be_kind_of(String)
   end
 
-  it "taints the result when self or other is tainted" do
-    strs = ["", "OK", StringSpecs::MyString.new(""), StringSpecs::MyString.new("OK")]
-    strs += strs.map { |s| s.dup.taint }
-
-    strs.each do |str|
-      strs.each do |other|
-        (str + other).tainted?.should == (str.tainted? | other.tainted?)
-      end
-    end
-  end
+  # Maglev, no taint propagation
+# it "taints the result when self or other is tainted" do
+#   strs = ["", "OK", StringSpecs::MyString.new(""), StringSpecs::MyString.new("OK")]
+#   strs += strs.map { |s| s.dup.taint }
+#
+#   strs.each do |str|
+#     strs.each do |other|
+#       (str + other).tainted?.should == (str.tainted? | other.tainted?)
+#     end
+#   end
+# end
 end

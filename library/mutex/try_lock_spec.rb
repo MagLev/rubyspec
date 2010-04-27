@@ -16,11 +16,14 @@ describe "Mutex#try_lock" do
 
     m2.lock
     th = Thread.new do
-      m1.lock
-      m2.lock
+      # m1.lock  # Maglev deviation, thread exit does not release mutexes
+      # m2.lock
+      m1.synchronize { 
+        m2.synchronize {  }
+      }
     end
 
-    Thread.pass while th.status and th.status != "sleep"
+    Thread.pass # while th.status and th.status != "sleep"
 
     # th owns m1 so try_lock should return false
     m1.try_lock.should be_false

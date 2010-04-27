@@ -25,7 +25,8 @@ describe 'Zlib::Inflate#inflate' do
     unzipped.should == "\000" * 32 * 1024
   end
 
-  it 'works in pass-through mode, once finished' do
+ not_compliant_on :maglev do # 
+  it 'works in pass-through mode, once finished' do #
     data = "x\234c`\200\001\000\000\n\000\001"
 
     unzipped = @inflator.inflate data
@@ -38,6 +39,7 @@ describe 'Zlib::Inflate#inflate' do
     @inflator << ('uncompressed_data') << nil
     @inflator.finish.should == 'uncompressed_data'
   end
+ end
 
 end
 
@@ -59,17 +61,20 @@ describe 'Zlib::Inflate::inflate' do
     zipped.should == "\000" * 32 * 1024
   end
 
-  it 'properly handles data in chunks' do
+ not_compliant_on :maglev do
+  it 'properly handles data in chunks' do #
     data =  "x\234K\313\317\a\000\002\202\001E"
     z = Zlib::Inflate.new
     # add bytes, one by one
     result = ""
-    data.each_byte { |d| result << z.inflate(d.chr)}
+    data.each_byte { |d| result << z.inflate(d.chr) }
     result << z.finish
     result.should == "foo"
   end
+ end
 
-  it 'properly handles incomplete data' do
+ not_compliant_on :maglev do
+  it 'properly handles incomplete data' do #
     data =  "x\234K\313\317\a\000\002\202\001E"[0,5]
     z = Zlib::Inflate.new
     # add bytes, one by one, but not all
@@ -77,8 +82,10 @@ describe 'Zlib::Inflate::inflate' do
     data.each_byte { |d| result << z.inflate(d.chr)}
     lambda { result << z.finish }.should raise_error(Zlib::BufError)
   end
+ end
 
-  it 'properly handles excessive data, byte-by-byte' do
+ not_compliant_on :maglev do
+  it 'properly handles excessive data, byte-by-byte' do #
     main_data = "x\234K\313\317\a\000\002\202\001E"
     data =  main_data * 2
     result = ""
@@ -92,6 +99,7 @@ describe 'Zlib::Inflate::inflate' do
     # the second chunk is just passed through.
     result.should == "foo" + main_data
   end
+ end
 
   it 'properly handles excessive data, in one go' do
     main_data = "x\234K\313\317\a\000\002\202\001E"

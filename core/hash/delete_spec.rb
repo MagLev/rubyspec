@@ -22,8 +22,11 @@ describe "Hash#delete" do
 
   ruby_version_is "" ... "1.9" do
     it "raises a TypeError if called on a frozen instance" do
-      lambda { HashSpecs.frozen_hash.delete("foo")  }.should raise_error(TypeError)
-      lambda { HashSpecs.empty_frozen_hash.delete("foo") }.should raise_error(TypeError)
+      # Maglev, error only on actual modification
+      # lambda { HashSpecs.frozen_hash.delete("foo")  }.should raise_error(TypeError)
+      # lambda { HashSpecs.empty_frozen_hash.delete("foo") }.should raise_error(TypeError)
+      HashSpecs.frozen_hash.delete("foo").should == nil 
+      lambda { HashSpecs.frozen_hash.delete(3)  }.should raise_error(TypeError)
     end
   end
 

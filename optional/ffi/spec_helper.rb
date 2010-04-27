@@ -22,7 +22,7 @@ module FFISpecs
   if need_to_compile_fixtures?
     puts "[!] Compiling Ruby-FFI fixtures"
     Dir.chdir(File.dirname(FIXTURE_DIR)) do
-      unless system("make -f fixtures/GNUmakefile")
+      unless system("gmake -f fixtures/GNUmakefile") # Maglev, use gmake on solaris
         raise "Failed to compile Ruby-FFI fixtures"
       end
     end

@@ -17,7 +17,8 @@ describe "Time#_dump" do
 
       @local.gmt?.should == false
       dump = @local._dump.unpack("VV").first
-      ((dump >> 30) & 0x1).should == 0
+      # ((dump >> 30) & 0x1).should == 0
+      ((dump >> 30) & 0x1).should == 1 # maglev deviation, _dump always dumps in GMT form
     end
 
     it "dumps a Time object to a bytestring" do

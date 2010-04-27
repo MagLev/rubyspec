@@ -7,9 +7,6 @@ module ModuleSpecs
   class SubclassSpec
   end
 
-  class RemoveClassVariable
-  end
-
   module LookupModInMod
     INCS = :ethereal
   end
@@ -222,8 +219,11 @@ module ModuleSpecs
 
     Nesting[:basic] = Module.nesting
 
-    module ::ModuleSpecs
-      Nesting[:open_first_level] = Module.nesting
+    module ::ModuleSpecs			  #
+      Nesting[:open_first_level] = Module.nesting  #  Maglev bug here
+      # Maglev gets   [Object, ModuleSpecs::Nesting, ModuleSpecs]
+      #  correct is   [ModuleSpecs, ModuleSpecs::Nesting, ModuleSpecs]
+      #   problem in constantsLexicalPath implem  or  isColon3 uses .
     end
 
     class << self
@@ -302,7 +302,10 @@ module ModuleSpecs
   end
 
   class SubModule < Module
-    attr_reader :special
+    # attr_reader :special 
+    def special	# Maglev debugging
+      @special
+    end 
     def initialize
       @special = 10
     end

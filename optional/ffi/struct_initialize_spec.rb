@@ -15,7 +15,8 @@ describe FFI::Struct, ' with an initialize function' do
   end
 end
 
-describe FFI::ManagedStruct, ' with an initialize function' do
+if false # maglev, ManagedStruct not implem
+describe FFI::ManagedStruct, ' with an initialize function' do #
   it "should call the initialize function" do
     managed_struct_with_initialize = Class.new(FFI::ManagedStruct) do
       layout :string, :string
@@ -30,3 +31,4 @@ describe FFI::ManagedStruct, ' with an initialize function' do
     managed_struct_with_initialize.new.magic.should == 42
   end
 end
+end # maglev

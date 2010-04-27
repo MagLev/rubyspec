@@ -1,5 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require File.expand_path('../shared/mult', __FILE__)
+require File.expand_path('../shared/multiply_maglev', __FILE__)   # maglev deviations
 require 'bigdecimal'
 
 describe "BigDecimal#*" do

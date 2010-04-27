@@ -86,23 +86,24 @@ describe "Kernel#instance_variable_get when passed Fixnum" do
       end
     end
 
-    not_compliant_on :rubinius do
-      it "tries to convert the passed Integer to a Symbol and returns the instance variable that is referred by the Symbol" do
-        @obj.instance_variable_get(:@test.to_i).should == :test
-      end
+# Maglev not compliant  either
+#   not_compliant_on :rubinius do
+#     it "tries to convert the passed Integer to a Symbol and returns the instance variable that is referred by the Symbol" do
+#       @obj.instance_variable_get(:@test.to_i).should == :test
+#     end
 
-      it "outputs a warning" do
-        lambda { @obj.instance_variable_get(:@test.to_i) }.should complain(/#{"do not use Fixnums as Symbols"}/)
-      end
+#     it "outputs a warning" do
+#       lambda { @obj.instance_variable_get(:@test.to_i) }.should complain(/#{"do not use Fixnums as Symbols"}/)
+#     end
 
-      it "raises an ArgumentError when the passed Fixnum can't be converted to a Symbol" do
-        lambda { @obj.instance_variable_get(-10) }.should raise_error(ArgumentError)
-      end
+#     it "raises an ArgumentError when the passed Fixnum can't be converted to a Symbol" do
+#       lambda { @obj.instance_variable_get(-10) }.should raise_error(ArgumentError)
+#     end
 
-      it "raises a NameError when the Symbol does not start with an '@'" do
-        lambda { @obj.instance_variable_get(:test.to_i) }.should raise_error(NameError)
-      end
-    end
+#     it "raises a NameError when the Symbol does not start with an '@'" do
+#       lambda { @obj.instance_variable_get(:test.to_i) }.should raise_error(NameError)
+#     end
+#   end
   end
 
   ruby_version_is "1.9" do

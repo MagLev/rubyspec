@@ -2,6 +2,8 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 require File.expand_path('../shared/replace', __FILE__)
 
+# Maglev, do not run this file , PRIVATE  Hash#initialize_copy does not conform"
+
 describe "Hash#initialize_copy" do
   it "is private" do
     hash_class.should have_private_instance_method("initialize_copy")

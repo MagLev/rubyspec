@@ -6,6 +6,27 @@ require File.expand_path('../fixtures/classes.rb', __FILE__)
 #   String#[re] = obj
 #   String#[re, idx] = obj
 #   String#[str] = obj
+describe "simple missing tests" do
+  it 'String#[range] = obj' do
+    s = 'abcdefghijk'
+    s[3..5] = 'AB' 
+    s.should == 'abcABghijk'
+    s[4..6] = 'CDEFG'
+    s.should == 'abcACDEFGijk'
+  end
+  it 'String#[re] = obj' do
+    s = 'abcdefghijk'
+    s[/fgh/] = 'FFGH'
+    s.should == 'abcdeFFGHijk'
+  end
+# it 'String#[re, idx] = obj' do # TODO
+# end
+  it 'String#[str] = obj' do
+    s = 'abcdefghijk'
+    s['def'] = 'DD'
+    s.should == 'abcDDghijk'
+  end
+end
 
 ruby_version_is ""..."1.9" do
   describe "String#[]= with index" do
@@ -94,15 +115,16 @@ describe "String#[]= with String" do
     a.should == "bamelo"
   end
 
-  it "taints self if other_str is tainted" do
-    a = "hello"
-    a[0] = "".taint
-    a.tainted?.should == true
+# Maglev no taint propagation
+# it "taints self if other_str is tainted" do
+#   a = "hello"
+#   a[0] = "".taint
+#   a.tainted?.should == true
 
-    a = "hello"
-    a[0] = "x".taint
-    a.tainted?.should == true
-  end
+#   a = "hello"
+#   a[0] = "x".taint
+#   a.tainted?.should == true
+# end
 
   it "raises an IndexError without changing self if idx is outside of self" do
     str = "hello"
@@ -267,15 +289,16 @@ describe "String#[]= with index, count" do
     a.should == "hellobob"
   end
 
-  it "taints self if other_str is tainted" do
-    a = "hello"
-    a[0, 0] = "".taint
-    a.tainted?.should == true
+# Maglev no taint propagation
+# it "taints self if other_str is tainted" do
+#   a = "hello"
+#   a[0, 0] = "".taint
+#   a.tainted?.should == true
 
-    a = "hello"
-    a[1, 4] = "x".taint
-    a.tainted?.should == true
-  end
+#   a = "hello"
+#   a[1, 4] = "x".taint
+#   a.tainted?.should == true
+# end
 
   it "raises an IndexError if |idx| is greater than the length of the string" do
     lambda { "hello"[6, 0] = "bob"  }.should raise_error(IndexError)

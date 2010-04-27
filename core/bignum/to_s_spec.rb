@@ -6,7 +6,7 @@ describe "Bignum#to_s when given a base" do
     a.to_s(2).should == "10000000000000000000000000000000000000000000000000000000000000000" 
     a.to_s(8).should == "2000000000000000000000"
     a.to_s(16).should == "10000000000000000"
-    a.to_s(32).should == "g000000000000" 
+    a.to_s(32).should == "G000000000000" # Maglev, was "g000000000000" 
   end
   
   it "raises an ArgumentError if the base is less than 2 or higher than 36" do

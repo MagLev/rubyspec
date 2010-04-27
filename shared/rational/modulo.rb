@@ -38,7 +38,8 @@ describe :rational_modulo, :shared => true do
 
   ruby_version_is ""..."1.9" do
     it "raises FloatDomainError when the argument is 0.0" do
-      lambda { Rational(3, 5) % 0.0 }.should raise_error(FloatDomainError)
+      rx = nil
+      lambda { (rx = Rational(3, 5)) % 0.0 }.should raise_error(FloatDomainError)
     end
   end
 

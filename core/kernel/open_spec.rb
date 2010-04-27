@@ -14,9 +14,11 @@ describe "Kernel#open" do
     rm_r @name
   end
 
+ not_compliant_on :maglev do # not private yet
   it "is a private method" do
     Kernel.should have_private_instance_method(:open)
   end
+ end #
 
   it "opens a file when given a valid filename" do
     @file = open(@name)
@@ -29,6 +31,7 @@ describe "Kernel#open" do
   end
 
   platform_is_not :windows do
+   not_compliant_on :maglev do # IO pipes not implem
     it "opens an io when path starts with a pipe" do
       @io = open("|date")
       @io.should be_kind_of(IO)
@@ -38,6 +41,8 @@ describe "Kernel#open" do
       @output = open("|date") { |f| f.gets }
       @output.should_not == ''
     end
+   end #
+    
   end
 
   platform_is :windows do

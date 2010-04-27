@@ -21,6 +21,7 @@ describe "Numeric#singleton_method_added" do
     lambda do
       a = NumericSub.new
       def a.test; end
+      nil.pause
     end.should raise_error(TypeError)
     
     lambda do

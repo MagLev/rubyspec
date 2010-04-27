@@ -8,8 +8,13 @@ describe "Numeric#divmod" do
 
   ruby_version_is ""..."1.9" do
     it "returns [quotient, modulus], with quotient being obtained as in Numeric#div and modulus being obtained by calling self#% with other" do
-      @obj.should_receive(:/).with(10).and_return(13 - TOLERANCE)
-      @obj.should_receive(:%).with(10).and_return(3)
+      # Maglev, internal uses of / must use _divide() to avoid
+      #   infinite recursion after  math.n redefines quo and / for Rational
+
+      # @obj.should_receive(:/).with(10).and_return(13 - TOLERANCE)  
+      # @obj.should_receive(:%).with(10).and_return(3)
+      @obj.should_receive(:__divide).with(10).and_return(13 - TOLERANCE) # Maglev
+      @obj.should_receive(:-).with(120).and_return(3)  # Maglev uses 1.9 style algorithm
       
       @obj.divmod(10).should == [12, 3]
     end

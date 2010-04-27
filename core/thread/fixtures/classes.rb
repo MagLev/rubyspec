@@ -39,7 +39,7 @@ module ThreadSpecs
   def self.running_thread
     Thread.new do
       begin
-        loop {}
+        loop { Thread.pass }  # Maglev, yield to avoid hot loop
         ScratchPad.record :woken
       rescue Object => e
         ScratchPad.record e
@@ -57,7 +57,8 @@ module ThreadSpecs
   
   def self.status_of_running_thread
     t = running_thread
-    Thread.pass while t.status and t.status != "run"
+    # Maglev, other thread will be a sleep if not the current thread
+    Thread.pass while (v = t.status) and v != "run" and v != "sleep"
     status = Status.new t
     t.kill
     t.join
@@ -72,7 +73,7 @@ module ThreadSpecs
   
   def self.status_of_sleeping_thread
     t = sleeping_thread
-    Thread.pass while t.status and t.status != 'sleep'
+#    Thread.pass while t.status and t.status != 'sleep' 
     status = Status.new t
     t.run
     t.join
@@ -83,7 +84,7 @@ module ThreadSpecs
     m = Mutex.new
     m.lock
     t = Thread.new { m.lock }
-    Thread.pass while t.status and t.status != 'sleep'
+    Thread.pass while t.status and t.status != 'sleep' 
     status = Status.new t
     m.unlock
     t.join
@@ -91,20 +92,19 @@ module ThreadSpecs
   end
   
   def self.status_of_aborting_thread
-    t = Thread.new { begin; sleep; ensure; Thread.pass; end }
+    t = Thread.new { sleep }
     begin
       Thread.critical = true if Thread.respond_to? :critical
-      Thread.pass while t.status and t.status != 'sleep'
       t.kill
       Status.new t
     ensure
-      Thread.critical = false if Thread.respond_to? :critical
+      Thread.critical = false if Thread.respond_to? :critical     
     end
   end
   
   def self.status_of_killed_thread
     t = Thread.new { sleep }
-    Thread.pass while t.status and t.status != 'sleep'
+    Thread.pass while t.status and t.status != 'sleep' 
     t.kill
     t.join
     Status.new t
@@ -128,7 +128,7 @@ module ThreadSpecs
   
   def self.status_of_dying_sleeping_thread
     t = dying_thread_ensures { Thread.stop; }           
-    Thread.pass while t.status and t.status != 'sleep'
+    Thread.pass while t.status and t.status != 'sleep' 
     status = Status.new t
     t.wakeup
     t.join
@@ -138,9 +138,9 @@ module ThreadSpecs
   def self.dying_thread_ensures(kill_method_name=:kill)
     t = Thread.new do
       begin
-        Thread.current.send(kill_method_name)
+       Thread.current.send(kill_method_name)
       ensure
-        yield
+        yield 
       end
     end
   end
@@ -167,7 +167,7 @@ module ThreadSpecs
   
   def self.wakeup_dying_sleeping_thread(kill_method_name=:kill)
     t = ThreadSpecs.dying_thread_ensures(kill_method_name) { yield }
-    Thread.pass while t.status and t.status != 'sleep'
+    Thread.pass while t.status and t.status != 'sleep' 
     t.wakeup
     t.join
   end
@@ -251,10 +251,10 @@ module ThreadSpecs
       Thread.main.wakeup
     end
     
-    sleep 5
+    sleep 2  # Maglev reduced  sleep from 5 to 2
     @@after_first_sleep = true
     main_thread1(critical_thread, isThreadSleep, isThreadStop)
-    sleep 5
+    sleep 2  # Maglev reduced  sleep from 5 to 2
     main_thread2(critical_thread)
   end
   

@@ -98,7 +98,8 @@ describe "IO#readlines" do
     end
   end
 
-  describe "when passed a string that starts with a |" do
+ not_compliant_on :maglev do
+  describe "when passed a string that starts with a |" do #
     it "gets data from the standard out of the subprocess" do
       lines = IO.readlines("|sh -c 'echo hello;echo line2'")
       lines.should == ["hello\n", "line2\n"]
@@ -116,6 +117,7 @@ describe "IO#readlines" do
       end
     end
   end
+ end #
 end
 
 describe "IO#readlines" do

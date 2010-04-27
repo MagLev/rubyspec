@@ -5,15 +5,19 @@ describe "ENV.each_key" do
   it "returns each key" do
     e = []
     orig = ENV.to_hash
+    orig.should_not include("1") # maglev
+    orig.should_not include("2")
     begin
-      ENV.clear
+      # ENV.clear # Maglev, ENV.clear not supported
       ENV["1"] = "3"
       ENV["2"] = "4"
       ENV.each_key { |k| e << k }
       e.should include("1")
       e.should include("2")
     ensure
-      ENV.replace orig
+      # ENV.replace orig # Maglev, not supported
+      ENV["1"] = "" 
+      ENV["2"] = "" 
     end
   end
 

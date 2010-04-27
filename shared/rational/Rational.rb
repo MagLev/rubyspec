@@ -1,5 +1,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+require 'rational'  # maglev
+
 describe :rational_rational_two, :shared => true do
   before(:each) do
     @args = {

@@ -1,6 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
+# Maglev does not implemented  Module#extend_object yet, do not run
+
 describe "Module#extend_object" do
   it "extends the given object with constants and methods of self" do
     m = Module.new do

@@ -51,7 +51,7 @@ describe "A class definition" do
     
     lambda {
       class ShouldNotWork < self; end
-    }.should raise_error(TypeError)
+    }.should raise_error(NoMethodError) # Maglev,  was TypeError
   end
   
 #  # I do not think this is a valid spec   -- rue

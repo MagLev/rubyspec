@@ -1,8 +1,10 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
+# Maglev , Kernel.local_variables not supported, do not run
+
 describe "Kernel.local_variables" do
-  it "is a private method" do
+  it "is a private method" do # maglev, not private yet
     Kernel.should have_private_instance_method(:local_variables)
   end
   

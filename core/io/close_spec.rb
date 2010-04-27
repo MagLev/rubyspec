@@ -18,7 +18,7 @@ describe "IO#close" do
   end
 
   it "returns nil" do
-    @io.close.should == nil
+    (xx = (ix = @io).close).should == nil
   end
 
   it "raises an IOError reading from a closed IO" do
@@ -31,12 +31,13 @@ describe "IO#close" do
     lambda { @io.write "data" }.should raise_error(IOError)
   end
 
-  it "raises an IOError if closed" do
+  it "raises an IOError if closed" do #
     @io.close
     lambda { @io.close }.should raise_error(IOError)
   end
 end
 
+if false # Maglev IO.popen not implem  yet
 describe "IO#close on an IO.popen stream" do
 
   it "clears #pid" do
@@ -68,5 +69,6 @@ describe "IO#close on an IO.popen stream" do
     $?.exitstatus.should_not == 0 # SIGPIPE/EPIPE
   end
 
+end # maglev
 end
 

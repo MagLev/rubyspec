@@ -21,10 +21,12 @@ describe "IO#sysseek" do
     @io.readline.should == "igne une.\n"
   end
 
-  it "raises an error when called after buffered reads" do
+ not_compliant_on :maglev do # error not raised
+  it "raises an error when called after buffered reads" do # maglev no error
     @io.readline
     lambda { @io.sysseek(-5, IO::SEEK_CUR) }.should raise_error(IOError)
   end
+ end
 
   it "moves the read position relative to the start with SEEK_SET" do
     @io.sysseek(43, IO::SEEK_SET)

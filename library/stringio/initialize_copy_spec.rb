@@ -1,5 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require 'stringio'
+ 
+# Maglev fails, do not run this file yet. Since our StringIO is pure ruby
+#  it does not need a reimplementation of initialize_copy 
 
 describe "StringIO#initialize_copy" do
   before(:each) do

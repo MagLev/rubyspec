@@ -23,7 +23,7 @@ describe "Array#reject" do
     array.reject { true }.should == []
   end
 
-  not_compliant_on :ironruby do
+  not_compliant_on :ironruby , :maglev do #
     it "returns subclass instance on Array subclasses" do
       ArraySpecs::MyArray[1, 2, 3].reject { |x| x % 2 == 0 }.should be_kind_of(ArraySpecs::MyArray)
     end
@@ -84,11 +84,13 @@ describe "Array#reject!" do
     a.reject! { true }.should == nil
   end
 
+unless defined?( Maglev::System )  # Maglev
   ruby_version_is "" ... "1.9" do
-    it "raises a TypeError on a frozen array" do
+    it "raises a TypeError on a frozen array" do  # Maglev does not freeze during reject!
       lambda { ArraySpecs.frozen_array.reject! {} }.should raise_error(TypeError)
     end
   end
+end
 
   ruby_version_is "1.9" do
     it "raises a RuntimeError on a frozen array" do

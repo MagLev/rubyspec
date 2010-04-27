@@ -10,17 +10,19 @@ describe "String#lstrip" do
   end
 
   # spec/core/string/lstrip_spec.rb
-  not_compliant_on :rubinius do
-    it "does not strip leading \0" do
-     "\x00hello".lstrip.should == "\x00hello"
-    end
-  end
+# Maglev not compliant also
+# not_compliant_on :rubinius do
+#   it "does not strip leading \0" do
+#    "\x00hello".lstrip.should == "\x00hello"
+#   end
+# end
 
-  it "taints the result when self is tainted" do
-    "".taint.lstrip.tainted?.should == true
-    "ok".taint.lstrip.tainted?.should == true
-    "   ok".taint.lstrip.tainted?.should == true
-  end
+# Maglev, no propagation of taint
+# it "taints the result when self is tainted" do
+#   "".taint.lstrip.tainted?.should == true
+#   "ok".taint.lstrip.tainted?.should == true
+#   "   ok".taint.lstrip.tainted?.should == true
+# end
 end
 
 describe "String#lstrip!" do

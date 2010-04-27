@@ -2,12 +2,14 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Array#choice" do
-  ruby_version_is "" ... "1.8.7" do
+  #ruby_version_is "" ... "1.8.7" do
+  ruby_version_is "" .. "1.8.7" do  # maglev does not implement choice
     it "raises NoMethodError" do
       lambda { [].choice }.should raise_error(NoMethodError)
     end
   end
 
+ not_compliant_on :maglev do
   ruby_version_is "1.8.7" ... "1.9" do
     it "selects a random value from the array" do
       a = [1,2,3,4]
@@ -20,6 +22,7 @@ describe "Array#choice" do
       [].choice.should be_nil
     end
   end
+ end
 
   ruby_version_is "1.9" do
     it "raises NoMethodError" do

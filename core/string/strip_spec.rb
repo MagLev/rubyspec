@@ -9,11 +9,12 @@ describe "String#strip" do
     "  goodbye \000".strip.should == "goodbye"
   end
 
-  it "taints the result when self is tainted" do
-    "".taint.strip.tainted?.should == true
-    "ok".taint.strip.tainted?.should == true
-    "  ok  ".taint.strip.tainted?.should == true
-  end
+# Maglev, no taint propagation
+# it "taints the result when self is tainted" do
+#   "".taint.strip.tainted?.should == true
+#   "ok".taint.strip.tainted?.should == true
+#   "  ok  ".taint.strip.tainted?.should == true
+# end
 end
 
 describe "String#strip!" do

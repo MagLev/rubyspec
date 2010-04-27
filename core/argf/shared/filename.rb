@@ -5,7 +5,10 @@ describe :argf_filename, :shared => true do
   end
 
   after :each do
-    ARGF.close unless ARGF.closed?
+    af = ARGF  # Maglev, edits to run under Smalltalk main
+    unless af.equal?(nil)
+      af.close unless af.closed?
+    end
   end
 
   # NOTE: this test assumes that fixtures files have two lines each
@@ -27,7 +30,11 @@ describe :argf_filename, :shared => true do
   it "it sets the $FILENAME global variable with the current file name on each file" do
     argv [@file1, @file2] do
       result = []
-      result << $FILENAME while ARGF.gets
+      af = ARGF
+      if af.equal?(nil)	# Maglev 
+        raise 'ARGF is nil' 
+      end
+      result << $FILENAME while af.gets
       # returns last current file even when closed
       result << $FILENAME
       result.map! { |f| File.expand_path(f) }

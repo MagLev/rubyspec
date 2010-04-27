@@ -7,8 +7,10 @@ describe "ENV.values_at" do
     ENV["bar"] = "rab"
     ENV.values_at.should == []
     ENV.values_at("bar", "foo").should == ["rab", "oof"]
-    ENV.delete "foo"
-    ENV.delete "bar"
+    # ENV.delete "foo"
+    # ENV.delete "bar"
+    ENV["foo"] = nil # Maglev
+    ENV["bar"] = nil # Maglev
   end
 
   ruby_version_is "1.9" do

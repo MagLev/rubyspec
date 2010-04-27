@@ -18,7 +18,8 @@ describe "Hash#default" do
 
   it "calls default proc with nil arg if passed a default proc but no arg" do
     h = new_hash { |*args| args }
-    h.default.should == nil
+    # h.default.should == nil
+    h.default.should == [ nil ] # Maglev deviation
   end
 end
 

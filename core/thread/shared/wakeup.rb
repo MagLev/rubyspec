@@ -4,11 +4,11 @@ describe :thread_wakeup, :shared => true do
     after_sleep1 = false
     after_sleep2 = false
     t = Thread.new do
-      loop do
-        if exit_loop == true
-          break
-        end
-      end
+#      loop do   # Maglev infinite loop here, because non-preemptive scheduling
+#        if exit_loop == true
+#          break
+#        end
+#      end
       
       sleep
       after_sleep1 = true
@@ -17,16 +17,16 @@ describe :thread_wakeup, :shared => true do
       after_sleep2 = true
     end
 
-    10.times { t.send(@method); Thread.pass } # These will all get ignored because the thread is not sleeping yet
+#    10.times { t.send(@method); Thread.pass } # These will all get ignored because the thread is not sleeping yet
 
     exit_loop = true
     
-    Thread.pass while t.status and t.status != "sleep"
+    Thread.pass while (st = t.status) and st != 'sleep' and st != 'run'
     after_sleep1.should == false # t should be blocked on the first sleep
     t.send(@method)
 
     Thread.pass while after_sleep1 != true
-    Thread.pass while t.status and t.status != "sleep"
+    Thread.pass while (st = t.status) and st != 'sleep' and st != 'run'
     after_sleep2.should == false # t should be blocked on the second sleep
     t.send(@method)
     Thread.pass while after_sleep2 != true

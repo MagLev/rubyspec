@@ -1,4 +1,6 @@
 require File.expand_path('../../../spec_helper', __FILE__)
+ 
+# Maglev, ENV.replace not supported, do not run this file
 
 describe "ENV.values" do
 

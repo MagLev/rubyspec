@@ -39,7 +39,8 @@ describe :stringio_each_byte, :shared => true do
 
     it "returns an Enumerator when passed no block" do
       enum = @io.send(@method)
-      enum.instance_of?(enumerator_class).should be_true
+      # enum.instance_of?(enumerator_class).should be_true
+      enum.kind_of?(enumerator_class).should be_true  # maglev
 
       seen = []
       enum.each { |b| seen << b }

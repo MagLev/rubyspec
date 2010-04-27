@@ -12,7 +12,9 @@ describe "Enumerable#minmax_by" do
     end
 
     it "returns the object for whom the value returned by block is the largest" do
-      EnumerableSpecs::Numerous.new(*%w[1 2 3]).minmax_by {|obj| obj.to_i }.should == ['1', '3']
+      ee = EnumerableSpecs::Numerous.new(*%w[1 2 3])
+      ax = ee.to_a
+      (rx = ee.minmax_by {|obj| obj.to_i }).should == ['1', '3']
       EnumerableSpecs::Numerous.new(*%w[three five]).minmax_by {|obj| obj.length }.should == ['five', 'three']
     end
 

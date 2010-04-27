@@ -50,7 +50,8 @@ typedef struct bugged_struct {
 
 unsigned int
 bugged_struct_size() {
-    return sizeof(bugged_struct_t);
+    int res = sizeof(bugged_struct_t);
+    return res;
 }
 
 struct test1 {

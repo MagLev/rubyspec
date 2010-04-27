@@ -3,6 +3,7 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Numeric#singleton_method_added" do
   it "raises a TypeError when trying to #dup a Numeric" do
+    a = nil
     lambda do
       a = NumericSub.new
       a.dup

@@ -12,9 +12,11 @@ describe "Kernel#load" do
     CodeLoadingSpecs.spec_cleanup
   end
 
+ not_compliant_on :maglev do # not private yet
   it "is a private method" do
     Kernel.should have_private_instance_method(:load)
   end
+ end #
 
   it_behaves_like :kernel_require_basic, :load, CodeLoadingSpecs::Method.new
 end
@@ -35,6 +37,6 @@ describe "Kernel.load" do
   it_behaves_like :kernel_require_basic, :load, Kernel
 end
 
-describe "Kernel.load" do
+describe "Kernel#load" do
   it_behaves_like :kernel_load, :load, Kernel
 end

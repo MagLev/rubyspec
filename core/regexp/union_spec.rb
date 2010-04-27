@@ -17,7 +17,7 @@ describe "Regexp.union" do
 
   ruby_version_is '' ... '1.9' do
     it "propagates the kcode setting to the output Regexp" do
-      Regexp.union(/./u, "meow").kcode.should == "utf8"
+      (bx = Regexp.union((ax = /./u), "meow")).kcode.should == "utf8"
     end
   end
 

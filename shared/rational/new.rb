@@ -3,7 +3,7 @@ require 'rational'
 
 describe :rational_new, :shared => true do
   it "is private" do
-    Rational.private_methods.should include("new")
+    (rx = Rational).private_methods.should include("new")
   end
 end
 

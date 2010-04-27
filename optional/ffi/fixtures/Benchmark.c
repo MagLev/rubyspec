@@ -56,12 +56,12 @@ typedef void v;
 typedef char* S;
 typedef void* P;
 
-#define B6(R, T1, T2, T3, T4, T5, T6) R bench_##T1##T2##T3##T4##T5##T6##_##R(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6) {}
-#define B5(R, T1, T2, T3, T4, T5) R bench_##T1##T2##T3##T4##T5##_##R(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5) {}
-#define B4(R, T1, T2, T3, T4) R bench_##T1##T2##T3##T4##_##R(T1 a1, T2 a2, T3 a3, T4 a4) {}
-#define B3(R, T1, T2, T3) R bench_##T1##T2##T3##_##R(T1 a1, T2 a2, T3 a3) {}
-#define B2(R, T1, T2) R bench_##T1##T2##_##R(T1 a1, T2 a2) {}
-#define B1(R, T1) R bench_##T1##_##R(T1 a1) {}
+#define B6(R, T1, T2, T3, T4, T5, T6) R bench_##T1##T2##T3##T4##T5##T6##_##R(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6) { return ; }
+#define B5(R, T1, T2, T3, T4, T5) R bench_##T1##T2##T3##T4##T5##_##R(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5) { return ; }
+#define B4(R, T1, T2, T3, T4) R bench_##T1##T2##T3##T4##_##R(T1 a1, T2 a2, T3 a3, T4 a4) { return ; }
+#define B3(R, T1, T2, T3) R bench_##T1##T2##T3##_##R(T1 a1, T2 a2, T3 a3) { return ; }
+#define B2(R, T1, T2) R bench_##T1##T2##_##R(T1 a1, T2 a2) { return ; }
+#define B1(R, T1) R bench_##T1##_##R(T1 a1) { return ; }
 #define BrV(T) B1(v, T); B2(v, T, T); B3(v, T, T, T); B4(v, T, T, T, T); B5(v, T, T, T, T, T); B6(v, T, T, T, T, T, T);
 BrV(u32);
 BrV(s32);

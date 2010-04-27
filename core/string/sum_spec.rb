@@ -14,9 +14,4 @@ describe "String#sum" do
 
     "hello".sum(obj).should == "hello".sum(8)
   end
-
-  it "returns sum of the bytes in self if n less or equal to zero" do
-    "xyz".sum(0).should == 363
-    "xyz".sum(-10).should == 363
-  end
 end

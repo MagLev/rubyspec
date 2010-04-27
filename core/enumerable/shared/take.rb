@@ -55,6 +55,7 @@ describe :enumerable_take, :shared => true do
       counter.send(@method, 2).should == [1,2]
       counter.times_called.should == 1
       counter.times_yielded.should == 2
+      # counter.times_yielded.should == 3 # Maglev does to_a before creating enumerator
     end
   end
 end

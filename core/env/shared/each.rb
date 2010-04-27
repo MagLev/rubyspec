@@ -3,14 +3,15 @@ describe :env_each, :shared => true do
     orig = ENV.to_hash
     e = []
     begin
-      ENV.clear
+      # ENV.clear # Maglev, not supported
       ENV["foo"] = "bar"
       ENV["baz"] = "boo"
       ENV.send(@method) { |k, v| e << [k, v] }
       e.should include(["foo", "bar"])
       e.should include(["baz", "boo"])
     ensure
-      ENV.replace orig
+      ENV["foo"] = "" # Maglev
+      ENV["baz"] = ""
     end
   end
 

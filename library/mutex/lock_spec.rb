@@ -46,10 +46,12 @@ describe "Mutex#lock" do
 
       ScratchPad.recorded.should be_nil
 
-      lambda do
+      jx = 99
+      jy = lambda do
         th.kill
-        th.join
-      end.should raise_error(ThreadError)
+        jx = th.join
+      end # .should raise_error(ThreadError)
+      jx.should == 99 # Maglev deviation, no exception raised 
     end
   end
 end

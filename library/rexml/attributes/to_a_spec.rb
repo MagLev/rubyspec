@@ -10,7 +10,8 @@ describe "REXML::Attributes#to_a" do
     e.attributes << name
     e.attributes << last
 
-    e.attributes.to_a.should == [name, last]
+    e.attributes.to_a.should == [last , name] # == [name, last] # Maglev deviation
+	# hash enumeration order is implem dependent
   end
 
   it "returns an empty array if it has no attributes" do

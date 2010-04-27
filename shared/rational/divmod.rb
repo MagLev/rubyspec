@@ -35,7 +35,8 @@ describe :rational_divmod_float, :shared => true do
 
   ruby_bug "#", "1.8.6" do # Fixed at MRI 1.8.7
     it "returns the quotient as Integer and the remainder as Float" do
-      Rational(7, 4).divmod(-0.5).should eql([-4, -0.25])
+      Rational(7, 4).divmod(-0.5).should eql([-4, -0.25]) # 1.8.7 behavior
+      # Rational(7, 4).divmod(-0.5).should eql([-3, 0.25]) # Maglev 1.8.6 behavior
     end
   end
   

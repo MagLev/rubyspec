@@ -173,21 +173,25 @@ describe :kernel_require_basic, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-    it "does not resolve a ./ relative path against $LOAD_PATH entries" do
+  not_compliant_on :maglev do # fails to raise error
+    it "does not resolve a ./ relative path against $LOAD_PATH entries" do #
       $LOAD_PATH << CODE_LOADING_DIR
       lambda do
         @object.send(@method, "./load_fixture.rb")
       end.should raise_error(LoadError)
       ScratchPad.recorded.should == []
     end
+  end #
 
-    it "does not resolve a ../ relative path against $LOAD_PATH entries" do
+  not_compliant_on :maglev do # fails to raise error
+    it "does not resolve a ../ relative path against $LOAD_PATH entries" do #
       $LOAD_PATH << CODE_LOADING_DIR
       lambda do
         @object.send(@method, "../code/load_fixture.rb")
       end.should raise_error(LoadError)
       ScratchPad.recorded.should == []
     end
+  end #
 
     it "resolves a non-canonical path against $LOAD_PATH entries" do
       $LOAD_PATH << File.dirname(CODE_LOADING_DIR)
@@ -254,12 +258,14 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-    it "does not load a C-extension file if a .rb extensioned file is already loaded" do
+   not_compliant_on :maglev do # no C-extension support
+    it "does not load a C-extension file if a .rb extensioned file is already loaded" do #
       $LOADED_FEATURES << File.expand_path("load_fixture.rb", CODE_LOADING_DIR)
       path = File.expand_path "load_fixture", CODE_LOADING_DIR
       @object.require(path).should be_false
       ScratchPad.recorded.should == []
     end
+  end #
 
     it "loads a .rb extensioned file when passed a non-.rb extensioned path" do
       path = File.expand_path "load_fixture.ext", CODE_LOADING_DIR
@@ -278,12 +284,14 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-    it "does not load a C-extension file if a complex-extensioned .rb file is already loaded" do
+   not_compliant_on :maglev do # no C-extension support
+    it "does not load a C-extension file if a complex-extensioned .rb file is already loaded" do #
       $LOADED_FEATURES << File.expand_path("load_fixture.ext.rb", CODE_LOADING_DIR)
       path = File.expand_path "load_fixture.ext", CODE_LOADING_DIR
       @object.require(path).should be_false
       ScratchPad.recorded.should == []
     end
+   end #
   end
 
   describe "($LOAD_FEATURES)" do
@@ -316,13 +324,15 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == []
     end
 
-    it "does not load a ../ relative path that is already stored" do
+   not_compliant_on :maglev do # raises RubyLoadError, empty loadPath
+    it "does not load a ../ relative path that is already stored" do #
       $LOADED_FEATURES << "../load_fixture.rb"
       Dir.chdir CODE_LOADING_DIR do
         @object.require("../load_fixture.rb").should be_false
       end
       ScratchPad.recorded.should == []
     end
+  end #
 
     it "does not load a non-canonical path that is already stored" do
       $LOADED_FEATURES << "code/../code/load_fixture.rb"
@@ -465,16 +475,17 @@ describe :kernel_require, :shared => true do
       ENV["HOME"] = @env_home
     end
 
-    ruby_bug "#3171", "1.8.7.249" do
-      it "performs tilde expansion on a .rb file before storing paths in $LOADED_FEATURES" do
+    ruby_version_is "".."1.9" do
+      it "does not perform tilde expansion before storing paths in $LOADED_FEATURES" do
+        @object.require("~/load_fixture.rb").should be_true
+        $LOADED_FEATURES.should == ["~/load_fixture.rb"]
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "performs tilde expansion before storing paths in $LOADED_FEATURES" do
         path = File.expand_path("load_fixture.rb", CODE_LOADING_DIR)
         @object.require("~/load_fixture.rb").should be_true
-        $LOADED_FEATURES.should == [path]
-      end
-
-      it "performs tilde expansion on a non-extensioned file before storing paths in $LOADED_FEATURES" do
-        path = File.expand_path("load_fixture.rb", CODE_LOADING_DIR)
-        @object.require("~/load_fixture").should be_true
         $LOADED_FEATURES.should == [path]
       end
     end

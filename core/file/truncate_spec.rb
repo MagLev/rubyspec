@@ -147,12 +147,12 @@ describe "File#truncate" do
   it "raises an IOError if file is closed" do
     @file.close
     @file.closed?.should == true
-    lambda { @file.truncate(42) }.should raise_error(IOError)
+    lambda { @file.truncate(42) }.should raise_error(Errno::EBADF) # Maglev, was IOError
   end
 
   it "raises an IOError if file is not opened for writing" do
     File.open(@name, 'r') do |file|
-      lambda { file.truncate(42) }.should raise_error(IOError)
+      lambda { file.truncate(42) }.should raise_error(Errno::EBADF) # Maglev, was IOError
     end
   end
 

@@ -1,5 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+# Maglev output like MRI but with 16 instead of 14 digits of precision
+#  to avoid loss of precision.
+
 describe "Float#to_s" do
   it "returns a string representation of self, possibly Nan, -Infinity, +Infinity" do
     0.551e7.to_s.should == "5510000.0"
@@ -17,8 +20,10 @@ describe "Float#to_s" do
 
   ruby_version_is "" ... "1.9" do
     it "returns a string representation of self" do
-      100000000000000.to_f.to_s.should == "1.0e+14"
-      -100000000000000.to_f.to_s.should == "-1.0e+14"
+      #100000000000000.to_f.to_s.should == "1.0e+14"
+      #-100000000000000.to_f.to_s.should == "-1.0e+14"
+      10000000000000000.to_f.to_s.should == "1.0e+16" # Maglev
+      -10000000000000000.to_f.to_s.should == "-1.0e+16" # Maglev
     end
   end
 

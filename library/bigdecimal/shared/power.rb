@@ -20,8 +20,9 @@ describe :bigdecimal_power, :shared => true do
     e2_plus.send(@method, -1).should == e5_minus
     e2_plus.send(@method, -1).should == e5_minus.power(1)
     (e2_plus.send(@method, -1) * e5_minus.send(@method, -1)).should == 1
-    e.send(@method, 2).should == e * e
-    e.send(@method, -1).should be_close(one.div(e, 120), tolerance)
+    sel = @method
+    (b = (a = e).send(@method, 2)).should == (c = e * e)
+    (b = ((a = e).send(@method, -1)) ).should be_close((c = one.div(e, 120)), tolerance)
     ten.send(@method, 10000).should == ten_powers
     pi.send(@method, 10).should be_close(Math::PI ** 10, TOLERANCE)
   end

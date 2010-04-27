@@ -28,7 +28,7 @@ describe "BigDecimal#sqrt" do
       @three.sqrt(idx).should be_close(BigDecimal(sqrt_3), BigDecimal("1E-#{idx-1}"))
     }
     BigDecimal('121').sqrt(5).should be_close(11, 0.00001)
-    @frac_2.sqrt(1).to_s.should == "0.3E-49999"
+    (nb = (na = @frac_2).sqrt(1)).to_s.should == "0.3E-49999"
   end
 
   it "requires a single fixnum argument" do

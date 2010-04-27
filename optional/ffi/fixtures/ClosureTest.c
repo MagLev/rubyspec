@@ -75,6 +75,12 @@ void testClosureIrV(void (*closure)(int), int a1)
 {
     (*closure)(a1);
 }
+
+void testIClosure_rV(int a1, void (*closure)(int))
+{
+    (*closure)(a1);
+}
+
 void testClosureLrV(void (*closure)(long), long a1)
 {
     (*closure)(a1);

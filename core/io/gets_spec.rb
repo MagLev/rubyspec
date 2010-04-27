@@ -38,11 +38,13 @@ describe "IO#gets" do
       IOSpecs.lines.each { |line| line.should == @io.gets }
     end
 
+   not_compliant_on :maglev do  #  no taint prop
     it "returns tainted strings" do
       while line = @io.gets
         line.tainted?.should == true
       end
     end
+   end #
 
     it "updates lineno with each invocation" do
       while line = @io.gets
@@ -50,11 +52,14 @@ describe "IO#gets" do
       end
     end
 
+   not_compliant_on :maglev do  #  $. not implem
     it "updates $. with each invocation" do
       while line = @io.gets
         $..should == @count += 1
       end
     end
+   end
+
   end
 
   describe "with nil separator" do
@@ -62,11 +67,13 @@ describe "IO#gets" do
       @io.gets(nil).should == IOSpecs.lines.join("")
     end
 
-    it "returns tainted strings" do
+   not_compliant_on :maglev do  #  no taint propagation
+    it "returns tainted strings" do #
       while line = @io.gets(nil)
         line.tainted?.should == true
       end
     end
+   end # maglev
 
     it "updates lineno with each invocation" do
       while line = @io.gets(nil)
@@ -74,11 +81,14 @@ describe "IO#gets" do
       end
     end
 
+   not_compliant_on :maglev do  #  $. not implem
     it "updates $. with each invocation" do
       while line = @io.gets(nil)
         $..should == @count += 1
       end
     end
+   end
+
   end
 
   describe "with an empty String separator" do
@@ -96,11 +106,13 @@ describe "IO#gets" do
       @io.gets.should == IOSpecs.lines[4]
     end
 
+   not_compliant_on :maglev do  #  no taint prop
     it "returns tainted strings" do
       while line = @io.gets("")
         line.tainted?.should == true
       end
     end
+   end #
 
     it "updates lineno with each invocation" do
       while line = @io.gets("")
@@ -115,16 +127,18 @@ describe "IO#gets" do
     end
   end
 
-  describe "with an arbitrary String separator" do
+  describe "with an arbitrary String separator" do 
     it "reads up to and including the separator" do
       @io.gets("la linea").should == "Voici la ligne une.\nQui \303\250 la linea"
     end
 
+   not_compliant_on :maglev do  #  no taint prop
     it "returns tainted strings" do
       while line = @io.gets("la")
         line.tainted?.should == true
       end
     end
+   end #
 
     it "updates lineno with each invocation" do
       while (line = @io.gets("la"))

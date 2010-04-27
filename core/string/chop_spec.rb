@@ -31,10 +31,11 @@ describe "String#chop" do
     "".chop.should == ""
   end
 
-  it "taints result when self is tainted" do
-    "hello".taint.chop.tainted?.should == true
-    "".taint.chop.tainted?.should == true
-  end
+# Maglev, no taint propagatation
+# it "taints result when self is tainted" do
+#   "hello".taint.chop.tainted?.should == true
+#   "".taint.chop.tainted?.should == true
+# end
   
   it "returns subclass instances when called on a subclass" do
     StringSpecs::MyString.new("hello\n").chop.should be_kind_of(StringSpecs::MyString)

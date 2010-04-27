@@ -30,7 +30,7 @@ describe "Module#const_defined?" do
 
   ruby_version_is ""..."1.9" do
     it "returns false if the constant is not defined in the receiver" do
-      ConstantSpecs::ContainerA::ChildA.const_defined?(:CS_CONST4).should == false
+      (cx = ConstantSpecs::ContainerA::ChildA).const_defined?(:CS_CONST4).should == false
       ConstantSpecs::ParentA.const_defined?(:CS_CONST12).should == false
     end
   end

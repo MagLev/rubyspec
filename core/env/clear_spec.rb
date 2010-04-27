@@ -1,5 +1,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+# Maglev will not support ENV.clear !!
+
 describe "ENV.clear" do
   it "deletes all environment variables" do
     orig = ENV.to_hash

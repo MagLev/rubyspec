@@ -33,7 +33,8 @@ describe "Kernel#freeze" do
       b.frozen?.should be_false
       c.frozen?.should be_false
       d.frozen?.should be_false
-      e.frozen?.should be_false
+      # e.frozen?.should be_false
+      e.frozen?.should == true # maglev, symbosl are always frozen
     end
   end
 

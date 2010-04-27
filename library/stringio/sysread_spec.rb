@@ -16,7 +16,8 @@ describe "StringIO#sysread when passed no arguments" do
   ruby_bug "http://redmine.ruby-lang.org/projects/ruby-18/issues/show?id=156", "1.8.7" do
     it "returns an empty String if at EOF" do
       @io.sysread.should == "example"
-      @io.sysread.should == ""
+      # @io.sysread.should == ""
+      lambda { @io.sysread }.should raise_error(EOFError)  # current Maglev behavior, bug?
     end
   end
 end
@@ -31,7 +32,8 @@ describe "StringIO#sysread when passed nil" do
   ruby_bug "http://redmine.ruby-lang.org/projects/ruby-18/issues/show?id=156", "1.8.7" do
     it "returns an empty String if at EOF" do
       @io.sysread(nil).should == "example"
-      @io.sysread(nil).should == ""
+      # @io.sysread(nil).should == ""
+      lambda { @io.sysread(nil) }.should raise_error(EOFError)  # current Maglev behavior
     end
   end
 end

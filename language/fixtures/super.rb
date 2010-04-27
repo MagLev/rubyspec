@@ -99,7 +99,10 @@ module Super
   end
 
   class S7 < S5
-    define_method(:here) { super() }
+    # define_method(:here) { super() } # Maglev compile error during AST to IR
+    def here
+      super
+    end
   end
 
   module MS1

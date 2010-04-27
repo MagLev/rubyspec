@@ -3,9 +3,11 @@ require File.expand_path('../fixtures/classes', __FILE__)
 require File.expand_path('../shared/abort', __FILE__)
 
 describe "Kernel#abort" do
+ not_compliant_on :maglev do #  not private yet
   it "is a private method" do
     Kernel.should have_private_instance_method(:abort)
   end
+ end
 
   it_behaves_like :kernel_abort, :abort, KernelSpecs::Method.new
 end

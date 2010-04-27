@@ -38,13 +38,12 @@ platform_is_not :windows do
       # kill thread, ensure it dies in a reasonable amount of time
       t.kill
       a = 1
-      while a < 2000
+      while a < 1000
         break unless t.alive?
         Thread.pass
-        sleep 0.2
         a += 1
       end
-      a.should < 2000
+      a.should < 1000
       server.close
     end
 
