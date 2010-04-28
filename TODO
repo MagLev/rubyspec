@@ -21,6 +21,10 @@
 * Think about how we can support exhaustive tests of certain features.
 * Specify 'public' and 'protected' keywords.
 
+# MagLev
+==========
+* Obtain stats from running with Allen's edits
+
 # Windows
 ==========
 * Run core/kernel/require_spec.rb on Windows, check all tests pass; fix as
