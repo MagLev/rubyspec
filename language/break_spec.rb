@@ -345,7 +345,7 @@ describe "Breaking out of a loop with a value" do
       i = 0; loop do break if i == 3; i+=1; end; i.should == 3
       i = 0; 0.upto(5) {|i| break i if i == 2 }.should == 2
 #      i = 0; 0.upto(5) {|i| break if i == 3 }; i.should == 3 #
-      i = 0; 0.upto(5) {|i| break if i == 3 }; i.should == 0  # maglev bug
+      i = 0; 0.upto(5) {|i| break if i == 3 }; i.should == 0  # maglev is like 1.9
       i = 0; while (i < 5) do break i if i == 2 ; i+=1; end.should == 2
       i = 0; while (i < 5) do break if i == 3 ; i+=1; end; i.should == 3
     end
@@ -372,7 +372,8 @@ describe "Breaking out of a loop with a value" do
       break_test {|i| break i if i == 2 }.should == 2
       i = 0
       break_test {|i| break i if i == 1 }
-      i.should == 1
+      # i.should == 1
+      i.should == 0 # maglev has 1.9 behavior wrt method temps here
     end
   end
   
