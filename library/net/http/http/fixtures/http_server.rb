@@ -73,13 +73,8 @@ module NetHTTPSpecs
     end
     
     def stop_server
-      sx = @server
-      stat = nil # maglev patch
       @server.shutdown
-      begin 
-        Thread.pass 
-        stat = @server.status
-      end until stat.equal?(:Stop) || stat.equal?(:Shutdown)  # maglev patch
+      Thread.pass until @server.status == :Stop
     end
   end
 end
