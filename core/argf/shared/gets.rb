@@ -78,6 +78,7 @@ describe :argf_gets_inplace_edit, :shared => true do
   end
 
   # -i with no backup extension is not supported on Windows
+ not_compliant_on :maglev do  # -i not supported yet
   platform_is_not :os => :windows do
     it "modifies the files when in place edit mode is on" do
       ruby_exe(@code,
@@ -100,4 +101,5 @@ describe :argf_gets_inplace_edit, :shared => true do
     File.read(@tmp1_name_bak).should == "file1.1\nfile1.2\n"
     File.read(@tmp2_name_bak).should == "line2.1\nline2.2\n"
   end
+ end # maglev no -i
 end
