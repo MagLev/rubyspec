@@ -1,2 +1,2 @@
 stdin.1
-stdin.2
+STDIN.2
