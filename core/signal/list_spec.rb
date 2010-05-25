@@ -49,8 +49,7 @@ describe "Signal.list" do
   }
 
   it "doesn't contain other signals than in 1.8" do
-    #(Signal.list.keys - RUBY18_SIGNALS).should == []
-    (Signal.list.keys - RUBY18_SIGNALS).should == [ 'RTMIN' ] # maglev on solaris
+    (Signal.list.keys - RUBY18_SIGNALS).should == []
   end
 
   if Signal.list["CHLD"]
