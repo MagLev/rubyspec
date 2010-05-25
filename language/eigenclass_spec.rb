@@ -271,42 +271,45 @@ describe "Class methods of an eigenclass" do
     @a_class_eigenclass = class << ClassSpecs::A; self end
   end
 
-# Maglev failures
-#  it "includes ones of the object's class" do
-#    @k_eigenclass.should have_method(:example_class_method)
-#  end
-#
-#  it "does not include instance methods of the object's class" do
-#    @k_eigenclass.should_not have_method(:example_instance_method)
-#  end
-#
-#  it "includes instance methods of Class" do
-#    @a_eigenclass.should have_method(:example_instance_method_of_class)
-#  end
-#
-#  it "does not include class mtehods of Class" do
-#    @a_eigenclass.should_not have_method(:example_class_method_of_class)
-#  end
-#
-#  it "includes instance methods of Class, for a class" do
-#    @a_class_eigenclass.should have_method(:example_instance_method_of_class)
-#  end
-#
-#  it "includes class methods of Class, for a class" do
-#    @a_class_eigenclass.should have_method(:example_class_method_of_class)
-#  end
-#
-#  it "includes instance methods of the metaclass of Class, for a class" do
-#    @a_class_eigenclass.should have_method(:example_instance_method_of_metaclass)
-#  end
-#
-#  it "does not include class methods of the metaclass of Class, for a class" do
-#    @a_class_eigenclass.should_not have_method(:example_class_method_of_metaclass)
-#  end
-#
-#  it "includes instance methods of the metaclass of Class, for a metaclass" do
-#    (class << @a_class_eigenclass; self end).should have_method(:example_instance_method_of_metaclass)
-#  end
+ not_compliant_on :maglev do
+   it "includes ones of the object's class" do #
+     @k_eigenclass.should have_method(:example_class_method)
+   end
+ end 
+ 
+   it "does not include instance methods of the object's class" do
+     @k_eigenclass.should_not have_method(:example_instance_method)
+   end
+ 
+   it "includes instance methods of Class" do
+     @a_eigenclass.should have_method(:example_instance_method_of_class)
+   end
+ 
+   it "does not include class mtehods of Class" do
+     @a_eigenclass.should_not have_method(:example_class_method_of_class)
+   end
+
+ not_compliant_on :maglev do
+   it "includes instance methods of Class, for a class" do #
+     @a_class_eigenclass.should have_method(:example_instance_method_of_class)
+   end
+
+   it "includes class methods of Class, for a class" do #
+     @a_class_eigenclass.should have_method(:example_class_method_of_class)
+   end
+ 
+   it "includes instance methods of the metaclass of Class, for a class" do #
+     @a_class_eigenclass.should have_method(:example_instance_method_of_metaclass)
+   end
+ end 
+ 
+   it "does not include class methods of the metaclass of Class, for a class" do
+     @a_class_eigenclass.should_not have_method(:example_class_method_of_metaclass)
+   end
+ 
+   it "includes instance methods of the metaclass of Class, for a metaclass" do
+     (class << @a_class_eigenclass; self end).should have_method(:example_instance_method_of_metaclass)
+   end
 
   ruby_version_is "1.9" do
     it "includes class methods of the metaclass of Class, for a metaclass" do
