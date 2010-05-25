@@ -28,7 +28,7 @@ describe "ARGF.seek" do
     argv [@file1_name, @file2_name] do
       ARGF.seek 0, IO::SEEK_CUR
       ARGF.gets.should == @file1.first
-      ARGF.seek -@file1.first.size+2, IO::SEEK_CUR
+      ARGF.seek( -@file1.first.size+2, IO::SEEK_CUR) # maglev gets syntax err w/o   parens
       ARGF.gets.should == @file1.first[2..-1]
       ARGF.seek 1, IO::SEEK_CUR
       ARGF.gets.should == @file1.last[1..-1]
@@ -41,7 +41,7 @@ describe "ARGF.seek" do
 
   it "sets the absolute position relative to end of file" do
     argv [@file1_name, @file2_name] do
-      ARGF.seek -@file1.first.size-@file1.last.size, IO::SEEK_END
+      ARGF.seek( -@file1.first.size-@file1.last.size, IO::SEEK_END ) # maglev gets syntax err w/o   parens
       ARGF.gets.should == @file1.first
       ARGF.seek -6, IO::SEEK_END
       ARGF.gets.should == @file1.last[-6..-1]
