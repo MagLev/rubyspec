@@ -105,6 +105,18 @@ describe "Kernel#instance_eval" do
     end
   end
 
+  ruby_version_is ""..."1.9" do
+    it "makes the receiver metaclass the scoped class when used with a string" do
+      obj = Object.new
+      klass = obj.instance_eval %{
+        class B; end
+        B
+      }
+      # klass.name.should =~ /(.+)::B/
+      klass.name.should == 'B' # maglev deviation
+    end
+  end
+
   it "gets constants in the receiver if a string given" do
     KernelSpecs::InstEvalOuter::Inner::X_BY_STR.should == 23
   end

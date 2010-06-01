@@ -2,6 +2,9 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel#system" do
+  before do
+    @ruby = MSpecScript.config[:target]
+  end
 
   it "can run basic things that exist" do
     begin
@@ -68,16 +71,17 @@ describe "Kernel#system" do
     @helper_script = KernelSpecs.helper_script
   end
 
+not_compliant_on :maglev do
   it "expands shell variables when given a single string argument" do
-    result = system("ruby #{@helper_script} #{@shell_var} foo")
+    result = system("#{@ruby} #{@helper_script} #{@shell_var} foo")
     result.should be_true
   end
+end
   
-# Maglev fails, does expand them
-# it "does not expand shell variables when given multiples arguments" do
-#   result = system("ruby", @helper_script, @shell_var, "foo")
-#   result.should be_false
-# end
+  it "does not expand shell variables when given multiples arguments" do 
+    result = system("#{@ruby}", @helper_script, @shell_var, "foo")
+    result.should be_false
+  end
 end
 
 describe "Kernel.system" do

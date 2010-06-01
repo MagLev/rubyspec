@@ -15,29 +15,30 @@ describe "Kernel#caller" do
     end
   end
   
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:caller)
-# end
-  
+not_compliant_on :maglev do # not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:caller)
+  end
+end
+
   it "returns the current call stack" do
     stack = c 0
     stack[0].should =~ /caller_spec.rb.*?8.*?`a'/
     stack[1].should =~ /caller_spec.rb.*?11.*?`b'/
     stack[2].should =~ /caller_spec.rb.*?14.*?`c'/
   end
-  
-# Maglev fails
-# it "omits a number of frames corresponding to the parameter" do
-#   c(0)[1..-1].should == c(1)
-#   c(0)[2..-1].should == c(2)
-#   c(0)[3..-1].should == c(3)
-# end
-  
-# Maglev fails
-# it "defaults to omitting one frame" do
-#   caller.should == caller(1)
-# end
+
+not_compliant_on :maglev do 
+  it "omits a number of frames corresponding to the parameter" do #
+    c(0)[1..-1].should == c(1)
+    c(0)[2..-1].should == c(2)
+    c(0)[3..-1].should == c(3)
+  end
+
+  it "defaults to omitting one frame" do #
+    caller.should == caller(1)
+  end
+end #
 
   # The contents of the array returned by #caller depends on whether
   # the call is made from an instance_eval block or a <block>#call.
@@ -66,7 +67,7 @@ describe "Kernel#caller in a Proc or eval" do
 #      stack[0].should =~ /caller_fixture1\.rb:31:in `(block in )?third'/
 #     stack[0].should =~ /.*caller_fixture1\.rb:30: in .*\[\] in .* third/  # Maglev deviation
 #     stack[1].should =~ /caller_spec\.rb:60/
-      stack[1].should =~ /.*caller_spec\.rb:65/  # Maglev deviation
+      stack[1].should =~ /.*caller_spec\.rb:66/  # Maglev deviation
     end
 
 # Maglev fails
@@ -83,13 +84,13 @@ describe "Kernel#caller in a Proc or eval" do
 #     stack[0].should == "(eval):1:in `eval_caller'"
 #     stack[1].should =~ /caller_spec\.rb:74/  # Maglev deviations
       stack[2].should =~ /23:in \`__evalCaller\'/
-      stack[6].should =~ /caller_spec\.rb:82/
+      stack[6].should =~ /caller_spec\.rb:83/
     end
 
     it "begins with the eval's sender's sender for caller(1) in eval" do
       stack = CallerFixture.eval_caller(1)
 #     stack[0].should =~ /caller_spec\.rb:80/
-      stack[5].should =~ /.*caller_spec\.rb:90/ # Maglev
+      stack[5].should =~ /.*caller_spec\.rb:91/ # Maglev
     end
 
     it "shows the current line in the calling block twice when evaled" do
@@ -100,14 +101,14 @@ describe "Kernel#caller in a Proc or eval" do
 #     stack[2].should =~/caller_fixture2\.rb:23/
 #     stack[3].should =~/caller_spec\.rb:85/
       stack[4].should =~/.*caller_fixture2\.rb:23/  # Maglev deviations
-      stack[6].should =~/.*caller_spec\.rb:96/
+      stack[6].should =~/.*caller_spec\.rb:97/
     end
   end
-  
+
   ruby_version_is "1.9" do
     it "returns the definition trace of a block when evaluated in a Proc binding" do
       stack = CallerFixture.caller_of(CallerFixture.block)
-      stack[0].should == "(eval):1:in `<top (required)>'"
+      stack[0].should =~ /caller_fixture1\.rb:4:in `<top \(required\)>'/
       stack[1].should =~ /caller_fixture2\.rb:18:in `eval'/
       stack[2].should =~ /caller_fixture2\.rb:18:in `caller_of'/
       stack[3].should =~ /caller_spec\.rb:95:in `block \(3 levels\) in <top \(required\)>'/
@@ -115,7 +116,7 @@ describe "Kernel#caller in a Proc or eval" do
 
     it "returns the definition trace of a Proc" do
       stack = CallerFixture.caller_of(CallerFixture.example_proc)
-      stack[0].should == "(eval):1:in `example_proc'"
+      stack[0].should =~ /caller_fixture1\.rb:14:in `example_proc'/
       stack[1].should =~ /caller_fixture2\.rb:18:in `eval'/
       stack[2].should =~ /caller_fixture2\.rb:18:in `caller_of'/
       stack[3].should =~ /caller_spec\.rb:103:in `block \(3 levels\) in <top \(required\)>'/
@@ -133,7 +134,7 @@ describe "Kernel#caller in a Proc or eval" do
     # the correct behaviour
     it "returns the correct definition line for a complex Proc trace" do
       stack = CallerFixture.caller_of(CallerFixture.entry_point)
-      stack[0].should == "(eval):1:in `third'"
+      stack[0].should =~ /caller_fixture1\.rb:29:in `third'/
       stack[1].should =~ /caller_fixture2\.rb:18:in `eval'/
       stack[2].should =~ /caller_fixture2\.rb:18:in `caller_of'/
       stack[3].should =~ /caller_spec.rb:121:in `block \(3 levels\) in <top \(required\)>'/
@@ -154,7 +155,7 @@ describe "Kernel#caller in a Proc or eval" do
 
     it "shows the current line in the calling block twice when evaled" do
       stack = CallerFixture.eval_caller(0)
-      
+
       stack[0].should == "(eval):1:in `eval_caller'"
       stack[1].should =~/caller_fixture2\.rb:23:in `eval'/
       stack[2].should =~/caller_fixture2\.rb:23:in `eval_caller'/
@@ -164,8 +165,6 @@ describe "Kernel#caller in a Proc or eval" do
 end
 
 describe "Kernel.caller" do
-  it "needs to be reviewed for spec completeness"
-
   ruby_bug("redmine:3011", "1.8.7") do
     it "returns one entry per call, even for recursive methods" do
       two   = CallerSpecs::recurse(2)

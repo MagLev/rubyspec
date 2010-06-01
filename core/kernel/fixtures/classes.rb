@@ -273,6 +273,12 @@ module KernelSpecs
       "Done #{method}(#{args})"
     end
   end
+
+  class Ivar
+    def initialize
+      @greeting = "hello"
+    end
+  end
 end
 
 class EvalSpecs

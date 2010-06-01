@@ -3,6 +3,8 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Method#to_proc" do
   before(:each) do
+    ScratchPad.record []
+
     @m = MethodSpecs::Methods.new
     @meth = @m.method(:foo)
   end
@@ -27,25 +29,45 @@ describe "Method#to_proc" do
     end
   end
 
-# Maglev fails
-# it "returns a proc that can be used by define_method" do
-#   x = 'test'
-#   to_s = class << x
-#     define_method :foo, method(:to_s).to_proc
-#     to_s
-#   end
+not_compliant_on :maglev do
+  it "returns a proc that can be used by define_method" do #
+    # would need a new instVar in Proc holding the original method
+    #  and then must use __define_method_meth instead of __define_method_block 
+    x = 'test'
+    to_s = class << x
+      define_method( :foo, ($mx = method(:to_s).to_proc))
+      to_s
+    end
+    mx = $mx
+    x.foo.should == to_s # maglev gets MNU of call
+  end
+end
 
-#   x.foo.should == to_s
-# end
+  it "returns a proc that can be yielded to" do
+    x = Object.new
+    def x.foo(*a); a; end
+    def x.bar; yield; end
+    def x.baz(*a); yield(*a); end
 
-# it "returns a proc that can be yielded to" do
-#   x = Object.new
-#   def x.foo(*a); a; end
-#   def x.bar; yield; end
-#   def x.baz(*a); yield(*a); end
+    m = x.method( :foo )
+    x.bar(&m).should == []
+    x.baz(1,2,3,&m).should == [1,2,3]
+  end
 
-#   m = x.method :foo
-#   x.bar(&m).should == []
-#   x.baz(1,2,3,&m).should == [1,2,3]
-# end
+  ruby_version_is ""..."1.9" do
+    it "returns a proc that accepts passed arguments like a block would" do
+      obj = MethodSpecs::ToProc.new
+
+      array = [["text", :comment], ["space", :chunk]]
+      array.each(&obj)
+
+      ScratchPad.recorded.should == array = [["text", :comment], ["space", :chunk]]
+    end
+  end
+
+  it "can be called directly and not unwrap arguments like a block" do
+    obj = MethodSpecs::ToProcBeta.new
+    obj.to_proc.call([1]).should == [1]
+  end
+
 end

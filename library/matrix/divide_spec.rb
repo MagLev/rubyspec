@@ -9,11 +9,14 @@ describe "Matrix#/" do
     @c = Matrix[ [1.2, 2.4], [3.6, 4.8] ]
   end
 
-# ruby_bug "?", "1.9" do # maglev at 1.8.6
-#   it "returns the result of dividing self by another Matrix" do
-#     (@a / @b).should be_close_to_matrix([[2.5, -1.5], [1.5, -0.5]])
-#   end
-# end
+  ruby_bug "?", "1.8.7" do
+    it "returns the result of dividing self by another Matrix" do
+      # patch spec, inverse of matrix does not assume Floats (unless Rational loaded)
+      ax = @a 
+      bx = Matrix[ [4.0, 5.0], [6.0, 7.0] ] # @b with floats
+      (cx = (ax / bx)).should be_close_to_matrix([[2.5, -1.5], [1.5, -0.5]])
+    end
+  end
 
   conflicts_with :Prime do
     it "returns the result of dividing self by a Fixnum" do

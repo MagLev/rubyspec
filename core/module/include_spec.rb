@@ -268,6 +268,10 @@ describe "Module#include?" do
     ModuleSpecs::Basic.include?(ModuleSpecs::Super).should == false
   end
 
+  it "returns false if given module is equal to self" do
+    ModuleSpecs.include?(ModuleSpecs).should == false
+  end
+
   it "raises a TypeError when no module was given" do
     lambda { ModuleSpecs::Child.include?("Test") }.should raise_error(TypeError)
     ma = nil
