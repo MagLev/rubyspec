@@ -1,7 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require 'tempfile'
 
-describe "Tempfile#initialize" do
+describe "Tempfile#initialize" do  # maglev does not support direct use of Tempfile#initialize
+				   # do not run this file.
   before(:each) do
     @tempfile = Tempfile.allocate
   end
