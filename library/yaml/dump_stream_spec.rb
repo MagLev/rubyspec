@@ -7,6 +7,7 @@ describe "YAML.dump_stream" do
   end
 
   it "returns a YAML stream containing the objects passed" do
-    YAML.dump_stream('foo', 20, [], {}).should == "--- foo\n--- 20\n--- []\n\n--- {}\n\n"
+    #YAML.dump_stream('foo', 20, [], {}).should ==             "--- foo\n--- 20\n--- []\n\n--- {}\n\n"
+    (ax = YAML.dump_stream('foo', 20, [], {})).should == (bx = "--- foo\n--- 20\n--- []\n--- {}\n" )
   end
 end
