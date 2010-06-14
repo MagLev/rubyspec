@@ -254,6 +254,16 @@ describe "String#split with Regexp" do
   end
  end #
 
+  it "respects the encoding of the regexp when splitting between characters" do
+    str = "\303\202"
+
+    $KCODE = "a"
+
+    ary = str.split(//u)
+    ary.size.should == 1
+    ary.should == ["\303\202"]
+  end
+
   it "includes all captures in the result array" do
     "hello".split(/(el)/).should == ["h", "el", "lo"]
     "hi!".split(/()/).should == ["h", "", "i", "", "!"]

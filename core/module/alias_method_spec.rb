@@ -59,4 +59,10 @@ describe "Module#alias_method" do
 #   lambda { ModuleSpecs::ReopeningModule.foo2 }.should_not raise_error(NoMethodError)
 # end
   
+  it "accesses a method defined on Object from Kernel" do
+    Kernel.should_not have_public_instance_method(:module_specs_public_method_on_object)
+
+    Kernel.should have_public_instance_method(:module_specs_alias_on_kernel)
+    Object.should have_public_instance_method(:module_specs_alias_on_kernel)
+  end
 end

@@ -5,7 +5,7 @@ describe "Numeric#singleton_method_added" do
   it "raises a TypeError when trying to #dup a Numeric" do
     a = nil
     lambda do
-      a = NumericSub.new
+      a = NumericSpecs::Subclass.new
       a.dup
     end.should raise_error(TypeError)
     
