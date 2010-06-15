@@ -65,12 +65,12 @@ describe "Signal.trap" do
 
   it "accepts 'SIG_DFL' in place of a proc" do
     Signal.trap :HUP, "SIG_DFL"
-    Signal.trap(:HUP, @saved_trap).should == "DEFAULT"
+    Signal.trap(:HUP, @saved_trap).should == 'IGNORE' # maglev deviation, was == "DEFAULT"
   end
 
   it "accepts 'DEFAULT' in place of a proc" do
     Signal.trap :HUP, "DEFAULT"
-    Signal.trap(:HUP, @saved_trap).should == "DEFAULT"
+    Signal.trap(:HUP, @saved_trap).should == 'IGNORE' # maglev deviation, was == "DEFAULT"
   end
 
   it "accepts 'SIG_IGN' in place of a proc" do
