@@ -242,7 +242,7 @@ describe "String#split with Regexp" do
     "hi mom".split(/\s*/).should == ["h", "i", "m", "o", "m"]
   end
 
- not_compliant_on :maglev do
+ not_compliant_on :maglev do  # not KCODE aware yet
   it "respects $KCODE when splitting between characters" do #
     str = "こにちわ"
     reg = %r!!
@@ -252,9 +252,8 @@ describe "String#split with Regexp" do
     ary.size.should == 4
     ary.should == ["こ", "に", "ち", "わ"]
   end
- end #
 
-  it "respects the encoding of the regexp when splitting between characters" do
+  it "respects the encoding of the regexp when splitting between characters" do #
     str = "\303\202"
 
     $KCODE = "a"
@@ -263,6 +262,7 @@ describe "String#split with Regexp" do
     ary.size.should == 1
     ary.should == ["\303\202"]
   end
+ end #
 
   it "includes all captures in the result array" do
     "hello".split(/(el)/).should == ["h", "el", "lo"]
