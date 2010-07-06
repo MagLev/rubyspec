@@ -21,9 +21,21 @@ describe "Process.kill" do
   end
 
   platform_is_not :windows do
+    it "accepts symbols as signal names" do
+      begin
+        flag = false
+        @saved_trap = Signal.trap("HUP") { flag = true }
+        Process.kill(:HUP, Process.pid).should == 1
+        sleep 0.5
+        flag.should == true
+      ensure
+        Signal.trap("HUP", @saved_trap)
+      end
+    end
+
     it "tests for the existence of a process without sending a signal" do
       Process.kill(0, 0).should == 1
-lambda { 
+lambda {     
       pid = Process.fork {
         begin
           Signal.trap("HUP") { Process.exit! 99 }
@@ -41,8 +53,8 @@ unless defined?(Maglev)
       Process.kill(1, pid).should == 1
       Process.waitpid(pid)
       lambda { Process.kill(0, pid) }.should raise_error(Errno::ESRCH)
-     end
 end
+    end
   end
 
   if Process.uid != 0
