@@ -1,6 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
+require 'fcntl'
+
 describe "IO#reopen" do
   before :each do
     @name = tmp("io_reopen.txt")
@@ -65,12 +67,11 @@ describe "IO#reopen with a String" do
     @io = IOSpecs.io_fixture "lines.txt"
 
     @tmp_file = tmp("reopen")
-    @rb_file = tmp("io_reopen.rb")
   end
 
   after :each do
     @io.close unless @io.closed?
-    rm_r @other_name, @tmp_file, @rb_file
+    rm_r @other_name, @tmp_file
   end
 
   it "does not raise an exception when called on a closed stream with a path" do
@@ -95,14 +96,16 @@ describe "IO#reopen with a String" do
     @io.gets.should == "Line 1: One\n"
   end
 
-  it "effects exec/system/fork performed after it" do
-    touch(@rb_file) do |f|
-      f.puts %Q{STDOUT.reopen('#{@tmp_file}')}
-      f.puts %q{system 'echo from_system'}
-      f.puts %q{exec 'echo from_exec'}
+  platform_is_not :windows do
+    it "passes all mode flags through" do
+      @io.reopen(@name, "ab")
+      (@io.fcntl(Fcntl::F_GETFL) & File::APPEND).should == File::APPEND
     end
-    ruby_exe(@rb_file)
-    File.read(@tmp_file).should == "from_system\nfrom_exec\n"
+  end
+
+  it "effects exec/system/fork performed after it" do
+    ruby_exe fixture(__FILE__, "reopen_stdout.rb"), :args => @tmp_file
+    @tmp_file.should have_data("from system\nfrom exec", "r")
   end
 
   ruby_version_is "1.9" do
@@ -247,5 +250,10 @@ describe "IO#reopen with an IO" do
   it "may change the class of the instance" do
     @io.reopen @other_io
     @io.should be_an_instance_of(File)
+  end
+
+  it "sets path equals to the other IO's path if other IO is File" do
+    @io.reopen @other_io
+    @io.path.should == @other_io.path
   end
 end

@@ -1,10 +1,10 @@
 require File.expand_path('../../../../spec_helper', __FILE__)
 require File.expand_path('../../fixtures/classes', __FILE__)
 
-describe "BasicSocket#for_fd" do
+describe "UNIXServer#for_fd" do
   before :each do
-    @server = TCPServer.new(SocketSpecs.port)
-    @s2 = nil
+    @unix_path = tmp("unix_socket")
+    @unix = UNIXServer.new(@unix_path)
   end
 
   after :each do
@@ -16,23 +16,18 @@ describe "BasicSocket#for_fd" do
     # I'm not aware of one.
 
     begin
-      @server.close unless @server.closed?
+      @unix.close unless @unix.closed?
     rescue Errno::EBADF
-      # I hate this API
+      # I hate this API too
     end
 
-    begin
-      if @s2
-        @s2.close unless @s2.closed?
-      end
-    rescue Errno::EBADF
-      # I hate this API
-    end
+    rm_r @unix_path
   end
 
-  it "return a Socket instance wrapped around the descriptor" do
-    @s2 = TCPServer.for_fd(@server.fileno)
-    @s2.should be_kind_of(TCPServer)
-    @s2.fileno.should == @server.fileno
+  it "can calculate the path" do
+    b = UNIXServer.for_fd(@unix.fileno)
+
+    b.path.should == @unix_path
+    b.close
   end
 end

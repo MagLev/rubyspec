@@ -29,6 +29,31 @@ describe "C-API Kernel function" do
     end
   end
 
+  describe "rb_throw" do
+    before :each do
+      ScratchPad.record []
+    end
+
+    it "sets the return value of the catch block to the specified value" do
+      catch(:foo) do
+        @s.rb_throw(:return_value)
+      end.should == :return_value
+    end
+
+    it "terminates the function at the point it was called" do
+      catch(:foo) do
+        ScratchPad << :before_throw
+        @s.rb_throw(:thrown_value)
+        ScratchPad << :after_throw
+      end.should == :thrown_value
+      ScratchPad.recorded.should == [:before_throw]
+    end
+
+    it "raises a NameError if there is no catch block for the symbol" do
+      lambda { @s.rb_throw(nil) }.should raise_error(NameError)
+    end
+  end
+
   describe "rb_warn" do
     before :each do
       @stderr, $stderr = $stderr, IOStub.new
@@ -76,6 +101,22 @@ describe "C-API Kernel function" do
 
     it "raises LocalJumpError when no block is given" do
       lambda { @s.rb_yield(1) }.should raise_error(LocalJumpError)
+    end
+  end
+
+  describe "rb_yield_values" do
+    it "yields passed arguments" do
+      ret = nil
+      @s.rb_yield_values(1, 2) { |x, y| ret = x + y }
+      ret.should == 3
+    end
+
+    it "returns the result from block evaluation" do
+      @s.rb_yield_values(1, 2) { |x, y| x + y }.should == 3
+    end
+
+    it "raises LocalJumpError when no block is given" do
+      lambda { @s.rb_yield_values(1, 2) }.should raise_error(LocalJumpError)
     end
   end
 
