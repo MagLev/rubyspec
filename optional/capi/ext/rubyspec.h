@@ -128,6 +128,7 @@
 #define HAVE_RB_F_GLOBAL_VARIABLES         1
 #define HAVE_RB_GV_GET                     1
 #define HAVE_RB_GV_SET                     1
+#define HAVE_RB_SET_KCODE                  1
 
 // Hash
 #define HAVE_RB_HASH_AREF                  1
@@ -147,12 +148,13 @@
 #define HAVE_RB_ENSURE                     1
 #define HAVE_RB_EVAL_STRING                1
 #define HAVE_RB_RAISE                      1
+#define HAVE_RB_THROW                      1
 #define HAVE_RB_RESCUE                     1
 #define HAVE_RB_RESCUE2                    1
 #define HAVE_RB_SYS_FAIL                   1
 #define HAVE_RB_WARN                       1
 #define HAVE_RB_YIELD                      1
-
+#define HAVE_RB_YIELD_VALUES               1
 // GC
 #define HAVE_RB_GC_REGISTER_ADDRESS        1
 
@@ -211,6 +213,7 @@
 #define HAVE_RB_RESPOND_TO                 1
 #define HAVE_RB_SPECIAL_CONST_P            1
 #define HAVE_RB_TO_ID                      1
+#define HAVE_RB_TO_INT                     1
 #define HAVE_RTEST                         1
 #define HAVE_TYPE                          1
 
