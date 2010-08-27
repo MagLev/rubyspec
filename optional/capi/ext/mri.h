@@ -12,4 +12,37 @@
 
 #undef HAVE_THREAD_BLOCKING_REGION
 
+#ifdef RUBY_VERSION_IS_1_9
+#undef HAVE_RARRAY
+#undef HAVE_RFLOAT
+#undef HAVE_RSTRING
+#undef HAVE_STR2CSTR
+#undef HAVE_RB_STR2CSTR
+#undef HAVE_RB_SET_KCODE
+#endif
+
+/* RubySpec assumes following are public API */
+#ifndef rb_proc_new
+VALUE rb_proc_new _((VALUE (*)(ANYARGS/* VALUE yieldarg[, VALUE procarg] */), VALUE));
+#endif
+#ifndef rb_str_len
+int rb_str_len(VALUE);
+#endif
+#ifndef rb_set_errinfo
+void rb_set_errinfo(VALUE);
+#endif
+
+/* Macros that may not be defined in old versions */
+#ifndef RARRAY_PTR
+#define RARRAY_PTR(s) (*(VALUE *const *)&RARRAY(s)->ptr)
+#endif
+
+#ifndef RARRAY_LEN
+#define RARRAY_LEN(s) (*(const long *)&RARRAY(s)->len)
+#endif
+
+#ifndef RFLOAT_VALUE
+#define RFLOAT_VALUE(v) (RFLOAT(v)->value)
+#endif
+
 #endif

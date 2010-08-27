@@ -276,6 +276,24 @@
 /* Time */
 #define HAVE_RB_TIME_NEW                   1
 
+/* Define convenience macros similar to the RubySpec guards to assist
+ * with version incompatibilities.
+ */
+
+#include "rubyspec_version.h"
+
+#if RUBY_VERSION_MAJOR == 1 && RUBY_VERSION_MINOR == 8
+#define RUBY_VERSION_IS_1_8
+#endif
+
+#if RUBY_VERSION_MAJOR == 1 && RUBY_VERSION_MINOR == 8 && RUBY_VERSION_TEENY < 7
+#define RUBY_VERSION_IS_LT_1_8_7
+#endif
+
+#if RUBY_VERSION_MAJOR == 1 && RUBY_VERSION_MINOR == 9
+#define RUBY_VERSION_IS_1_9
+#endif
+
 /* Now, create the differential set. The format of the preprocessor directives
  * is significant. The alternative implementations should define RUBY because
  * some extensions depend on that. But only one alternative implementation
@@ -290,21 +308,6 @@
 #include "jruby.h"
 #else /* MRI */
 #include "mri.h"
-#endif
-
-#ifndef RARRAY_PTR
-#define RARRAY_PTR(s) (*(VALUE *const *)&RARRAY(s)->ptr)
-#endif
-#ifndef RARRAY_LEN
-#define RARRAY_LEN(s) (*(const long *)&RARRAY(s)->len)
-#endif
-#ifndef RFLOAT_VALUE
-#define RFLOAT_VALUE(v) (RFLOAT(v)->value)
-#endif
-
-#if RUBY_VERSION_MAJOR > 1 || RUBY_VERSION_MINOR > 8
-#undef HAVE_RB_CVAR_SET
-#undef HAVE_RB_SET_KCODE
 #endif
 
 #endif
