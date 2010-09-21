@@ -211,6 +211,19 @@ static VALUE so_is_type_class(VALUE self, VALUE obj) {
   }
   return Qfalse;
 }
+
+static VALUE so_is_type_data(VALUE self, VALUE obj) {
+  if(TYPE(obj) == T_DATA) {
+    return Qtrue;
+  }
+  return Qfalse;
+}
+#endif
+
+#ifdef HAVE_RB_TO_INT
+static VALUE object_spec_rb_to_int(VALUE self, VALUE obj) {
+  return rb_to_int(obj);
+}
 #endif
 
 void Init_object_spec() {
@@ -330,6 +343,11 @@ void Init_object_spec() {
   rb_define_method(cls, "rb_is_type_array", so_is_type_array, 1);
   rb_define_method(cls, "rb_is_type_module", so_is_type_module, 1);
   rb_define_method(cls, "rb_is_type_class", so_is_type_class, 1);
+  rb_define_method(cls, "rb_is_type_data", so_is_type_data, 1);
+#endif
+
+#ifdef HAVE_RB_TO_INT
+  rb_define_method(cls, "rb_to_int", object_spec_rb_to_int, 1);
 #endif
 }
 

@@ -156,6 +156,7 @@ describe "CApiObject" do
     @o.rb_is_type_array(DescArray.new).should == true
     @o.rb_is_type_module(ObjectTest).should == false
     @o.rb_is_type_class(ObjectTest).should == true
+    @o.rb_is_type_data(Time.now).should == true
   end
 
   describe "RTEST" do
@@ -264,7 +265,7 @@ describe "CApiObject" do
     end
   end
 
-  describe "rb_obj_taint" do 
+  describe "rb_obj_taint" do
     it "marks the object passed as tainted" do
       obj = ""
       obj.tainted?.should == false
@@ -272,31 +273,85 @@ describe "CApiObject" do
       obj.tainted?.should == true
     end
 
-    it "raises an error if the object passed is frozen" do
-      obj = ""
-      obj.freeze
-      lambda { @o.rb_obj_taint(obj) }.should raise_error(TypeError)
+    ruby_version_is ""..."1.9" do
+      it "raises a TypeError if the object passed is frozen" do
+        lambda { @o.rb_obj_taint("".freeze) }.should raise_error(TypeError)
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "raises a RuntimeError if the object passed is frozen" do
+        lambda { @o.rb_obj_taint("".freeze) }.should raise_error(RuntimeError)
+      end
     end
   end
 
-  describe "rb_check_frozen" do 
-    it "raises an error if the obj is frozen" do 
-      obj = ""
-      obj.freeze
-      lambda { @o.rb_check_frozen(obj) }.should raise_error(TypeError)
+  describe "rb_check_frozen" do
+    ruby_version_is ""..."1.9" do
+      it "raises a TypeError if the obj is frozen" do
+        lambda { @o.rb_check_frozen("".freeze) }.should raise_error(TypeError)
+      end
     end
 
-    it "does nothing when object isn't frozen" do 
+    ruby_version_is "1.9" do
+      it "raises a RuntimeError if the obj is frozen" do
+        lambda { @o.rb_check_frozen("".freeze) }.should raise_error(RuntimeError)
+      end
+    end
+
+    it "does nothing when object isn't frozen" do
       obj = ""
       lambda { @o.rb_check_frozen(obj) }.should_not raise_error(TypeError)
     end
   end
 
   describe "rb_any_to_s" do
-    it "converts obj to string" do 
+    it "converts obj to string" do
       obj = 1
       i = @o.rb_any_to_s(obj)
       i.should be_kind_of(String)
+    end
+  end
+
+  describe "rb_to_int" do
+    it "returns self when called on an Integer" do
+      @o.rb_to_int(5).should == 5
+    end
+
+    it "returns self when called on a Bignum" do
+      @o.rb_to_int(bignum_value()).should == bignum_value()
+    end
+
+    it "calls #to_int to convert and object to an integer" do
+      x = mock("to_int")
+      x.should_receive(:to_int).and_return(5)
+      @o.rb_to_int(x).should == 5
+    end
+
+    it "converts a Float to an Integer by truncation" do
+      @o.rb_to_int(1.35).should == 1
+    end
+
+    it "raises a TypeError if #to_int does not return an Integer" do
+      x = mock("to_int")
+      x.should_receive(:to_int).and_return("5")
+      lambda { @o.rb_to_int(x) }.should raise_error(TypeError)
+    end
+
+    it "raises a TypeError if called with nil" do
+      lambda { @o.rb_to_int(nil) }.should raise_error(TypeError)
+    end
+
+    it "raises a TypeError if called with true" do
+      lambda { @o.rb_to_int(true) }.should raise_error(TypeError)
+    end
+
+    it "raises a TypeError if called with false" do
+      lambda { @o.rb_to_int(false) }.should raise_error(TypeError)
+    end
+
+    it "raises a TypeError if called with a String" do
+      lambda { @o.rb_to_int("1") }.should raise_error(TypeError)
     end
   end
 end

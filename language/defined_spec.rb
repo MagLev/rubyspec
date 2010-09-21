@@ -471,12 +471,12 @@ describe "The defined? keyword for an expression" do
         defined?(@@defined_specs_undefined_class_variable or true).should == "expression"
       end
 
-      it "does not call a method in an '&&' expression and returns 'expression'" do
+      it "does not call a method in an '||' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects || true).should == "expression"
         ScratchPad.recorded.should be_nil
       end
 
-      it "does not call a method in an 'and' expression and returns 'expression'" do
+      it "does not call a method in an 'or' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects or true).should == "expression"
         ScratchPad.recorded.should be_nil
       end
@@ -1297,6 +1297,12 @@ describe "The defined? keyword for super" do
 
     it "returns 'super' from a block in a #define_method when a superclass method exists" do
       DefinedSpecs::Super.new.define_method_block_args.should == "super"
+    end
+  end
+  
+  describe "within an included module's method" do
+    it "returns 'super' when a superclass method exists in the including hierarchy" do
+      DefinedSpecs::Child.new.defined_super.should == "super"
     end
   end
 end

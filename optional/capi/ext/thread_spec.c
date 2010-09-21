@@ -19,8 +19,8 @@ static VALUE do_unlocked(void* data) {
   return (VALUE)0;
 }
 
-// There is really no way to know we're unlocked. So just make sure the arguments
-// go through fine.
+/* There is really no way to know we're unlocked. So just make sure the arguments */
+/* go through fine. */
 static VALUE thread_spec_rb_thread_blocking_region() {
   VALUE ret = rb_thread_blocking_region(do_unlocked, (void*)1, 0, 0);
   if(ret == (VALUE)1) return Qtrue;
@@ -49,13 +49,14 @@ static VALUE thread_spec_rb_thread_local_aset(VALUE self, VALUE thr, VALUE sym, 
 #ifdef HAVE_RB_THREAD_SELECT
 static VALUE thread_spec_rb_thread_select_fd(VALUE self, VALUE fd_num, VALUE msec) {
   int fd = NUM2INT(fd_num);
+  struct timeval tv = {0, NUM2INT(msec)};
+  int n;
 
   fd_set read;
   FD_ZERO(&read);
   FD_SET(fd, &read);
 
-  struct timeval tv = {0, NUM2INT(msec)};
-  int n = rb_thread_select(fd + 1, &read, NULL, NULL, &tv);
+  n = rb_thread_select(fd + 1, &read, NULL, NULL, &tv);
   if(n == 1 && FD_ISSET(fd, &read)) return Qtrue;
   return Qfalse;
 }

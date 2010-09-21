@@ -29,6 +29,39 @@ describe "C-API Kernel function" do
     end
   end
 
+  describe "rb_throw" do
+    before :each do
+      ScratchPad.record []
+    end
+
+    it "sets the return value of the catch block to the specified value" do
+      catch(:foo) do
+        @s.rb_throw(:return_value)
+      end.should == :return_value
+    end
+
+    it "terminates the function at the point it was called" do
+      catch(:foo) do
+        ScratchPad << :before_throw
+        @s.rb_throw(:thrown_value)
+        ScratchPad << :after_throw
+      end.should == :thrown_value
+      ScratchPad.recorded.should == [:before_throw]
+    end
+
+    ruby_version_is ""..."1.9" do
+      it "raises a NameError if there is no catch block for the symbol" do
+        lambda { @s.rb_throw(nil) }.should raise_error(NameError)
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "raises an ArgumentError if there is no catch block for the symbol" do
+        lambda { @s.rb_throw(nil) }.should raise_error(ArgumentError)
+      end
+    end
+  end
+
   describe "rb_warn" do
     before :each do
       @stderr, $stderr = $stderr, IOStub.new
@@ -79,12 +112,28 @@ describe "C-API Kernel function" do
     end
   end
 
+  describe "rb_yield_values" do
+    it "yields passed arguments" do
+      ret = nil
+      @s.rb_yield_values(1, 2) { |x, y| ret = x + y }
+      ret.should == 3
+    end
+
+    it "returns the result from block evaluation" do
+      @s.rb_yield_values(1, 2) { |x, y| x + y }.should == 3
+    end
+
+    it "raises LocalJumpError when no block is given" do
+      lambda { @s.rb_yield_values(1, 2) }.should raise_error(LocalJumpError)
+    end
+  end
+
   describe "rb_rescue" do
     before :each do
       @proc = lambda { |x| x }
-      @arg_error_proc = lambda { raise ArgumentError, '' }
-      @std_error_proc = lambda { raise StandardError, '' }
-      @exc_error_proc = lambda { raise Exception, '' }
+      @arg_error_proc = lambda { |*_| raise ArgumentError, '' }
+      @std_error_proc = lambda { |*_| raise StandardError, '' }
+      @exc_error_proc = lambda { |*_| raise Exception, '' }
     end
 
     it "executes passed function" do
@@ -105,7 +154,7 @@ describe "C-API Kernel function" do
     end
 
     it "makes $! available only during 'raise function' execution" do
-      @s.rb_rescue(@std_error_proc, nil, lambda { $! }, nil).class.should == StandardError
+      @s.rb_rescue(@std_error_proc, nil, lambda { |*_| $! }, nil).class.should == StandardError
       $!.should == nil
     end
   end
@@ -113,9 +162,9 @@ describe "C-API Kernel function" do
   describe "rb_rescue2" do
     it "only rescues if one of the passed exceptions is raised" do
       proc = lambda { |x| x }
-      arg_error_proc = lambda { raise ArgumentError, '' }
-      run_error_proc = lambda { raise RuntimeError, '' }
-      type_error_proc = lambda { raise TypeError, '' }
+      arg_error_proc = lambda { |*_| raise ArgumentError, '' }
+      run_error_proc = lambda { |*_| raise RuntimeError, '' }
+      type_error_proc = lambda { |*_| raise TypeError, '' }
       @s.rb_rescue2(arg_error_proc, :no_exc, proc, :exc, ArgumentError, RuntimeError).should == :exc
       @s.rb_rescue2(run_error_proc, :no_exc, proc, :exc, ArgumentError, RuntimeError).should == :exc
       lambda {
@@ -132,7 +181,7 @@ describe "C-API Kernel function" do
 
     it "executes passed 'ensure function' when no exception is raised" do
       foo = nil
-      proc = lambda { }
+      proc = lambda { |*_| }
       ensure_proc = lambda { |x| foo = x }
       @s.rb_ensure(proc, nil, ensure_proc, :foo)
       foo.should == :foo
@@ -147,8 +196,8 @@ describe "C-API Kernel function" do
     end
 
     it "raises the same exception raised inside passed function" do
-      raise_proc = lambda { raise RuntimeError, 'foo' }
-      proc = lambda { }
+      raise_proc = lambda { |*_| raise RuntimeError, 'foo' }
+      proc = lambda { |*_| }
       lambda { @s.rb_ensure(raise_proc, nil, proc, nil) }.should raise_error(RuntimeError, 'foo')
     end
   end
