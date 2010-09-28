@@ -18,7 +18,7 @@ describe "Float#CONSTANTS" do
   end
 
   it "the MIN_10_EXP is -308" do
-    Float::MIN_10_EXP.should == -307
+    Float::MIN_10_EXP.should == -308
   end
 
   it "the MAX_EXP is 1024" do
@@ -26,7 +26,7 @@ describe "Float#CONSTANTS" do
   end
 
   it "the MIN_EXP is -1021" do
-    Float::MIN_EXP.should == -1021
+    Float::MIN_EXP.should == -1022
   end
 
   it "the MAX is 1.79769313486232e+308" do
