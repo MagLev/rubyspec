@@ -22,13 +22,13 @@ describe "Module#private_class_method" do
     lambda { ModuleSpecs::Parent.private_method }.should raise_error(NoMethodError)
   end
 
-# it "makes an existing class method private up the inheritance tree" do # Maglev fails
-#   ModuleSpecs::Child.private_method_1.should == nil
-#   ModuleSpecs::Child.private_class_method :private_method_1
+  it "makes an existing class method private up the inheritance tree" do
+    ModuleSpecs::Child.private_method_1.should == nil
+    ModuleSpecs::Child.private_class_method :private_method_1
 
-#   lambda { ModuleSpecs::Child.private_method_1 }.should raise_error(NoMethodError) # Maglev no error
-#   lambda { ModuleSpecs::Child.private_method   }.should raise_error(NoMethodError)
-# end
+    lambda { ModuleSpecs::Child.private_method_1 }.should raise_error(NoMethodError)
+    lambda { ModuleSpecs::Child.private_method   }.should raise_error(NoMethodError)
+  end
 
   it "accepts more than one method at a time" do
     ModuleSpecs::Parent.private_method_1.should == nil
@@ -37,8 +37,8 @@ describe "Module#private_class_method" do
 
     ModuleSpecs::Child.private_class_method :private_method_1, :private_method_2, :private_method_3
     
-#   lambda { ModuleSpecs::Child.private_method_1 }.should raise_error(NoMethodError)
-#   lambda { ModuleSpecs::Child.private_method_2 }.should raise_error(NoMethodError)
+    lambda { ModuleSpecs::Child.private_method_1 }.should raise_error(NoMethodError)
+    lambda { ModuleSpecs::Child.private_method_2 }.should raise_error(NoMethodError)
     lambda { ModuleSpecs::Child.private_method_3 }.should raise_error(NoMethodError)
   end
 

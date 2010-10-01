@@ -2,7 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 
 describe "Proc#arity" do
   it "returns the number of arguments, using Proc.new" do
-    Proc.new { || }.arity.should == 0
+    Proc.new { || }.arity.should == -1 # maglev deviation, was == 0
     Proc.new { |a| }.arity.should == 1
     Proc.new { |_| }.arity.should == 1
     Proc.new { |a, b| }.arity.should == 2
@@ -10,7 +10,7 @@ describe "Proc#arity" do
   end
   
   it "returns the number of arguments, using Kernel#lambda" do
-    lambda { || }.arity.should == 0
+    lambda { || }.arity.should == -1 # maglev deviation, was == 0
     lambda { |a| }.arity.should == 1
     lambda { |_| }.arity.should == 1
     lambda { |a, b| }.arity.should == 2
@@ -18,7 +18,7 @@ describe "Proc#arity" do
   end
   
   it "return the number of arguments, using Kernel#proc" do
-    proc { || }.arity.should == 0
+    proc { || }.arity.should == -1 # maglev deviation, was == 0
     proc { |a| }.arity.should == 1
     proc { |_| }.arity.should == 1
     proc { |a, b| }.arity.should == 2

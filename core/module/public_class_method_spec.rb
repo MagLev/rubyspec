@@ -12,7 +12,7 @@ describe "Module#public_class_method" do
   end
 
   it "makes an existing class method public" do
-#    lambda { ModuleSpecs::Parent.public_method_1 }.should raise_error(NoMethodError) # Maglev no error
+    lambda { ModuleSpecs::Parent.public_method_1 }.should raise_error(NoMethodError)
     ModuleSpecs::Parent.public_class_method :public_method_1
     ModuleSpecs::Parent.public_method_1.should == nil
 
@@ -22,34 +22,28 @@ describe "Module#public_class_method" do
   end
 
   it "makes an existing class method public up the inheritance tree" do
-    lambda { ModuleSpecs::Child.public_method_1 }.should raise_error(NoMethodError) # Maglev no error
+    lambda { ModuleSpecs::Child.public_method_1 }.should raise_error(NoMethodError)
     ModuleSpecs::Child.public_class_method :public_method_1
 
-    # ModuleSpecs::Child.public_method_1.should == nil
-    lambda { ModuleSpecs::Child.public_method_1 } .should raise_error(NoMethodError) # Maglev deviation, see Trac 701
-
+    ModuleSpecs::Child.public_method_1.should == nil
     ModuleSpecs::Child.public_method.should == nil
   end
 
   it "accepts more than one method at a time" do
-    lambda { ModuleSpecs::Parent.public_method_1 }.should raise_error(NameError) # Maglev no error on methods not found
-    lambda { ModuleSpecs::Parent.public_method_2 }.should raise_error(NameError) 
+    lambda { ModuleSpecs::Parent.public_method_1 }.should raise_error(NameError)
+    lambda { ModuleSpecs::Parent.public_method_2 }.should raise_error(NameError)
     lambda { ModuleSpecs::Parent.public_method_3 }.should raise_error(NameError)
 
     ModuleSpecs::Child.public_class_method :public_method_1, :public_method_2, :public_method_3
     
-    # ModuleSpecs::Child.public_method_1.should == nil
-    # ModuleSpecs::Child.public_method_2.should == nil
-    # ModuleSpecs::Child.public_method_3.should == nil
-    lambda { ModuleSpecs::Child.public_method_1 } .should raise_error(NoMethodError) # maglev deviation, trac 701
-    lambda { ModuleSpecs::Child.public_method_2 } .should raise_error(NoMethodError) # maglev deviation, trac 701
-    lambda { ModuleSpecs::Child.public_method_3 } .should raise_error(NoMethodError) # maglev deviation, trac 701
-    
+    ModuleSpecs::Child.public_method_1.should == nil
+    ModuleSpecs::Child.public_method_2.should == nil
+    ModuleSpecs::Child.public_method_3.should == nil
   end
 
-# it "raises a NameError if class method doesn't exist" do  # Maglev does not raise error yet
-#   lambda { ModuleSpecs.public_class_method :no_method_here }.should raise_error(NameError)
-# end
+  it "raises a NameError if class method doesn't exist" do
+    lambda { ModuleSpecs.public_class_method :no_method_here }.should raise_error(NameError)
+  end
 
   it "makes a class method public" do
     c = Class.new do
@@ -60,20 +54,20 @@ describe "Module#public_class_method" do
     c.foo.should == "foo"
   end
 
-# it "raises a NameError when the given name is not a method" do # Maglev no error yet
-#   lambda {
-#     c = Class.new do
-#       public_class_method :foo
-#     end
-#   }.should raise_error(NameError)
-# end
+  it "raises a NameError when the given name is not a method" do
+    lambda {
+      c = Class.new do
+        public_class_method :foo
+      end
+    }.should raise_error(NameError)
+  end
 
-# it "raises a NameError when the given name is an instance method" do # Maglev no error
-#   lambda {
-#     c = Class.new do
-#       def foo() "foo" end
-#       public_class_method :foo
-#     end
-#   }.should raise_error(NameError)
-# end
+  it "raises a NameError when the given name is an instance method" do
+    lambda {
+      c = Class.new do
+        def foo() "foo" end
+        public_class_method :foo
+      end
+    }.should raise_error(NameError)
+  end
 end
