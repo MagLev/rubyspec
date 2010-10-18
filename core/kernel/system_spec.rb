@@ -34,7 +34,8 @@ describe "Kernel#system" do
   end
 
   it "returns false when the command has a non-zero exit status" do
-    result = system("#{RUBY_EXE} -e 'exit(1)'")
+     # maglev +d to turn off debug flag
+    result = system("#{RUBY_EXE} +d -e 'exit(1)'")
     result.should be_false
   end
 
