@@ -20,10 +20,8 @@ ruby_version_is "1.8.7" do # maglev, was  "1.9" do
       @fh.read.should == text
     end
 
-   not_compliant_on :maglev do 
-    it "accepts an object that has a #to_path method" do # maglev requires arg1 be a String or File
+    it "accepts an object that has a #to_path method" do 
       @fh = File.new(@file).reopen(mock_to_path(@file), "r")
     end
-   end #
   end
 end
