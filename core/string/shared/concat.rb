@@ -22,7 +22,9 @@ describe :string_concat, :shared => true do
       a = "hello"
       a.freeze
 
-      lambda { a.send(@method, "")     }.should raise_error(TypeError)
+      b = a.send(@method, "") # Maglev deviation error only if modification would occur
+      b.equal?(a).should == true 
+      lambda { a.send(@method, "a")     }.should raise_error(TypeError) # Maglev deviation
       lambda { a.send(@method, "test") }.should raise_error(TypeError)
     end
   end

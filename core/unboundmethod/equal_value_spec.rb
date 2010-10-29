@@ -116,8 +116,6 @@ describe "UnboundMethod#==" do
       def discard_1; :discard; end
     end
 
-    # (@discard_1 == UnboundMethodSpecs::Methods.instance_method(:discard_1)).should == false
-    #  Maglev failing, returning true
-    ((ax = @discard_1) == (bx = UnboundMethodSpecs::Methods.instance_method(:discard_1))).should == true
+    (@discard_1 == UnboundMethodSpecs::Methods.instance_method(:discard_1)).should == false
   end
 end
