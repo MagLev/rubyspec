@@ -14,11 +14,13 @@ module SocketSpecs
   end
   
   def self.port
-    40001
+    # 40001
+    10027  # For solaris, port number needs to be resolvable
   end
   
   def self.str_port
-    "40001"
+    # "40001"
+    "10027"  # For solaris, port number needs to be resolvable
   end
 
   def self.sockaddr_in(port, host)
