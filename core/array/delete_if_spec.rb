@@ -35,16 +35,23 @@ describe "Array#delete_if" do
     end
   end
 
+ not_compliant_on :maglev do # no exception because empty blocks means no deletion
   ruby_version_is '' ... '1.9' do
-# Maglev no exception raised , because the empty delete block means no deletion
-#    it "raises a TypeError on a frozen array" do
-#      lambda { ArraySpecs.frozen_array.delete_if {} }.should raise_error(TypeError)
-#    end
+    it "raises a TypeError on a frozen array" do
+      lambda { ArraySpecs.frozen_array.delete_if {} }.should raise_error(TypeError)
+    end
+    it "raises a TypeError on an empty frozen array" do
+      lambda { ArraySpecs.empty_frozen_array.delete_if {} }.should raise_error(TypeError)
+    end
   end
+ end
 
   ruby_version_is '1.9' do
     it "raises a RuntimeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.delete_if {} }.should raise_error(RuntimeError)
+    end
+    it "raises a RuntimeError on an empty frozen array" do
+      lambda { ArraySpecs.empty_frozen_array.delete_if {} }.should raise_error(RuntimeError)
     end
   end
 

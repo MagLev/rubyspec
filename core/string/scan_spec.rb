@@ -78,23 +78,39 @@ describe "String#scan" do
     lambda { "cruel world".scan(mock('x')) }.should raise_error(TypeError)
   end
 
-  # Note: MRI taints for tainted regexp patterns,
-  # but not for tainted string patterns.
-  # TODO: Report to ruby-core.
-# Maglev, no taint propagation
-# it "taints the match strings if self is tainted, unless the taint happens in the method call" do
-#   a = "hello hello hello".scan("hello".taint)
-#   a.each { |m| m.tainted?.should == false }
+  ruby_version_is ''...'1.9.3' do
+   not_compliant_on :maglev do # not taint propagation
+    it "taints the match strings if self is tainted, unless the taint happens in the method call" do
+      a = "hello hello hello".scan("hello".taint)
+      a.each { |m| m.tainted?.should == false }
 
-#   a = "hello hello hello".taint.scan("hello")
-#   a.each { |m| m.tainted?.should == true }
+      a = "hello hello hello".taint.scan("hello")
+      a.each { |m| m.tainted?.should == true }
 
-#   a = "hello".scan(/./.taint)
-#   a.each { |m| m.tainted?.should == true }
+      a = "hello".scan(/./.taint)
+      a.each { |m| m.tainted?.should == true }
 
-#   a = "hello".taint.scan(/./)
-#   a.each { |m| m.tainted?.should == true }
-# end
+      a = "hello".taint.scan(/./)
+      a.each { |m| m.tainted?.should == true }
+    end
+   end
+  end
+
+  ruby_version_is '1.9.3' do
+    it "taints the match strings if self is tainted" do
+      a = "hello hello hello".scan("hello".taint)
+      a.each { |m| m.tainted?.should == true }
+
+      a = "hello hello hello".taint.scan("hello")
+      a.each { |m| m.tainted?.should == true }
+
+      a = "hello".scan(/./.taint)
+      a.each { |m| m.tainted?.should == true }
+
+      a = "hello".taint.scan(/./)
+      a.each { |m| m.tainted?.should == true }
+    end
+  end
 end
 
 describe "String#scan with pattern and block" do
@@ -177,20 +193,35 @@ describe "String#scan with pattern and block" do
     $~.should == nil
   end
 
-  # Note: MRI taints for tainted regexp patterns,
-  # but not for tainted string patterns.
-  # TODO: Report to ruby-core.
-# Maglev, no taint propagation
-# it "taints the match strings if self is tainted, unless the tain happens inside the scan" do
-#   "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == false }
+  ruby_version_is ''...'1.9.3' do
+   not_compliant_on :maglev do  # no taint propagation
+    it "taints the match strings if self is tainted, unless the tain happens inside the scan" do
+      "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == false }
 
-#   deviates_on :rubinius do
-#     "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == true }
-#   end
+      deviates_on :rubinius do
+        "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == true }
+      end
 
-#   "hello hello hello".taint.scan("hello") { |m| m.tainted?.should == true }
+      "hello hello hello".taint.scan("hello") { |m| m.tainted?.should == true }
 
-#   "hello".scan(/./.taint) { |m| m.tainted?.should == true }
-#   "hello".taint.scan(/./) { |m| m.tainted?.should == true }
-# end
+      "hello".scan(/./.taint) { |m| m.tainted?.should == true }
+      "hello".taint.scan(/./) { |m| m.tainted?.should == true }
+    end
+   end
+  end
+
+  ruby_version_is '1.9.3' do
+    it "taints the match strings if self is tainted" do
+      "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == true }
+
+      deviates_on :rubinius do
+        "hello hello hello".scan("hello".taint) { |m| m.tainted?.should == true }
+      end
+
+      "hello hello hello".taint.scan("hello") { |m| m.tainted?.should == true }
+
+      "hello".scan(/./.taint) { |m| m.tainted?.should == true }
+      "hello".taint.scan(/./) { |m| m.tainted?.should == true }
+    end
+  end
 end
