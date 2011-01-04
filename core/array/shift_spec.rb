@@ -34,9 +34,11 @@ describe "Array#shift" do
     it "raises a TypeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.shift }.should raise_error(TypeError)
     end
+   not_compliant_on :maglev do
     it "raises a TypeError on an empty frozen array" do
       lambda { ArraySpecs.empty_frozen_array.shift }.should raise_error(TypeError)
     end
+   end
   end
 
   ruby_version_is "1.9" do
