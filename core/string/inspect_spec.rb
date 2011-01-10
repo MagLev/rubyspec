@@ -324,7 +324,7 @@ describe "String#inspect" do
       ].should be_computed_by(:inspect)
     end
 
-    describe "with $KCODE" do
+    describe "with $KCODE == 'NONE'" do
       before :each do
         @kcode = $KCODE
       end
@@ -333,22 +333,30 @@ describe "String#inspect" do
         $KCODE = @kcode
       end
 
-      it "returns a string with bytes represented in \\0nn notation when $KCODE == 'NONE'" do
+      it "returns a string with bytes represented in stringified octal notation" do
         $KCODE = "NONE"
         "äöü".inspect.should == "\"\\303\\244\\303\\266\\303\\274\""
       end
+    end
 
-# Maglev not KCODE aware
-#     it "returns a string with extended character set when $KCODE == 'UTF-8'" do
-#       $KCODE = "UTF-8"
-#       "äöü".inspect.should == "\"äöü\""
-#     end
+    describe "with $KCODE == 'UTF-8'" do
+      before :each do
+        @kcode = $KCODE
+      end
 
-#     it "can handle malformed UTF-8 string when $KCODE is UTF-8" do
-#       $KCODE = "UTF-8"
-#       # malformed UTF-8 sequence
-#       "\007äöüz\303".inspect.should == "\"\\aäöüz\\303\""
-#     end
+      after :each do
+        $KCODE = @kcode
+      end
+
+      it "returns a string with extended character set" do
+        $KCODE = "UTF-8"
+        "äöü".inspect.should == "\"äöü\""
+      end
+
+      it "returns malformed UTF-8 characters in stringified octal notation" do
+        $KCODE = "UTF-8"
+        "\007äöüz\303".inspect.should == "\"\\aäöüz\\303\""
+      end
     end
   end
 
