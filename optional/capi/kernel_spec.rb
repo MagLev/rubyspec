@@ -29,6 +29,7 @@ describe "C-API Kernel function" do
     end
   end
 
+ not_supported_on :maglev do
   describe "rb_throw" do
     before :each do
       ScratchPad.record []
@@ -61,6 +62,7 @@ describe "C-API Kernel function" do
       end
     end
   end
+ end #
 
   describe "rb_warn" do
     before :each do
@@ -144,10 +146,10 @@ describe "C-API Kernel function" do
 
   describe "rb_rescue" do
     before :each do
-      @proc = lambda { |x| x }
-      @arg_error_proc = lambda { |*_| raise ArgumentError, '' }
-      @std_error_proc = lambda { |*_| raise StandardError, '' }
-      @exc_error_proc = lambda { |*_| raise Exception, '' }
+      @proc = lambda { |x| puts "--PA";   x }
+      @arg_error_proc = lambda { |*_| puts "--PB" ; nil.pause; raise ArgumentError, '' }
+      @std_error_proc = lambda { |*_| puts "--PC" ; raise StandardError, '' }
+      @exc_error_proc = lambda { |*_| puts "--PD" ; raise Exception, '' }
     end
 
     it "executes passed function" do
@@ -222,6 +224,7 @@ describe "C-API Kernel function" do
     end
   end
 
+ not_supported_on :maglev do
   describe "rb_block_proc" do
     it "converts the implicit block into a proc" do
       proc = @s.rb_block_proc() { 1+1 }
@@ -229,4 +232,5 @@ describe "C-API Kernel function" do
       proc.call.should == 2
     end
   end
+ end #
 end

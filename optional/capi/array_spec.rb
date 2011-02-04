@@ -18,6 +18,7 @@ describe "C-API Array function" do
       @s.rb_ary_new2(5).should == []
     end
 
+   not_compliant_on :maglev do  # rb_ary_new2_assign not supported
     ruby_version_is ""..."1.9" do
       it "returns an array which can be assigned to from C" do
         ary = @s.rb_ary_new2(5)
@@ -25,6 +26,7 @@ describe "C-API Array function" do
         ary.should == [:set] * 5
       end
     end
+   end #
   end
 
   describe "rb_ary_new3" do
@@ -138,7 +140,6 @@ describe "C-API Array function" do
 
     it "raises on IndexError if the negative index is greater than the length" do
       a = [1, 2, 3]
-
       lambda { @s.rb_ary_store(a, -10, 5) }.should raise_error(IndexError)
     end
 
@@ -150,6 +151,7 @@ describe "C-API Array function" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do
     describe "RARRAY" do
       it "returns a struct with a pointer to a C array of the array's elements" do
         a = [1, 2, 3]
@@ -182,9 +184,11 @@ describe "C-API Array function" do
         @s.RARRAY_len([1, 2, 3]).should == 3
       end
     end
+   end #
   end
 
   describe "RARRAY_PTR" do
+   not_compliant_on :maglev do
     it "returns a pointer to a C array of the array's elements" do
       a = [1, 2, 3]
       b = []
@@ -199,6 +203,7 @@ describe "C-API Array function" do
       @s.RARRAY_PTR_assign(a, :set)
       a.should == [:set, :set, :set]
     end
+   end #
   end
 
   describe "RARRAY_LEN" do

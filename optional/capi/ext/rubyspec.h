@@ -335,6 +335,8 @@
 #include "rubinius.h"
 #elif defined(JRUBY)
 #include "jruby.h"
+#elif defined(MAGLEV)
+#include "maglev.h"
 #else /* MRI */
 #include "mri.h"
 #endif

@@ -3,6 +3,7 @@ require File.expand_path('../spec_helper', __FILE__)
 load_extension("gc")
 
 describe "CApiGCSpecs" do
+ not_compliant_on :maglev do
   before :each do
     @f = CApiGCSpecs.new
   end
@@ -13,4 +14,5 @@ describe "CApiGCSpecs" do
     @f.registered_reference_address.should == "Globally registered data"
     @f.registered_reference_address.object_id.should == @f.registered_reference_address.object_id
   end
+ end #
 end

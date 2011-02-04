@@ -31,6 +31,10 @@ def compile_extension(path, name)
   elsif RUBY_NAME == 'jruby'
     require 'mkmf'
     hdrdir = $hdrdir
+  elsif RUBY_NAME == 'maglev'
+    hdrdir = ENV['GEMSTONE']
+    hdrdir = "#{hdrdir}/include"  
+    hdrdir = "/export/iceland1/users/otisa/Svn/st64_30alt/svn/src" # do not checkin
   else
     raise "Don't know how to build C extensions with #{RUBY_NAME}"
   end
@@ -55,21 +59,34 @@ def compile_extension(path, name)
   # avoid problems where compilation failed but previous shlib exists
   File.delete lib if File.exists? lib
 
-  cc        = RbConfig::CONFIG["CC"]
-  cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
+  #cc        = RbConfig::CONFIG["CC"]
+  #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
+  cc = "/opt/solstudio12.2/bin/cc"
+  cflags = "-m64 -fPIC -g"
   cflags   += " -fPIC" unless cflags.include?("-fPIC")
   incflags  = "-I#{path} -I#{hdrdir}"
   incflags << " -I#{arch_hdrdir}" if arch_hdrdir
   incflags << " -I#{ruby_hdrdir}" if ruby_hdrdir
 
-  `#{cc} #{incflags} #{cflags} -c #{source} -o #{obj}`
+  cmd = "#{cc} #{incflags} #{cflags} -c #{source} -o #{obj}"
+  puts "EXECUTING #{cmd}"
+  res = `#{cmd}` 
+  puts res
+  puts "----"
 
-  ldshared  = RbConfig::CONFIG["LDSHARED"]
+  # ldshared  = RbConfig::CONFIG["LDSHARED"]
+  ldshared = "#{cc} -shared"
   libpath   = "-L#{path}"
-  libs      = RbConfig::CONFIG["LIBS"]
-  dldflags  = RbConfig::CONFIG["DLDFLAGS"]
+  # libs      = RbConfig::CONFIG["LIBS"]
+  libs = "-lrt -ldl -lm -lc"
+  # dldflags  = RbConfig::CONFIG["DLDFLAGS"]
+  dldflags = "-m64 -L."
 
-  `#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}`
+  cmd = "#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}"
+  puts "EXECUTING #{cmd}"
+  res = `#{cmd}` 
+  puts res
+  puts "----"
 
   # we don't need to leave the object file around
   File.delete obj if File.exists? obj

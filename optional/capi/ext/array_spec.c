@@ -31,6 +31,7 @@ static VALUE array_spec_RARRAY_ptr_assign_funcall(VALUE self, VALUE array) {
 }
 
 static VALUE array_spec_RARRAY_len(VALUE self, VALUE array) {
+  # return INT2FIX(RARRAY(array)->len);
   return INT2FIX(RARRAY(array)->len);
 }
 
@@ -80,18 +81,43 @@ static VALUE array_spec_RARRAY_PTR_assign(VALUE self, VALUE array, VALUE value) 
   return Qnil;
 }
 
+#endif
+
+#if defined(HAVE_RARRAY_LEN)
+
 static VALUE array_spec_RARRAY_LEN(VALUE self, VALUE array) {
   return INT2FIX(RARRAY_LEN(array));
 }
 #endif
 
-#ifdef HAVE_RB_ARY_AREF
-static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self) {
+#if defined(HAVE_RB_ARY_AREF) 
+#if defined(HAVE_RB_SCAN_ARGS)
+static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self) 
+{
   VALUE ary, args;
   rb_scan_args(argc, argv, "1*", &ary, &args);
   return rb_ary_aref(RARRAY_LEN(args), RARRAY_PTR(args), ary);
 }
+#else
+static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self)
+{
+  VALUE args[2];
+  VALUE ary = argv[0];
+  if (argc == 2) {
+    args[0] = argv[1] ;
+    return rb_ary_aref(1, args, ary);
+  } else if (argc == 3) {
+    args[0] = argv[1] ;
+    args[1] = argv[2] ;
+    return rb_ary_aref(2, args, ary);
+  } else {
+    rb_raise_(rb_eArgError, "rb_ary_aref needs 1 or 2 args after array");
+    return Qnil;
+  }
+}
 #endif
+#endif
+
 
 #ifdef HAVE_RB_ARY_CLEAR
 static VALUE array_spec_rb_ary_clear(VALUE self, VALUE array) {
@@ -246,13 +272,15 @@ void Init_array_spec() {
   rb_define_method(cls, "RARRAY_len", array_spec_RARRAY_len, 1);
 #endif
 
-#if defined(HAVE_RARRAY_LEN) && defined(HAVE_RARRAY_PTR)
+#if defined(HAVE_RARRAY_LEN)
   rb_define_method(cls, "RARRAY_LEN", array_spec_RARRAY_LEN, 1);
+#if defined(HAVE_RARRAY_PTR)
   rb_define_method(cls, "RARRAY_PTR_iterate", array_spec_RARRAY_PTR_iterate, 1);
   rb_define_method(cls, "RARRAY_PTR_assign", array_spec_RARRAY_PTR_assign, 2);
 #endif
+#endif
 
-#ifdef HAVE_RB_ARY_AREF
+#if defined(HAVE_RB_ARY_AREF)
   rb_define_method(cls, "rb_ary_aref", array_spec_rb_ary_aref, -1);
 #endif
 

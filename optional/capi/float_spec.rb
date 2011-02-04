@@ -15,6 +15,7 @@ describe "CApiFloatSpecs" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do 
     describe "RFLOAT" do
       it "returns a struct with the Float value" do
         f = @f.RFLOAT_value(1.0)
@@ -30,6 +31,7 @@ describe "CApiFloatSpecs" do
         f.should eql(4.0)
       end
     end
+   end #
   end
 
   describe "rb_Float" do
