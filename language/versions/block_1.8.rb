@@ -1,25 +1,5 @@
-describe "Block parameters" do
-  it "assign to local variable" do
-    i = 0
-    a = [1,2,3]
-    a.each {|i| ;}
-    # i.should == 3
-    i.should == 0  # Maglev bug
-  end
-
-  it "captures variables from the outer scope" do
-    a = [1,2,3]
-    sum = 0
-    var = nil
-    a.each {|var| sum += var}
-    sum.should == 6
-    # var.should == 3
-    var.should == nil # Maglev bug
-  end
-end
-
 # not supported by Maglev , syntax errors at compile time
-# describe "Block parameters (to be removed from MRI)" do
+#describe "Block parameters (to be removed from MRI)" do
 #  it "assigns to a global variable" do
 #    $global_for_block_assignment = 0
 #    a = [1,2,3]
