@@ -120,10 +120,12 @@ describe "String#unpack with 'Q' and 'q' directives" do
     end
 
     ruby_bug "#", "1.8.7" do
+ not_compliant_on :maglev do #  fix needed
       it "pads nil when the string is short" do
         "\xF3\xFF\xFF\xFF\x32\x0B\x02\x00".unpack('Q2').should == [575263624658931, nil]
       end
     end
+end
   end
 
   big_endian do

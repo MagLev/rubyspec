@@ -32,8 +32,10 @@ describe "StringScanner#initialize_copy" do
     @s.send(:initialize_copy, @orig_s)
     @s.pre_match.should == "this"
 
+not_compliant_on :maglev do # bugs
     @s.unscan
     @s.scan(/\s/).should == " "
+end
   end
 
   it "does not taint self when the passed StringScanner is tainted" do

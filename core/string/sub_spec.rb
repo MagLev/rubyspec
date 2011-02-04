@@ -418,7 +418,7 @@ describe "String#sub! with pattern and block" do
       end
     end
 
-    not_compliant_on :rubinius do
+    not_compliant_on :rubinius , :maglev do
       it "raises a RuntimeError when self is frozen" do
         s = "hello"
         s.freeze

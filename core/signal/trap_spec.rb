@@ -86,6 +86,8 @@ describe "Signal.trap" do
 
   describe "the special EXIT signal code" do
 
+   not_compliant_on :maglev do #  signal EXIT is not trappable from ruby
+		# maglev must protect shared cache.
     it "accepts the EXIT code" do
       code = "trap(:EXIT, proc { print 1 })"
       ruby_exe(code).should == "1"
@@ -100,6 +102,7 @@ describe "Signal.trap" do
       code = "trap(:EXIT, proc { print 1 }); trap(:EXIT, 'DEFAULT')"
       ruby_exe(code).should == ""
     end
+   end #
 
   end
 

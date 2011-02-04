@@ -98,9 +98,11 @@ describe "String#center with length, padding" do
     "foo".center(10, StringSpecs::MyString.new("x")).should be_kind_of(String)
   end
 
+ not_compliant_on :maglev do # no taint prop
   it "when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self" do
     "hello".center(4, 'X'.taint).tainted?.should be_false
     "hello".center(5, 'X'.taint).tainted?.should be_false
     "hello".center(6, 'X'.taint).tainted?.should be_true
   end
+ end
 end

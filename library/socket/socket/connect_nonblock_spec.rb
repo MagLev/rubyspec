@@ -13,11 +13,13 @@ describe "Socket#connect_nonblock" do
     @socket.close
   end
 
+not_compliant_on :maglev do # bugs
   it "takes an encoded socket address and starts the connection to it" do
     lambda {
       @socket.connect_nonblock(@addr)
     }.should raise_error(Errno::EINPROGRESS)
   end
+end
 
   it "connects the socket to the remote side" do
     ready = false

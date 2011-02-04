@@ -295,7 +295,7 @@ class EvalSpecs
   class A
     eval "class B; end"
     def c
-      eval "class C; end"  # maglev C created as a singleton::C, not A::C
+      eval "class C; end"  
     end
   end
 

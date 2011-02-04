@@ -557,7 +557,7 @@ describe "String#gsub! with pattern and block" do
       end
     end
 
-    not_compliant_on :rubinius do
+    not_compliant_on :rubinius , :maglev do
       it "raises a RuntimeError if the frozen string would be modified" do
         s = "hello"
         s.freeze

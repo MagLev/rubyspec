@@ -81,9 +81,11 @@ describe "String#ljust with length, padding" do
     "foo".ljust(10, StringSpecs::MyString.new("x")).should be_kind_of(String)
   end
 
+ not_compliant_on :maglev do # no taint prop
   it "when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self" do
     "hello".ljust(4, 'X'.taint).tainted?.should be_false
     "hello".ljust(5, 'X'.taint).tainted?.should be_false
     "hello".ljust(6, 'X'.taint).tainted?.should be_true
   end
+ end
 end

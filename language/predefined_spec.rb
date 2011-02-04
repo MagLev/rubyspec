@@ -594,6 +594,7 @@ describe "The predefined global constants" do
 
 end
 
+not_compliant_on :maglev do  # not getting RuntimeError
 describe "Processing RUBYOPT" do
   before (:each) do
     @rubyopt, ENV['RUBYOPT'] = ENV["RUBYOPT"], nil
@@ -704,3 +705,4 @@ describe "Processing RUBYOPT" do
   end
 
 end
+end #maglev

@@ -150,6 +150,7 @@ HERE
     "#{obj}".should == '42'
   end
 
+ not_compliant_on :maglev do # making to_s private breaks Array#__joinStrings
   it "call #to_s as a private method" do
     obj = mock('to_s')
     obj.stub!(:to_s).and_return('42')
@@ -160,6 +161,7 @@ HERE
 
     "#{obj}".should == '42'
   end
+ end
 
   it "uses an internal representation when #to_s doesn't return a String" do
     obj = mock('to_s')

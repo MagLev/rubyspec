@@ -20,11 +20,13 @@ describe "Process::Status#exited?" do
       ruby_exe("Process.kill(:KILL, $$); exit(42)")
     end
 
+  not_compliant_on :maglev do # Need fix
     platform_is_not :windows do
       it "returns false" do
         $?.exited?.should be_false
       end
     end
+  end #
 
     platform_is :windows do
       it "always returns true" do

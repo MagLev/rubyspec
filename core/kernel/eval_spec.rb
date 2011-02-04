@@ -20,10 +20,9 @@ describe "Kernel#eval" do
     EvalSpecs::A::B.name.should == "EvalSpecs::A::B"
   end
 
-# maglev fails
-# it "evaluates such that consts are scoped to the class of the eval" do
-#   EvalSpecs::A::C.name.should == "EvalSpecs::A::C"
-# end
+  it "evaluates such that consts are scoped to the class of the eval" do
+    EvalSpecs::A::C.name.should == "EvalSpecs::A::C"
+  end
 
   it "finds a local in an enclosing scope" do
     a = 199	# maglev debugging
@@ -98,7 +97,7 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-if false # maglev broken
+not_compliant_on :maglev do
     it "allows a binding to be captured inside an eval" do #
       outer_binding = binding
       level1 = eval("binding", outer_binding)
@@ -160,7 +159,7 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-if false # maglev fails
+not_compliant_on :maglev do  
     it "allows Proc and binding to be nested in horrible ways" do #
       outer_binding = binding
       proc_binding = eval("proc {l = 5; binding}.call", outer_binding)
@@ -205,7 +204,7 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-if false # maglev fails
+not_compliant_on :maglev do
     it "allows creating a new class in a binding" do #
       bind = proc {}
       eval "class A; end", bind.binding  # maglev binding is private meth
@@ -215,7 +214,7 @@ end
 
 if false # maglev fails
     it "allows creating a new class in a binding created by #eval" do #
-# confusion in generated code for eval,
+# maglev confusion in generated code for eval,
 #    $~ = __vc.at(7)  #  vc.at(7) not a MatchData
 #
       bind = eval "binding"

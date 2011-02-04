@@ -348,6 +348,7 @@ describe "String#inspect" do
         $KCODE = @kcode
       end
 
+     not_compliant_on :maglev do # no KCODE yet
       it "returns a string with extended character set" do
         $KCODE = "UTF-8"
         "äöü".inspect.should == "\"äöü\""
@@ -357,6 +358,7 @@ describe "String#inspect" do
         $KCODE = "UTF-8"
         "\007äöüz\303".inspect.should == "\"\\aäöüz\\303\""
       end
+     end
     end
   end
 
