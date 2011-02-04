@@ -12,6 +12,16 @@ module KernelSpecs
     module MetaclassMethods
       def peekaboo
       end
+
+      protected
+
+      def nopeeking
+      end
+
+      private
+
+      def shoo
+      end
     end
 
     def self.ichi; end
@@ -285,7 +295,7 @@ class EvalSpecs
   class A
     eval "class B; end"
     def c
-      eval "class C; end"  # maglev C created as a singleton::C, not A::C
+      eval "class C; end"  
     end
   end
 

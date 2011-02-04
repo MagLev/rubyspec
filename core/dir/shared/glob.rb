@@ -15,6 +15,13 @@ describe :dir_glob, :shared => true do
     Dir.send(@method, obj).should == %w[file_one.ext]
   end
 
+ not_compliant_on :maglev do 
+  it "splits the string on \0 if there is only one string given" do
+    Dir.send(@method, "file_o*\0file_t*").should ==
+             %w!file_one.ext file_two.ext!
+  end
+ end #
+
   it "matches non-dotfiles with '*'" do
     expected = %w[
       brace
@@ -226,6 +233,13 @@ describe :dir_glob, :shared => true do
          subdir_two/nondotfile
          subdir_two/nondotfile.ext]
   end
+
+ not_compliant_on :maglev do
+  it "preserves the separator between directory components" do
+    Dir.send(@method, "deeply/nested//directory/structure/*.ext").should ==
+      %w!deeply/nested//directory/structure/file_one.ext!
+  end
+ end #
 end
 
 describe :dir_glob_recursive, :shared => true do

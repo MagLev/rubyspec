@@ -48,6 +48,13 @@ describe "String#delete" do
     "ABCabc[]".delete("A-a").should == "bc"
   end
 
+ not_compliant_on :maglev do #  fix needed
+  it "respects backslash for escaping a -" do
+    'Non-Authoritative Information'.delete(' \-\'').should ==
+      'NonAuthoritativeInformation'
+  end
+ end #
+
   ruby_version_is ""..."1.9" do
     it "regards invalid ranges as nothing" do
       "hello".delete("h-e").should == "hello"

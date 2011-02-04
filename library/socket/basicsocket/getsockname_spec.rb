@@ -17,6 +17,7 @@ describe "Socket::BasicSocket#getsockname" do
     @socket = TCPServer.new(SocketSpecs.port)
     sockaddr = Socket.unpack_sockaddr_in(@socket.getsockname)
     ["::", "127.0.0.1"].include?(sockaddr[1]).should be_true # maglev solaris
+    # ["::", "0.0.0.0", "::ffff:0.0.0.0"].include?(sockaddr[1]).should be_true
     sockaddr[0].should == SocketSpecs.port
   end
 

@@ -7,6 +7,23 @@ describe "C-API Array function" do
     @s = CApiArraySpecs.new
   end
 
+  ruby_version_is ""..."1.9" do
+    describe "RARRAY" do
+      it "is sync'd with the object properly" do
+        a2 = [1]
+
+        ary = [:foo]
+
+        @s.RARRAY_len(ary).should == 1
+        ary[0].should == :foo
+
+        ary[0] = :bar
+        @s.RARRAY_len(a2).should == 1
+        ary[0].should == :bar
+      end
+    end
+  end
+
   describe "rb_ary_new" do
     it "returns an empty array" do
       @s.rb_ary_new.should == []
@@ -60,6 +77,22 @@ describe "C-API Array function" do
       a = [1,2,3]
       b = ","
       @s.rb_ary_join(a,b).should == "1,2,3"
+    end
+  end
+
+  describe "rb_ary_to_s" do
+    ruby_version_is ""..."1.9" do
+      it "joins elements of an array with a string" do
+        @s.rb_ary_to_s([1,2,3]).should == "123"
+        @s.rb_ary_to_s([]).should == ""
+      end
+    end
+
+    ruby_version_is "1.9" do
+      it "creates an Array literal representation as a String" do
+        @s.rb_ary_to_s([1,2,3]).should == "[1, 2, 3]"
+        @s.rb_ary_to_s([]).should == "[]"
+      end
     end
   end
 
@@ -183,6 +216,28 @@ describe "C-API Array function" do
       it "returns a struct with the length of the array" do
         @s.RARRAY_len([1, 2, 3]).should == 3
       end
+
+      it "is sync'd with the ruby Array object" do
+        ary = Array.new(1000)
+
+        @s.RARRAY_len(ary).should == 1000
+        ary.clear  # shrink the array.
+
+        @s.RARRAY_len(ary).should == 0
+
+        # This extra check is to be sure that if there is a handle for
+        # the ruby object it is updated.
+        ary.size.should == 0
+
+        # Now check that it can sync growing too
+        1000.times { ary << 1 }
+
+        @s.RARRAY_len(ary).should == 1000
+
+        # Again, check that the possible handle doesn't confuse or misupdate
+        # the ruby object.
+        ary.size == 1000
+      end
     end
    end #
   end
@@ -267,6 +322,12 @@ describe "C-API Array function" do
       # Make sure they're different objects
       s2.equal?(s).should be_false
     end
+
+    it "calls a function with the other function available as a block" do
+      h = {:a => 1, :b => 2}
+
+      @s.rb_iterate_each_pair(h).sort.should == [1,2]
+    end
   end
 
   describe "rb_ary_delete" do
@@ -280,6 +341,28 @@ describe "C-API Array function" do
       ary = [1, 2, 3, 4]
       @s.rb_ary_delete(ary, 5).should be_nil
       ary.should == [1, 2, 3, 4]
+    end
+  end
+
+  describe "rb_mem_clear" do
+    it "sets elements of a C array to nil" do
+      @s.rb_mem_clear(1).should == nil
+    end
+  end
+
+  ruby_version_is ""..."1.9" do
+    describe "rb_protect_inspect" do
+      it "tracks an object recursively" do
+        @s.rb_protect_inspect("blah").should be_true
+      end
+    end
+  end
+
+  describe "rb_ary_freeze" do
+    it "freezes the object exactly like Object#freeze" do
+      ary = [1,2]
+      @s.rb_ary_freeze(ary)
+      ary.frozen?.should be_true
     end
   end
 

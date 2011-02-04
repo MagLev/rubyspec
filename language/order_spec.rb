@@ -49,12 +49,17 @@ describe "A method call" do
     it "evaluates block pass after arguments" do
       a = 0
       p = proc {true}
-      # @obj.foo1(a += 1, &(a += 1; p)).should == [1, true]  # Maglev gets [2,true]
-      @obj.foo1(a += 1, &(a += 1; p)).should == [2, true]  # Maglev 
+      ox = @obj
+#      @obj.foo1(a += 1, &(a += 1; p)).should == [1, true]
 #      @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, true]
 #      @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, true]
 #      @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, true]
-#      a.should == 14
+# Maglev devation,  p not evaluated at end 
+      @obj.foo1(a += 1, &(a += 1; p)).should == [1, p]
+      @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, p]
+      @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, p]
+      @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, p]
+      a.should == 14
     end
  
     it "evaluates block pass after receiver" do

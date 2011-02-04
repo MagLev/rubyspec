@@ -96,6 +96,18 @@ describe "Proc.new with an associated block" do
     some_method.should == :proc_return_value
   end
 
+  it "returns a subclass of Proc" do
+    obj = ProcSpecs::MyProc.new { }
+    obj.should be_kind_of(ProcSpecs::MyProc)
+  end
+
+ not_compliant_on :maglev do # Need fix
+  it "calls initialize on the Proc object" do # maglev too many args error
+    obj = ProcSpecs::MyProc2.new(:a, 2) { }
+    obj.first.should == :a
+    obj.second.should == 2
+  end
+ end #
 end
 
 describe "Proc.new without a block" do

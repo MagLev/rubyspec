@@ -7,6 +7,9 @@ module ModuleSpecs
   class SubclassSpec
   end
 
+  class RemoveClassVariable
+  end
+
   module LookupModInMod
     INCS = :ethereal
   end
@@ -219,11 +222,9 @@ module ModuleSpecs
 
     Nesting[:basic] = Module.nesting
 
-    module ::ModuleSpecs			  #
-      Nesting[:open_first_level] = Module.nesting  #  Maglev bug here
-      # Maglev gets   [Object, ModuleSpecs::Nesting, ModuleSpecs]
-      #  correct is   [ModuleSpecs, ModuleSpecs::Nesting, ModuleSpecs]
-      #   problem in constantsLexicalPath implem  or  isColon3 uses .
+    module ::ModuleSpecs			  
+      Nesting[:open_first_level] = Module.nesting
+      #  correct value is   [ModuleSpecs, ModuleSpecs::Nesting, ModuleSpecs]
     end
 
     class << self
@@ -231,7 +232,9 @@ module ModuleSpecs
     end
 
     def self.called_from_module_method
-      Module.nesting
+      rx = Module.nesting  # maglev debugging
+      # correct value is [ ModuleSpecs::Nesting, ModuleSpecs ]
+      rx
     end
 
     class NestedClass

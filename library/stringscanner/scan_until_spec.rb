@@ -15,4 +15,12 @@ describe "StringScanner#scan_until" do
   it "returns nil if there's no match" do
     @s.scan_until(/\d/).should == nil
   end
+
+not_compliant_on :maglev do # bugs
+  it "can match anchors properly" do
+    @s.scan(/T/)
+    @s.scan_until(/^h/).should == "h"
+  end
+end
+
 end

@@ -344,7 +344,7 @@ describe "String#sub! with pattern, replacement" do
     end
   end
 
-  ruby_version_is "1.9" do    
+  ruby_version_is "1.9" do
     it "raises a RuntimeError when self is frozen" do
       s = "hello"
       s.freeze
@@ -353,7 +353,7 @@ describe "String#sub! with pattern, replacement" do
       lambda { s.sub!(/e/, "e")       }.should raise_error(RuntimeError)
       lambda { s.sub!(/[aeiou]/, '*') }.should raise_error(RuntimeError)
     end
-  end    
+  end
 end
 
 describe "String#sub! with pattern and block" do
@@ -404,17 +404,33 @@ describe "String#sub! with pattern and block" do
   end
 
   ruby_version_is ""..."1.9" do
-    it "raises a RuntimeError when self is frozen" do
-      s = "hello"
-      s.freeze
+    deviates_on :rubinius do
+      # MRI 1.8.x is inconsistent here, raising a TypeError when not passed
+      # a block and a RuntimeError when passed a block. This is arguably a
+      # bug in MRI. In 1.9, both situations raise a RuntimeError.
+      it "raises a TypeError when self is frozen" do
+        s = "hello"
+        s.freeze
 
-      s.sub!(/ROAR/) { "x" } # ok
-      lambda { s.sub!(/e/) { "e" }       }.should raise_error(TypeError) # Maglev, was RuntimeError
-      lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(TypeError) # Maglev, was RuntimeError
+        s.sub!(/ROAR/) { "x" } # ok
+        lambda { s.sub!(/e/) { "e" }       }.should raise_error(TypeError)
+        lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(TypeError)
+      end
+    end
+
+    not_compliant_on :rubinius , :maglev do
+      it "raises a RuntimeError when self is frozen" do
+        s = "hello"
+        s.freeze
+
+        s.sub!(/ROAR/) { "x" } # ok
+        lambda { s.sub!(/e/) { "e" }       }.should raise_error(RuntimeError)
+        lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(RuntimeError)
+      end
     end
   end
 
-  ruby_version_is "1.9" do    
+  ruby_version_is "1.9" do
     it "raises a RuntimeError when self is frozen" do
       s = "hello"
       s.freeze
@@ -423,5 +439,5 @@ describe "String#sub! with pattern and block" do
       lambda { s.sub!(/e/) { "e" }       }.should raise_error(RuntimeError)
       lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(RuntimeError)
     end
-  end    
+  end
 end
