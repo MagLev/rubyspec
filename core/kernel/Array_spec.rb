@@ -74,9 +74,6 @@ describe :kernel_Array, :shared => true do
     @object.send(@method, nil).should == []
   end
 
- not_compliant_on :maglev
- # Maglev, attempts to_ary, then to_a without using respond_to?
- #   Mock framework not working right with respond_to?  ??
   it "raises a TypeError if #to_ary does not return an Array" do
     obj = mock("Array() string")
     obj.should_receive(:to_ary).and_return("string")
@@ -90,7 +87,6 @@ describe :kernel_Array, :shared => true do
 
     lambda { @object.send(@method, obj) }.should raise_error(TypeError)
   end
- end
 end
 
 describe "Kernel.Array" do

@@ -31,6 +31,7 @@ describe "Array#inspect" do
     lambda{ y.inspect }.should_not raise_error
   end
   
+ not_compliant_on :maglev do # no tainting
   it "propagates taint from itself or elements" do
     x = [1, 2]
     x.taint
@@ -41,6 +42,7 @@ describe "Array#inspect" do
     s = x.inspect
     s.tainted?.should == true
   end
+ end
   
   ruby_version_is "1.9" do
     it "propagates untrust from itself or elements" do

@@ -107,19 +107,19 @@ describe "Proc.new with an associated block" do
     obj.first.should == :a
     obj.second.should == 2
   end
- end #
 
-  it "returns a new Proc instance from the block passed to the containing method" do
+  it "returns a new Proc instance from the block passed to the containing method" do #
     prc = ProcSpecs.new_proc_in_method { "hello" }
     prc.should be_an_instance_of(Proc)
     prc.call.should == "hello"
   end
 
-  it "returns a new Proc instance from the block passed to the containing method" do
-    prc = ProcSpecs.new_proc_subclass_in_method { "hello" }
+  it "returns a new Proc instance from the block passed to the containing method" do #
+    prc = ProcSpecs.new_proc_subclass_in_method { "hello" } 
     prc.should be_an_instance_of(ProcSpecs::ProcSubclass)
     prc.call.should == "hello"
   end
+ end #
 end
 
 describe "Proc.new without a block" do

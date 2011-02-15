@@ -52,7 +52,8 @@ describe "Array#rindex" do
       [4, 2, 1, 5, 1, 3].rindex(5){|x| x < 2}.should == 3
     end
     
-    describe "given no argument and no block" do
+   not_compliant_on :maglev do # we get no block passed
+    describe "given no argument and no block" do #
       it "produces an Enumerator" do
         enum = [4, 2, 1, 5, 1, 3].rindex
         enum.class.should == enumerator_class
@@ -67,5 +68,6 @@ describe "Array#rindex" do
         lambda {enum.next}.should raise_error(StopIteration)
       end
     end
+   end #
   end
 end

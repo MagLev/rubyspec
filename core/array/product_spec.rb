@@ -24,12 +24,14 @@ describe "Array#product" do
     end
   end
   
-  it "does not attempt to produce an unreasonable number of products" do
+ not_compliant_on :maglev do # OutOfMemory
+  it "does not attempt to produce an unreasonable number of products" do #
     a = (0..100).to_a
     lambda do
       a.product(a, a, a, a, a, a, a, a, a, a)
     end.should raise_error(RangeError)
   end
+ end
 
   ruby_version_is "1.9" do
     describe "when given a block" do

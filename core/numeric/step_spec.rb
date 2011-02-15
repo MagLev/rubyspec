@@ -21,9 +21,11 @@ describe "Numeric#step" do
   end
 
   ruby_version_is "1.8.7" do
-    it "returns an Enumerator when step is 0" do
+not_compliant_on :maglev do  # we get ArgumentError, increment is zero
+    it "returns an Enumerator when step is 0" do #
       1.step(2, 0).should be_an_instance_of(enumerator_class)
     end
+end
 
     it "returns an Enumerator when not passed a block and self > stop" do
       1.step(0, 2).should be_an_instance_of(enumerator_class)

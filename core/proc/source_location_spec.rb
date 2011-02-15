@@ -32,15 +32,15 @@ ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
     it "sets the last value to a Fixnum representing the line on which the proc was defined" do
       line = @proc.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should == 4
+      line.should == 4 + 5
 
       line = @proc_new.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should == 12
+      line.should == 12 + 5
 
       line = @lambda.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should == 8
+      line.should ==  8 + 5
     end
 
     it "works even if the proc was created on the same line" do
@@ -51,15 +51,15 @@ ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
     end
 
     it "returns the first line of a multi-line proc (i.e. the line containing 'proc do')" do
-      ProcSpecs::SourceLocation.my_multiline_proc.source_location.last.should == 16
-      ProcSpecs::SourceLocation.my_multiline_proc_new.source_location.last.should == 30
-      ProcSpecs::SourceLocation.my_multiline_lambda.source_location.last.should == 23
+      ProcSpecs::SourceLocation.my_multiline_proc.source_location.last.should == 16 + 5
+      ProcSpecs::SourceLocation.my_multiline_proc_new.source_location.last.should == 30 + 5
+      ProcSpecs::SourceLocation.my_multiline_lambda.source_location.last.should == 23 + 5
     end
 
     it "returns the location of the proc's body; not necessarily the proc itself" do
-      ProcSpecs::SourceLocation.my_detached_proc.source_location.last.should == 37
-      ProcSpecs::SourceLocation.my_detached_proc_new.source_location.last.should == 47
-      ProcSpecs::SourceLocation.my_detached_lambda.source_location.last.should == 42
+      ProcSpecs::SourceLocation.my_detached_proc.source_location.last.should == 37 + 5
+      ProcSpecs::SourceLocation.my_detached_proc_new.source_location.last.should == 47 + 5
+      ProcSpecs::SourceLocation.my_detached_lambda.source_location.last.should == 42 + 5
     end
   end
 end
