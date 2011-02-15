@@ -343,10 +343,10 @@ describe "Breaking out of a loop with a value" do
     i = 0; loop do break i if i == 2; i+=1; end.should == 2
     i = 0; loop do break if i == 3; i+=1; end; i.should == 3
     i = 0; while (i < 5) do break i if i == 2 ; i+=1; end.should == 2
-    i = 0; while (i < 5) do break if i == 3 ; i+=1; end; i.should == 3
+    i = 0; while (i < 5) do break if i == 3 ; i+=1; end; i.should == 3  # maglev deviation ?
 
     at = 0; 0.upto(5) {|i| at = i; break i if i == 2 }.should == 2
-    at = 0; 0.upto(5) {|i| at = i; break if i == 3 }; at.should == 3
+    at = 0; 0.upto(5) {|i| at = i; break if i == 3 }; at.should == 3  # maglev deviation ?
   end
 
   it "stops a yielded method at the correct spot" do
