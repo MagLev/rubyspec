@@ -2,10 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel" do
-# Maglev not private yet
-# it "has private instance method Array()" do
-#   Kernel.should have_private_instance_method(:Array)
-# end
+ not_compliant_on :maglev do  # not private yet
+  it "has private instance method Array()" do  #
+    Kernel.should have_private_instance_method(:Array)
+  end
+ end
 end
 
 describe :kernel_Array, :shared => true do
@@ -73,9 +74,15 @@ describe :kernel_Array, :shared => true do
     @object.send(@method, nil).should == []
   end
 
+<<<<<<< HEAD
   # formerly   Maglev, attempts to_ary, then to_a without using respond_to?
   #   Mock framework not working right with respond_to?  ??
 
+=======
+ not_compliant_on :maglev
+ # Maglev, attempts to_ary, then to_a without using respond_to?
+ #   Mock framework not working right with respond_to?  ??
+>>>>>>> bebe26e82f9d4f73ab4d68766963b442e5c1bca5
   it "raises a TypeError if #to_ary does not return an Array" do
     obj = mock("Array() string")
     obj.should_receive(:to_ary).and_return("string")
@@ -89,6 +96,7 @@ describe :kernel_Array, :shared => true do
 
     lambda { @object.send(@method, obj) }.should raise_error(TypeError)
   end
+ end
 end
 
 describe "Kernel.Array" do

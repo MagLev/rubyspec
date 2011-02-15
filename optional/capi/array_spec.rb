@@ -18,6 +18,7 @@ describe "C-API Array function" do
       @s.rb_ary_new2(5).should == []
     end
 
+   not_compliant_on :maglev do  # rb_ary_new2_assign not supported
     ruby_version_is ""..."1.9" do
       it "returns an array which can be assigned to from C" do
         ary = @s.rb_ary_new2(5)
@@ -25,6 +26,7 @@ describe "C-API Array function" do
         ary.should == [:set, :set, :set, :set]
       end
     end
+   end #
   end
 
   describe "rb_ary_new3" do
@@ -62,12 +64,14 @@ describe "C-API Array function" do
   end
 
   describe "rb_ary_to_s" do
+not_compliant_on :maglev do
     ruby_version_is ""..."1.9" do
       it "joins elements of an array with a string" do
         @s.rb_ary_to_s([1,2,3]).should == "123"
         @s.rb_ary_to_s([]).should == ""
       end
     end
+end
 
     ruby_version_is "1.9" do
       it "creates an Array literal representation as a String" do
@@ -154,7 +158,6 @@ describe "C-API Array function" do
 
     it "raises on IndexError if the negative index is greater than the length" do
       a = [1, 2, 3]
-
       lambda { @s.rb_ary_store(a, -10, 5) }.should raise_error(IndexError)
     end
 
@@ -166,6 +169,7 @@ describe "C-API Array function" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do
     describe "RARRAY" do
       before :each do
         @array = (-2..5).to_a
@@ -264,9 +268,11 @@ describe "C-API Array function" do
         end
       end
     end
+   end #
   end
 
   describe "RARRAY_PTR" do
+   not_compliant_on :maglev do
     it "returns a pointer to a C array of the array's elements" do
       a = [1, 2, 3]
       b = []
@@ -281,6 +287,7 @@ describe "C-API Array function" do
       @s.RARRAY_PTR_assign(a, :set)
       a.should == [:set, :set, :set]
     end
+   end #
   end
 
   describe "RARRAY_LEN" do
@@ -345,11 +352,13 @@ describe "C-API Array function" do
       s2.equal?(s).should be_false
     end
 
+not_compliant_on :maglev do  # only iteration on arrays is supported
     it "calls a function with the other function available as a block" do
       h = {:a => 1, :b => 2}
 
       @s.rb_iterate_each_pair(h).sort.should == [1,2]
     end
+end
   end
 
   describe "rb_ary_delete" do
@@ -366,27 +375,29 @@ describe "C-API Array function" do
     end
   end
 
-  describe "rb_mem_clear" do
+not_compliant_on :maglev do  
+  describe "rb_mem_clear" do #
     it "sets elements of a C array to nil" do
       @s.rb_mem_clear(1).should == nil
     end
   end
 
   ruby_version_is ""..."1.9" do
-    describe "rb_protect_inspect" do
+    describe "rb_protect_inspect" do #
       it "tracks an object recursively" do
         @s.rb_protect_inspect("blah").should be_true
       end
     end
   end
 
-  describe "rb_ary_freeze" do
+  describe "rb_ary_freeze" do #
     it "freezes the object exactly like Object#freeze" do
       ary = [1,2]
       @s.rb_ary_freeze(ary)
       ary.frozen?.should be_true
     end
   end
+end
 
   describe "rb_ary_delete_at" do
     before :each do

@@ -7,7 +7,8 @@ describe "C-API Hash function" do
     @s = CApiHashSpecs.new
   end
 
-  describe "rb_hash" do
+not_compliant_on :maglev do
+  describe "rb_hash" do #
     it "calls #hash on the object" do
       obj = mock("rb_hash")
       obj.should_receive(:hash).and_return(5)
@@ -40,6 +41,7 @@ describe "C-API Hash function" do
       end
     end
   end
+end
 
   describe "rb_hash_new" do
     it "returns a new hash" do
@@ -86,7 +88,8 @@ describe "C-API Hash function" do
     end
   end
 
-  describe "rb_hash_delete_if" do
+not_compliant_on :maglev do
+  describe "rb_hash_delete_if" do #
     it "removes an entry if the block returns true" do
       h = { :a => 1, :b => 2, :c => 3 }
       @s.rb_hash_delete_if(h) { |k, v| v == 2 }
@@ -105,7 +108,9 @@ describe "C-API Hash function" do
       end
     end
   end
+end
 
+ not_supported_on :maglev do
   describe "rb_hash_foreach" do
     it "iterates over the hash" do
       hsh = {:name => "Evan", :sign => :libra}
@@ -115,6 +120,7 @@ describe "C-API Hash function" do
       out.should == hsh
     end
   end
+ end #
 
   # rb_hash_size is a static symbol in MRI
   extended_on :rubinius do

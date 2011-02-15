@@ -13,11 +13,13 @@ describe "CApiGlobalSpecs" do
     @f.sb_gv_get("SAFE").should == 0 # rb_gv_get should change SAFE to $SAFE
   end
 
-  it "should correctly retrieve $~" do
+not_compliant_on :maglev do
+  it "should correctly retrieve $~" do #
     'a' =~ /a/
     @f.sb_gv_get("$~").to_a.should == ['a']
     @f.sb_gv_get("~").to_a.should == ['a']
   end
+end
 
   it "correctly sets global values" do
     @f.sb_gv_get("$BLAH").should == nil
@@ -29,7 +31,7 @@ describe "CApiGlobalSpecs" do
     @f.rb_f_global_variables.should == Kernel.global_variables
   end
 
-  not_supported_on :rubinius, :jruby do
+  not_supported_on :rubinius, :jruby , :maglev do
     it "rb_define_variable should define a new global variable" do
       @f.rb_define_variable("my_gvar", "ABC")
       $my_gvar.should == "ABC"
@@ -38,13 +40,15 @@ describe "CApiGlobalSpecs" do
     end
   end
 
+ not_supported_on :maglev do
   it "rb_define_readonly_variable should define a new readonly global variable" do
     @f.rb_define_readonly_variable("ro_gvar", 15)
     $ro_gvar.should == 15
     lambda { $ro_gvar = 10 }.should raise_error(NameError)
   end
+ end
 
-  not_supported_on :rubinius, :jruby do
+  not_supported_on :rubinius, :jruby , :maglev do
     it "rb_define_hooked_variable should define a C hooked global variable" do
       @f.rb_define_hooked_variable_2x("$hooked_gvar")
       $hooked_gvar = 2
@@ -53,6 +57,7 @@ describe "CApiGlobalSpecs" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_supported_on :maglev do
     describe "rb_set_kcode" do
       before :each do
         @kcode = $KCODE
@@ -67,5 +72,6 @@ describe "CApiGlobalSpecs" do
         $KCODE.should == "UTF8"
       end
     end
+   end #
   end
 end

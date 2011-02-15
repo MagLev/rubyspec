@@ -110,7 +110,7 @@ static VALUE so_rb_obj_call_init(VALUE self, VALUE object,
 
 #ifdef HAVE_RB_OBJ_CLASSNAME
 static VALUE so_rbobjclassname(VALUE self, VALUE obj) {
-  return rb_str_new2(rb_obj_classname(obj));
+  return rb_str_new2(rb_obj_classname_(obj));
 }
 
 #endif
@@ -135,13 +135,13 @@ static VALUE object_spec_rb_obj_id(VALUE self, VALUE obj) {
 
 #ifdef HAVE_RB_OBJ_IS_INSTANCE_OF
 static VALUE so_instance_of(VALUE self, VALUE obj, VALUE klass) {
-  return rb_obj_is_instance_of(obj, klass);
+  return rb_obj_is_instance_of_(obj, klass) ? Qtrue : Qfalse ;
 }
 #endif
 
 #ifdef HAVE_RB_OBJ_IS_KIND_OF
 static VALUE so_kind_of(VALUE self, VALUE obj, VALUE klass) {
-  return rb_obj_is_kind_of(obj, klass);
+  return rb_obj_is_kind_of_(obj, klass) ? Qtrue : Qfalse ;
 }
 #endif
 
@@ -264,7 +264,7 @@ static VALUE object_spec_rb_ivar_set(VALUE self, VALUE obj, VALUE sym_name, VALU
 
 #ifdef HAVE_RB_IVAR_DEFINED
 static VALUE object_spec_rb_ivar_defined(VALUE self, VALUE obj, VALUE sym_name) {
-  return rb_ivar_defined(obj, SYM2ID(sym_name));
+  return rb_ivar_defined_(obj, SYM2ID(sym_name)) ? Qtrue : Qfalse ;
 }
 #endif
 

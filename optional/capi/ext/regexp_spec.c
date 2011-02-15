@@ -1,6 +1,6 @@
 #include "ruby.h"
 #include "rubyspec.h"
-#include "re.h"
+// #include "re.h"
 
 #include <string.h>
 

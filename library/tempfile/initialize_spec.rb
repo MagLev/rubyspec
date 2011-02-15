@@ -3,7 +3,8 @@ require File.expand_path('../fixtures/common', __FILE__)
 require 'tempfile'
 
 # maglev does not support direct use of Tempfile#initialize
-                                   # do not run this file.
+# do not run this file.
+
 describe "Tempfile#initialize" do
   before :each do
     @tempfile = Tempfile.allocate

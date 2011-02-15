@@ -40,14 +40,15 @@ VALUE sws_get_struct(VALUE self, VALUE obj) {
 
 VALUE sws_get_struct_rdata(VALUE self, VALUE obj) {
   struct sample_wrapped_struct* bar;
-  bar = (struct sample_wrapped_struct*) RDATA(obj)->data;
+  bar = (struct sample_wrapped_struct*) /*RDATA(obj)->data*/ rb_rdata_fetch(obj);
   return INT2FIX(bar->foo);
 }
 
 VALUE sws_change_struct(VALUE self, VALUE obj, VALUE new_val) {
   struct sample_wrapped_struct* new_struct = (struct sample_wrapped_struct *)malloc(sizeof(struct sample_wrapped_struct));
   new_struct->foo = FIX2INT(new_val);
-  RDATA(obj)->data = new_struct;
+  // RDATA(obj)->data = new_struct;
+  rb_rdata_store(obj, new_struct);
   return Qnil;
 }
 
@@ -63,8 +64,8 @@ void Init_data_spec() {
   rb_define_method(cls, "get_struct", sws_get_struct, 1);
   rb_define_method(cls, "get_struct_rdata", sws_get_struct_rdata, 1);
   rb_define_method(cls, "change_struct", sws_change_struct, 2);
-#endif
 }
+#endif
 
 #ifdef __cplusplus
 }

@@ -10,14 +10,14 @@ extern "C" {
 
 #ifdef HAVE_RB_EXC_NEW
 VALUE exception_spec_rb_exc_new(VALUE self, VALUE str) {
-  char *cstr = StringValuePtr(str);
+  const char *cstr = StringValuePtr(str);
   return rb_exc_new(rb_eException, cstr, strlen(cstr));
 }
 #endif
 
 #ifdef HAVE_RB_EXC_NEW2
 VALUE exception_spec_rb_exc_new2(VALUE self, VALUE str) {
-  char *cstr = StringValuePtr(str);
+  const char *cstr = StringValuePtr(str);
   return rb_exc_new2(rb_eException, cstr);
 }
 #endif
