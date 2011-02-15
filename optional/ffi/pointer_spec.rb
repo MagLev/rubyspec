@@ -30,23 +30,23 @@ describe "Pointer" do
   describe "pointer type methods" do
     describe "#read_pointer" do
       memory = FFI::MemoryPointer.new :pointer
-      FFISpecs::LibTest.ptr_set_pointer(memory, 0, FFISpecs::LibTest.ptr_from_address(0xdeadbeef))
-       (mx = memory.read_pointer).address.should == 0xdeadbeef
+      FFISpecs::LibTest.ptr_set_pointer(memory, 0, FFISpecs::LibTest.ptr_from_address(0xdeadbee8))
+       (mx = memory.read_pointer).address.should == 0xdeadbee8
     end
 
     describe "#write_pointer" do
       memory = FFI::MemoryPointer.new :pointer
-      memory.write_pointer(FFISpecs::LibTest.ptr_from_address(0xdeadbeef))
+      memory.write_pointer(FFISpecs::LibTest.ptr_from_address(0xdeadbee8))
 
       # TODO: Have to define this manually because setting it in the fixture
       # classes will override it with different function definitions.
 
       FFISpecs::LibTest.attach_function :ptr_ret_pointer, [ :pointer, :int ], :pointer
-      FFISpecs::LibTest.ptr_ret_pointer(memory, 0).address.should == 0xdeadbeef
+      FFISpecs::LibTest.ptr_ret_pointer(memory, 0).address.should == 0xdeadbee8
     end
 
     describe "#read_array_of_pointer" do
-      values = [0x12345678, 0xfeedf00d, 0xdeadbeef]
+      values = [0x12345678, 0xfeedf008, 0xdeadbee8]
       memory = FFI::MemoryPointer.new :pointer, values.size
       values.each_with_index do |address, j|
         FFISpecs::LibTest.ptr_set_pointer(memory, j * FFI.type_size(:pointer), FFISpecs::LibTest.ptr_from_address(address))
@@ -58,7 +58,7 @@ describe "Pointer" do
     end
 
     describe "#write_array_of_pointer" do
-      values = [0x12345678, 0xfeedf00d, 0xdeadbeef]
+      values = [0x12345678, 0xfeedf008, 0xdeadbee8]
       memory = FFI::MemoryPointer.new :pointer, values.size
       memory.write_array_of_pointer(values.map { |address| FFISpecs::LibTest.ptr_from_address(address) })
       array = []
