@@ -302,6 +302,7 @@ VALUE string_spec_RSTRING_ptr_assign_call(VALUE self, VALUE str) {
   char *ptr = RSTRING(str)->ptr;
 
   ptr[1] = 'x';
+  RSTRING(str)->len = 2;
   rb_str_concat(str, rb_str_new2("d"));
   return str;
 }
@@ -383,7 +384,7 @@ VALUE string_spec_StringValue(VALUE self, VALUE str) {
 
 #ifdef HAVE_RB_STR_HASH
 static VALUE string_spec_rb_str_hash(VALUE self, VALUE str) {
-  return LONG2NUM(rb_str_hash(str));
+  return INT2FIX(rb_str_hash(str));
 }
 #endif
 

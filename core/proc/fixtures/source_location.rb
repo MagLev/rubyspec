@@ -1,8 +1,11 @@
 module ProcSpecs
+<<<<<<< HEAD:core/proc/fixtures/procs.rb
   def self.new_proc_in_method(&blk) #
     # Maglev, you must pass the block explicitly
     Proc.new(&blk) #
   end
+=======
+>>>>>>> master:core/proc/fixtures/source_location.rb
   class SourceLocation
     def self.my_proc
       proc { true }
@@ -51,17 +54,5 @@ module ProcSpecs
       body = Proc.new { true }
       Proc.new &body
     end
-  end
-
-  class MyProc < Proc
-  end
-
-  class MyProc2 < Proc
-    def initialize(a, b)
-      @first = a
-      @second = b
-    end
-
-    attr_reader :first, :second
   end
 end
