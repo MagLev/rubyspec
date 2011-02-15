@@ -64,12 +64,14 @@ describe "C-API Array function" do
   end
 
   describe "rb_ary_to_s" do
+not_compliant_on :maglev do
     ruby_version_is ""..."1.9" do
       it "joins elements of an array with a string" do
         @s.rb_ary_to_s([1,2,3]).should == "123"
         @s.rb_ary_to_s([]).should == ""
       end
     end
+end
 
     ruby_version_is "1.9" do
       it "creates an Array literal representation as a String" do
@@ -350,11 +352,13 @@ describe "C-API Array function" do
       s2.equal?(s).should be_false
     end
 
+not_compliant_on :maglev do  # only iteration on arrays is supported
     it "calls a function with the other function available as a block" do
       h = {:a => 1, :b => 2}
 
       @s.rb_iterate_each_pair(h).sort.should == [1,2]
     end
+end
   end
 
   describe "rb_ary_delete" do
@@ -371,27 +375,29 @@ describe "C-API Array function" do
     end
   end
 
-  describe "rb_mem_clear" do
+not_compliant_on :maglev do  
+  describe "rb_mem_clear" do #
     it "sets elements of a C array to nil" do
       @s.rb_mem_clear(1).should == nil
     end
   end
 
   ruby_version_is ""..."1.9" do
-    describe "rb_protect_inspect" do
+    describe "rb_protect_inspect" do #
       it "tracks an object recursively" do
         @s.rb_protect_inspect("blah").should be_true
       end
     end
   end
 
-  describe "rb_ary_freeze" do
+  describe "rb_ary_freeze" do #
     it "freezes the object exactly like Object#freeze" do
       ary = [1,2]
       @s.rb_ary_freeze(ary)
       ary.frozen?.should be_true
     end
   end
+end
 
   describe "rb_ary_delete_at" do
     before :each do

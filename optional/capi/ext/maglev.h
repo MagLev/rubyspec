@@ -1,0 +1,57 @@
+#ifndef RUBYSPEC_CAPI_RUBINIUS_H
+#define RUBYSPEC_CAPI_RUBINIUS_H
+
+// following in neither rubinius nor maglev
+#undef HAVE_RB_DEFINE_HOOKED_VARIABLE
+#undef HAVE_RB_DEFINE_VARIABLE
+
+#undef HAVE_RB_PROC_NEW
+
+// following not in maglev
+
+#undef HAVE_RARRAY
+#undef HAVE_RARRAY_PTR
+#undef HAVE_RFLOAT
+
+#undef HAVE_RB_BIG2LL
+#undef HAVE_RB_LL2INUM
+
+#undef HAVE_RB_CALL_SUPER
+#undef HAVE_RSTRING
+
+#undef HAVE_RB_GC_REGISTER_ADDRESS
+#undef HAVE_RB_DEFINE_READONLY_VARIABLE
+#undef HAVE_RB_SET_KCODE
+
+#undef HAVE_RB_HASH_FOREACH
+
+#undef HAVE_RB_THROW
+#undef HAVE_RB_BLOCK_PROC
+
+#undef HAVE_RB_OBJ_FROZEN_P
+#undef HAVE_RB_OBJ_TAINT
+
+#undef HAVE_RB_STR_BUF_NEW
+
+// following neither in maglev, nor jruby 
+#undef HAVE_RB_ARY_TO_S
+#undef HAVE_RB_MEM_CLEAR
+#undef HAVE_RB_INSPECTING_P
+#undef HAVE_RB_PROTECT_INSPECT
+#undef HAVE_RB_ARY_FREEZE
+#undef HAVE_RBIGNUM_SIGN
+#undef HAVE_RB_HASH
+#undef HAVE_RB_HASH_DELETE_IF
+#undef HAVE_RB_NUM_ZERODIV
+#undef HAVE_RB_CMPINT
+#undef HAVE_RB_STR_HASH
+#undef HAVE_RB_REG_MATCH
+#undef HAVE_RB_BACKREF_GET
+#undef HAVE_RB_STRUCT_AREF
+#undef HAVE_RB_STRUCT_ASET
+#undef HAVE_RB_STRUCT_NEW
+#undef HAVE_RB_EXEC_RECURSIVE
+#undef HAVE_RB_SET_END_PROC
+#undef HAVE_RB_F_SPRINTF
+
+#endif

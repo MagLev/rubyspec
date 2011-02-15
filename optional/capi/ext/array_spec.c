@@ -89,16 +89,13 @@ static VALUE array_spec_RARRAY_LEN(VALUE self, VALUE array) {
 #endif
 
 #if defined(HAVE_RB_ARY_AREF) 
-#if defined(HAVE_RB_SCAN_ARGS)
 static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self) 
 {
-  VALUE ary, args;
-  rb_scan_args(argc, argv, "1*", &ary, &args);
-  return rb_ary_aref(RARRAY_LEN(args), RARRAY_PTR(args), ary);
-}
-#else
-static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self)
-{
+  // VALUE ary, args;
+  // rb_scan_args(argc, argv, "1*", &ary, &args);
+  // return rb_ary_aref(RARRAY_LEN(args), RARRAY_PTR(args), ary);
+
+  // rewrite to work without rb_scan_args
   VALUE args[2];
   VALUE ary = argv[0];
   if (argc == 2) {
@@ -113,7 +110,6 @@ static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self)
     return Qnil;
   }
 }
-#endif
 #endif
 
 
@@ -350,7 +346,7 @@ void Init_array_spec() {
   rb_define_method(cls, "rb_ary_join", array_spec_rb_ary_join, 2);
 #endif
 
-#ifdef HAVE_RB_ARY_JOIN
+#ifdef HAVE_RB_ARY_TO_S
   rb_define_method(cls, "rb_ary_to_s", array_spec_rb_ary_to_s, 1);
 #endif
 

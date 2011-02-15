@@ -59,8 +59,8 @@ def compile_extension(path, name)
   # avoid problems where compilation failed but previous shlib exists
   File.delete lib if File.exists? lib
 
-  cc        = RbConfig::CONFIG["CC"]
-  cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
+  #cc        = RbConfig::CONFIG["CC"]
+  #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
 
   cc = "/opt/solstudio12.2/bin/cc"   # maglev x86 solaris
   cflags = "-m64 -fPIC -g"
@@ -78,6 +78,10 @@ def compile_extension(path, name)
     puts "ERROR:\n#{output}"
     raise "Unable to compile \"#{source}\""
   end
+  if output.index('warning')
+    puts "WARNINGS:\n#{output}"
+    raise "Warnings in compile \"#{source}\""
+  end   
 
   ldshared  = RbConfig::CONFIG["LDSHARED"]
   libpath   = "-L#{path}"

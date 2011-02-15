@@ -9,7 +9,7 @@ describe "C-API Proc function" do
     @prc = @p.rb_proc_new
   end
 
-  describe "rb_proc_new" do
+  describe "rb_proc_new" do #
     it "returns a new valid Proc" do
       @prc.kind_of?(Proc).should == true
     end

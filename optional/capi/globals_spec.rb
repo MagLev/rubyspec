@@ -13,11 +13,13 @@ describe "CApiGlobalSpecs" do
     @f.sb_gv_get("SAFE").should == 0 # rb_gv_get should change SAFE to $SAFE
   end
 
-  it "should correctly retrieve $~" do
+not_compliant_on :maglev do
+  it "should correctly retrieve $~" do #
     'a' =~ /a/
     @f.sb_gv_get("$~").to_a.should == ['a']
     @f.sb_gv_get("~").to_a.should == ['a']
   end
+end
 
   it "correctly sets global values" do
     @f.sb_gv_get("$BLAH").should == nil

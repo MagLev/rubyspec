@@ -52,7 +52,8 @@ describe "C-API Regexp function" do
   end
  end #
 
-  describe "rb_reg_match" do
+not_compliant_on :maglev do
+  describe "rb_reg_match" do #
     it "returns the matched position or nil" do
       @p.rb_reg_match(/a/, 'ab').should == 0
       @p.rb_reg_match(/b/, 'ab').should == 1
@@ -60,7 +61,7 @@ describe "C-API Regexp function" do
     end
   end
 
-  describe "rb_backref_get" do
+  describe "rb_backref_get" do #
     it "returns the last MatchData" do
       md = /a/.match('ab')
       @p.rb_backref_get.should == md
@@ -70,4 +71,5 @@ describe "C-API Regexp function" do
       @p.rb_backref_get.should == md
     end
   end
+end
 end

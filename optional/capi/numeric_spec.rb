@@ -64,7 +64,7 @@ describe "CApiNumericSpecs" do
   end
 
  not_compliant_on :maglev do
-  describe "rb_ll2inum" do
+  describe "rb_ll2inum" do  # not implem yet
     it "should create a new Fixnum from a small signed long long" do
       i = @s.rb_ll2inum_14()
       i.should be_kind_of(Fixnum)
@@ -127,13 +127,14 @@ describe "CApiNumericSpecs" do
     end
   end
 
-  describe "rb_num_zerodiv" do
+ not_compliant_on :maglev do  # jruby has neither rb_num_zerodiv, rb_cmpint
+  describe "rb_num_zerodiv" do 
     it "raises a RuntimeError" do
       lambda { @s.rb_num_zerodiv() }.should raise_error(ZeroDivisionError, 'divided by 0')
     end
   end
 
-  describe "rb_cmpint" do
+  describe "rb_cmpint" do #
     it "returns a Fixnum if passed one" do
       @s.rb_cmpint(1, 2).should == 1
     end
@@ -164,4 +165,6 @@ describe "CApiNumericSpecs" do
       }.should raise_error(ArgumentError)
     end
   end
+ end # maglev
+
 end

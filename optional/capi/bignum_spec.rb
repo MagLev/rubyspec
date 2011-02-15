@@ -95,7 +95,8 @@ describe "CApiBignumSpecs" do
   end
 
   ruby_version_is "1.8.7" do
-    describe "RBIGNUM_SIGN" do
+not_compliant_on :maglev do
+    describe "RBIGNUM_SIGN" do #
       it "returns C true if the Bignum has a positive sign" do
         @s.RBIGNUM_SIGN(bignum_value()).should be_true
       end
@@ -104,5 +105,6 @@ describe "CApiBignumSpecs" do
         @s.RBIGNUM_SIGN(-bignum_value()).should be_false
       end
     end
+end
   end
 end

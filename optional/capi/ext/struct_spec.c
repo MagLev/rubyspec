@@ -1,5 +1,5 @@
 #include "ruby.h"
-#include "intern.h"
+// include "intern.h"
 #include "rubyspec.h"
 
 #ifdef __cplusplus
@@ -26,7 +26,7 @@ static VALUE struct_spec_struct_define(VALUE self, VALUE name,
   const char *a1 = StringValuePtr(attr1);
   const char *a2 = StringValuePtr(attr2);
   const char *a3 = StringValuePtr(attr3);
-  char *nm = NULL;
+  const char *nm = NULL;
 
   if (name != Qnil) nm = StringValuePtr(name);
 
