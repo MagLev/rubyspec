@@ -242,11 +242,10 @@ end
       @s.rb_str_to_str(ValidTostrTest.new).should == "ruby"
     end
 
-# do not checkin needs new exc handling
-#   it "raises a TypeError if coercion fails" do
-#     lambda { @s.rb_str_to_str(0) }.should raise_error(TypeError)
-#     lambda { @s.rb_str_to_str(InvalidTostrTest.new) }.should raise_error(TypeError)
-#   end
+    it "raises a TypeError if coercion fails" do
+      lambda { @s.rb_str_to_str(0) }.should raise_error(TypeError)
+      lambda { @s.rb_str_to_str(InvalidTostrTest.new) }.should raise_error(TypeError)
+    end
   end
 
   ruby_version_is ""..."1.9" do
@@ -344,7 +343,7 @@ end
     it "does not call #to_s on non-String objects" do
       str = mock("fake")
       str.should_not_receive(:to_s)
-#      lambda { @s.StringValue(str) }.should raise_error(TypeError)  # do not checkin
+      lambda { @s.StringValue(str) }.should raise_error(TypeError)
     end
   end
 

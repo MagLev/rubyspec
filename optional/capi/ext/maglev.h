@@ -1,5 +1,5 @@
-#ifndef RUBYSPEC_CAPI_RUBINIUS_H
-#define RUBYSPEC_CAPI_RUBINIUS_H
+#ifndef RUBYSPEC_CAPI_Maglev_H
+#define RUBYSPEC_CAPI_Maglev_H
 
 // following in neither rubinius nor maglev
 #undef HAVE_RB_DEFINE_HOOKED_VARIABLE

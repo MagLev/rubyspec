@@ -8,9 +8,9 @@ describe "CApiNumericSpecs" do
   end
 
   describe "rb_num2long" do
-#   it "rb_num2long raises an TypeError if passed nil" do	# do not checkin
-#     lambda { @s.rb_num2long(nil) }.should raise_error(TypeError)
-#   end
+    it "rb_num2long raises an TypeError if passed nil" do
+      lambda { @s.rb_num2long(nil) }.should raise_error(TypeError)
+    end
 
     it "converts a Float" do
       @s.rb_num2long(4.2).should == 4
@@ -32,9 +32,9 @@ describe "CApiNumericSpecs" do
   end
 
   describe "rb_num2ulong" do
-#   it "rb_num2ulong raises an TypeError if passed nil" do	# do not checkin
-#     lambda { @s.rb_num2ulong(nil) }.should raise_error(TypeError)
-#   end
+    it "rb_num2ulong raises an TypeError if passed nil" do
+      lambda { @s.rb_num2ulong(nil) }.should raise_error(TypeError)
+    end
 
     it "converts a Float" do
       @s.rb_num2ulong(4.2).should == 4
@@ -82,9 +82,9 @@ describe "CApiNumericSpecs" do
   end
 
   describe "rb_num2dbl" do
-#   it "rb_num2dbl raises an TypeError if passed nil" do   # do not checkin
-#     lambda { @s.rb_num2dbl(nil) }.should raise_error(TypeError)
-#   end
+    it "rb_num2dbl raises an TypeError if passed nil" do
+      lambda { @s.rb_num2dbl(nil) }.should raise_error(TypeError)
+    end
 
     it "raises an TypeError if passed a String" do
       lambda { @s.rb_num2dbl("1.2") }.should raise_error(TypeError)

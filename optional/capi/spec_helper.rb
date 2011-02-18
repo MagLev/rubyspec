@@ -32,9 +32,8 @@ def compile_extension(path, name)
     require 'mkmf'
     hdrdir = $hdrdir
   elsif RUBY_NAME == 'maglev'
-    hdrdir = ENV['GEMSTONE']
+    hdrdir = ENV['MAGLEV']
     hdrdir = "#{hdrdir}/include"  
-    hdrdir = "/export/iceland1/users/otisa/Svn/st64_30alt/svn/src" # do not checkin
   else
     raise "Don't know how to build C extensions with #{RUBY_NAME}"
   end

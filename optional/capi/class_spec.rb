@@ -180,12 +180,11 @@ describe "C-API Class function" do
       @s.rb_cvar_get(CApiClassSpecs::CVars, "@@cvar").should == :cvar
     end
 
-# need new handler search  # do not checkin
-#   it "raises a NameError if the class variable is not defined" do
-#     lambda {
-#       @s.rb_cv_get(CApiClassSpecs::CVars, "@@no_cvar")
-#     }.should raise_error(NameError)
-#   end
+    it "raises a NameError if the class variable is not defined" do
+      lambda {
+        @s.rb_cv_get(CApiClassSpecs::CVars, "@@no_cvar")
+      }.should raise_error(NameError)
+    end
   end
 
   describe "rb_cvar_set" do
@@ -212,12 +211,11 @@ describe "C-API Class function" do
       @s.rb_cvar_get(CApiClassSpecs::CVars, "@@cvar").should == :cvar
     end
 
-# need new handler search  # do not checkin
-#   it "raises a NameError if the class variable is not defined" do
-#     lambda {
-#       @s.rb_cvar_get(CApiClassSpecs::CVars, "@@no_cvar")
-#     }.should raise_error(NameError)
-#   end
+    it "raises a NameError if the class variable is not defined" do
+      lambda {
+        @s.rb_cvar_get(CApiClassSpecs::CVars, "@@no_cvar")
+      }.should raise_error(NameError)
+    end
   end
 
   describe "rb_class_inherited" do
@@ -243,14 +241,13 @@ describe "C-API Class function" do
       CApiClassSpecs::NewClass.should be_ancestor_of(subclass)
     end
 
-# do not checkin, need new exc handler search
-#   it "raises a TypeError if passed Class as the superclass" do
-#     lambda { @s.rb_class_new(Class) }.should raise_error(TypeError)
-#   end
+    it "raises a TypeError if passed Class as the superclass" do
+      lambda { @s.rb_class_new(Class) }.should raise_error(TypeError)
+    end
 
-#   it "raises a TypeError if passed a singleton class as the superclass" do
-#     metaclass = Object.new.metaclass
-#     lambda { @s.rb_class_new(metaclass) }.should raise_error(TypeError)
-#   end
+    it "raises a TypeError if passed a singleton class as the superclass" do
+      metaclass = Object.new.metaclass
+      lambda { @s.rb_class_new(metaclass) }.should raise_error(TypeError)
+    end
   end
 end

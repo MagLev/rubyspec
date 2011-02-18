@@ -82,7 +82,7 @@ describe "C-API Struct function" do
   end
 
 not_compliant_on :maglev do
-  describe "rb_struct_aref" do #
+  describe "rb_struct_aref" do # not on maglev
     it "returns the value of a struct member with a symbol key" do
       @struct[:a] = 2
       @s.rb_struct_aref(@struct, :a).should == 2
@@ -103,7 +103,7 @@ not_compliant_on :maglev do
     end
   end
 
-  describe "rb_struct_aset" do #
+  describe "rb_struct_aset" do # not on maglev
     it "sets the value of a struct member with a symbol key" do
       @s.rb_struct_aset(@struct, :a, 1)
       @struct[:a].should == 1
@@ -124,7 +124,7 @@ not_compliant_on :maglev do
     end
   end
 
-  describe "rb_struct_new" do #
+  describe "rb_struct_new" do # not on maglev
     it "creates a new instance of a struct" do
       i = @s.rb_struct_new(@klass, 1, 2, 3)
       i.a.should == 1
