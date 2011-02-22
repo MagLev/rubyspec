@@ -31,8 +31,6 @@
 #undef HAVE_RB_OBJ_FROZEN_P
 #undef HAVE_RB_OBJ_TAINT
 
-#undef HAVE_RB_STR_BUF_NEW
-
 // following neither in maglev, nor jruby 
 #undef HAVE_RB_ARY_TO_S
 #undef HAVE_RB_MEM_CLEAR

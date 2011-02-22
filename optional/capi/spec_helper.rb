@@ -32,8 +32,8 @@ def compile_extension(path, name)
     require 'mkmf'
     hdrdir = $hdrdir
   elsif RUBY_NAME == 'maglev'
-    hdrdir = ENV['MAGLEV']
-    hdrdir = "#{hdrdir}/include"  
+    mag = ENV['MAGLEV_HOME']
+    hdrdir = "#{mag}/lib/ruby/1.8/include"  
   else
     raise "Don't know how to build C extensions with #{RUBY_NAME}"
   end

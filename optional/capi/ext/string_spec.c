@@ -70,12 +70,8 @@ VALUE string_spec_rb_str_buf_new(VALUE self, VALUE len, VALUE str) {
   buf = rb_str_buf_new(NUM2LONG(len));
 
   if(RTEST(str)) {
-    // maglev RSTRING_PTR returns a  const char*
     // snprintf(RSTRING_PTR(buf), NUM2LONG(len), "%s", RSTRING_PTR(str));
-
-    // apparent MRI behavior, logical size still zero, so don't store_string
-    // const char *cstr = STR2CSTR(str);
-    // rb_store_string(buf, cstr);
+    // rb_str_buf_append(buf, str);
   }
 
   return buf;
