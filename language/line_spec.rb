@@ -24,7 +24,7 @@ ScratchPad << __LINE__
 ScratchPad << __LINE__
     EOC
 
-    ScratchPad.recorded.should == [3, 7] # maglev deviation, was [1, 5]
+    ScratchPad.recorded.should == [2, 6] # maglev deviation, was [1, 5]
   end
 end
 
