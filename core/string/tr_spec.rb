@@ -22,13 +22,25 @@ describe "String#tr" do
   end
 
  not_compliant_on :maglev do #  fix needed
-  it "treats a descending range in the replacement as containing just the start character" do
-    "hello".tr("a-y", "z-b").should == "zzzzz"
+  ruby_version_is '' ... '1.9.2' do
+    it "treats a descending range in the replacement as containing just the start character" do
+      "hello".tr("a-y", "z-b").should == "zzzzz"
+    end
+
+    it "treats a descending range in the source as empty" do
+      "hello".tr("l-a", "z").should == "hello"
+    end
   end
  end
 
-  it "treats a descending range in the source as empty" do
-    "hello".tr("l-a", "z").should == "hello"
+  ruby_version_is '1.9.2' do
+    it "raises a ArgumentError a descending range in the replacement as containing just the start character" do
+      lambda { "hello".tr("a-y", "z-b") }.should raise_error(ArgumentError)
+    end
+
+    it "raises a ArgumentError a descending range in the source as empty" do
+      lambda { "hello".tr("l-a", "z") }.should raise_error(ArgumentError)
+    end
   end
 
   it "translates chars not in from_string when it starts with a ^" do

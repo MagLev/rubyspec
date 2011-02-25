@@ -2,9 +2,6 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel#system" do
-  before do
-    @ruby = ENV['RUBY_EXE']
-  end
 
   it "can run basic things that exist" do
     begin
@@ -74,13 +71,13 @@ describe "Kernel#system" do
 
 not_compliant_on :maglev do
   it "expands shell variables when given a single string argument" do
-    result = system("#{@ruby} #{@helper_script} #{@shell_var} foo")
+    result = system("#{RUBY_EXE} #{@helper_script} #{@shell_var} foo")
     result.should be_true
   end
 end
   
-  it "does not expand shell variables when given multiples arguments" do 
-    result = system("#{@ruby}", @helper_script, @shell_var, "foo")
+  it "does not expand shell variables when given multiples arguments" do
+    result = system("#{RUBY_EXE}", @helper_script, @shell_var, "foo")
     result.should be_false
   end
 end

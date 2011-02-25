@@ -43,7 +43,7 @@ end #
 
   it "returns a class variable defined in a metaclass" do
     obj = mock("metaclass class variable")
-    meta = obj.metaclass
+    meta = obj.singleton_class
     meta.send :class_variable_set, :@@var, :cvar_value
     meta.send(:class_variable_get, :@@var).should == :cvar_value
   end

@@ -56,11 +56,8 @@ describe "A class definition" do
 
   it "raises a TypeError if inheriting from a metaclass" do
     obj = mock("metaclass super")
-    meta = obj.metaclass
-    lambda {   # maglev debugging
-       class ClassSpecs::MetaclassSuper < meta; 
-       end 
-    }.should raise_error(TypeError)
+    meta = obj.singleton_class
+    lambda { class ClassSpecs::MetaclassSuper < meta; end }.should raise_error(TypeError)
   end
 
 #  # I do not think this is a valid spec   -- rue
