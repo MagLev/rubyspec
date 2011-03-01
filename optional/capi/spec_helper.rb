@@ -58,44 +58,32 @@ def compile_extension(path, name)
   # avoid problems where compilation failed but previous shlib exists
   File.delete lib if File.exists? lib
 
-  #cc        = RbConfig::CONFIG["CC"]
-  #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
-
-  cc = "/opt/solstudio12.2/bin/cc"   # maglev x86 solaris
-  cflags = "-m64 -fPIC -g"
-
+  cc        = RbConfig::CONFIG["CC"]
+  cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
   cflags   += " -fPIC" unless cflags.include?("-fPIC")
   incflags  = "-I#{path} -I#{hdrdir}"
   incflags << " -I#{arch_hdrdir}" if arch_hdrdir
   incflags << " -I#{ruby_hdrdir}" if ruby_hdrdir
 
   cmd = "#{cc} #{incflags} #{cflags} -c #{source} -o #{obj}"
-  puts "EXECUTING #{cmd}"
-  output = `#{cmd}` 
+  puts cmd
+  output = `#{cmd}`
+  puts output
 
   if $?.exitstatus != 0 or !File.exists?(obj)
     puts "ERROR:\n#{output}"
     raise "Unable to compile \"#{source}\""
   end
-  if output.index('warning')
-    puts "WARNINGS:\n#{output}"
-    raise "Warnings in compile \"#{source}\""
-  end   
 
   ldshared  = RbConfig::CONFIG["LDSHARED"]
   libpath   = "-L#{path}"
   libs      = RbConfig::CONFIG["LIBS"]
   dldflags  = RbConfig::CONFIG["DLDFLAGS"]
 
-  # maglev x86 solaris
-  ldshared = "#{cc} -shared"
-  libs = "-lrt -ldl -lm -lc"  
-  dldflags = "-m64 -L."   
-
-  cmd = `#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}`
-  puts "EXECUTING #{cmd}"
+  cmd = "#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}"
+  puts cmd
   output = `#{cmd}`
-
+  puts output
 
   if $?.exitstatus != 0
     puts "ERROR:\n#{output}"
