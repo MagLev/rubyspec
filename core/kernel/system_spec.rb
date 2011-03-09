@@ -69,17 +69,17 @@ describe "Kernel#system" do
     @helper_script = KernelSpecs.helper_script
   end
 
-not_compliant_on :maglev do
+ not_compliant_on :maglev do
   it "expands shell variables when given a single string argument" do
     result = system("#{RUBY_EXE} #{@helper_script} #{@shell_var} foo")
     result.should be_true
   end
-end
   
   it "does not expand shell variables when given multiples arguments" do
     result = system("#{RUBY_EXE}", @helper_script, @shell_var, "foo")
     result.should be_false
   end
+ end #
 end
 
 describe "Kernel.system" do
