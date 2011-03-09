@@ -26,14 +26,12 @@ describe :kernel_String, :shared => true do
     @object.send(@method, obj).should == "test"
   end
 
- not_compliant_on :maglev do # undef_method not working in this case ; we always attempt to_s
   it "raises a TypeError if #to_s does not exist" do
     obj = mock('to_s')
     obj.undefine(:to_s)
 
     lambda { @object.send(@method, obj) }.should raise_error(TypeError)
   end
- end
 
   ruby_version_is ""..."1.9" do
    not_compliant_on :maglev do # does_not_respond_to not working in Mock
@@ -44,16 +42,14 @@ describe :kernel_String, :shared => true do
     end
    end #
 
-   not_compliant_on :maglev do # undef_method not working
     it "raises a NoMethodError if #to_s is not defined but #respond_to?(:to_s) returns true" do
       # cannot use a mock because of how RSpec affects #method_missing
       obj = Object.new
       obj.undefine(:to_s)
       obj.responds_to(:to_s)
 
-      lambda { @object.send(@method, obj) }.should raise_error(NoMethodError)
+      lambda { @object.send(@method, obj) }.should raise_error(TypeError) # maglev , was NoMethodError
     end
-   end #
   end
 
   ruby_version_is "1.9" do
@@ -64,7 +60,6 @@ describe :kernel_String, :shared => true do
       lambda { @object.send(@method, obj) }.should_not raise_error(TypeError)
     end
 
-   not_compliant_on :maglev do # undef_method not working
     it "raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true" do
       # cannot use a mock because of how RSpec affects #method_missing
       obj = Object.new
@@ -73,10 +68,8 @@ describe :kernel_String, :shared => true do
 
       lambda { @object.send(@method, obj) }.should raise_error(TypeError)
     end
-   end #
   end
 
- not_compliant_on :maglev do # undef_method not working
   it "calls #to_s if #respond_to?(:to_s) returns true" do
     obj = mock('to_s')
     obj.undefine(:to_s)
@@ -84,7 +77,6 @@ describe :kernel_String, :shared => true do
 
     @object.send(@method, obj).should == "test"
   end
- end #
 
   it "raises a TypeError if #to_s does not return a String" do
     (obj = mock('123')).should_receive(:to_s).and_return(123)
