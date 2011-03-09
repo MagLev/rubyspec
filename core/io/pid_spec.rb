@@ -15,7 +15,7 @@ describe "IO#pid" do
   end
 end
 
-not_compliant_on :maglev do # popen not implemented
+not_compliant_on :maglev do # IO.pid not implemented
 describe "IO#pid" do
   before :each do
     @io = IO.popen RUBY_EXE, "r+"

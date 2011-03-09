@@ -110,17 +110,14 @@ not_compliant_on :maglev do
   end
 end
 
- not_supported_on :maglev do
   describe "rb_hash_foreach" do
     it "iterates over the hash" do
       hsh = {:name => "Evan", :sign => :libra}
-
       out = @s.rb_hash_foreach(hsh)
       out.equal?(hsh).should == false
       out.should == hsh
     end
   end
- end #
 
   # rb_hash_size is a static symbol in MRI
   extended_on :rubinius do
