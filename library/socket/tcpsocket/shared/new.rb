@@ -18,7 +18,7 @@ describe :tcpsocket_new, :shared => true do
   it "connects to a listening server" do
     ready = false
     thread = Thread.new do
-      server = TCPServer.new(SocketSpecs.port)
+      server = TCPServer.new(@hostname, SocketSpecs.port)
       ready = true
       conn = server.accept
       conn.recv(50)
@@ -48,23 +48,25 @@ describe :tcpsocket_new, :shared => true do
     thread.status.should_not be_nil
     sock = TCPSocket.send(@method, @hostname, SocketSpecs.port)
 
-    if sock.addr[0] == "AF_INET"
-      sock.addr[0].should == "AF_INET"
-      sock.addr[1].should be_kind_of(Fixnum)
-      # on some platforms (Mac), MRI
-      # returns comma at the end. Other
-      # platforms such as OpenBSD setup the
-      # localhost as localhost.domain.com
-      sock.addr[2].should =~ /^#{@hostname}/
+    begin
+      if sock.addr[0] == "AF_INET"
+        sock.addr[0].should == "AF_INET"
+        sock.addr[1].should be_kind_of(Fixnum)
+        # on some platforms (Mac), MRI
+        # returns comma at the end. Other
+        # platforms such as OpenBSD setup the
+        # localhost as localhost.domain.com
+        sock.addr[2].should =~ /^#{@hostname}/
+          sock.addr[3].should == @addr
+      else
+        sock.addr[0].should == "AF_INET6"
+        sock.addr[1].should be_kind_of(Fixnum)
+        sock.addr[2].should =~ /^#{@hostname}/
         sock.addr[3].should == @addr
-    else
-      sock.addr[0].should == "AF_INET6"
-      sock.addr[1].should be_kind_of(Fixnum)
-      sock.addr[2].should =~ /^#{@hostname}/
-      sock.addr[3].should == @addr
+      end
+    ensure
+      sock.close
+      thread.join
     end
-
-    sock.close
-    thread.join
   end
 end
