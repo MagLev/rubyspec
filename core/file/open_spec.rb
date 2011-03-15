@@ -191,9 +191,14 @@ describe "File.open" do
   end
 
   it "opens a file that no exists when use File::CREAT mode" do
-    @fh = File.open(@nonexistent, File::CREAT) { |f| f }
-    @fh.should be_kind_of(File)
-    File.exist?(@file).should == true
+    if (RUBY_PLATFORM.match('solaris'))
+      @fh = File.open(@nonexistent, File::CREAT) { |f| f }
+      @fh.should be_kind_of(File)
+      File.exist?(@file).should == true
+    else
+      # linux
+      lambda { File.open(@nonexistent, File::CREAT) { |f| f } } .should raise_error(Errno::EINVAL)
+    end
   end
 
   it "opens a file that no exists when use 'a' mode" do
@@ -303,11 +308,12 @@ describe "File.open" do
 
   ruby_bug "#", "1.8.7.299" do
     it "raises an IOError when read in a block opened with File::RDONLY|File::APPEND mode" do
+      exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL 
       lambda {
         File.open(@file, File::RDONLY|File::APPEND ) do |f|
           f.puts("writing")
         end
-      }.should raise_error(IOError)
+      }.should raise_error(exp_err)
     end
   end
 
@@ -321,16 +327,24 @@ describe "File.open" do
   end
 
   it "can't read in a block when call open with File::EXCL mode" do
+    exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
     lambda {
       File.open(@file, File::EXCL) do |f|
         f.puts("writing").should == nil
       end
-    }.should raise_error(IOError)
+    }.should raise_error(exp_err)
   end
 
   it "can read in a block when call open with File::EXCL mode" do
-    File.open(@file, File::EXCL) do |f|
-      f.gets.should == nil
+    if RUBY_PLATFORM.match('solaris')
+      File.open(@file, File::EXCL) do |f|
+        f.gets.should == nil
+      end
+    else
+      # linux
+      lambda { 
+        File.open(@file, File::EXCL)
+      } .should raise_error(Errno::EINVAL)
     end
   end
 
@@ -372,11 +386,12 @@ describe "File.open" do
 
   ruby_bug "#", "1.8.7.299" do
     it "raises an IOError if the file exists when open with File::RDONLY|File::APPEND" do
+      exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
       lambda {
         File.open(@file, File::RDONLY|File::APPEND) do |f|
           f.puts("writing").should == nil
         end
-      }.should raise_error(IOError)
+      }.should raise_error(exp_err)
     end
   end
 
@@ -384,13 +399,25 @@ describe "File.open" do
 
     it "truncates the file when passed File::TRUNC mode" do
       File.open(@file, File::RDWR) { |f| f.puts "hello file" }
-      @fh = File.open(@file, File::TRUNC)
-      @fh.gets.should == nil
+      if RUBY_PLATFORM.match('solaris')
+        @fh = File.open(@file, File::TRUNC)
+        @fh.gets.should == nil
+      else
+      # linux
+        lambda { File.open(@file, File::TRUNC)
+         } .should raise_error(Errno::EINVAL)
+      end
     end
 
     it "can't read in a block when call open with File::TRUNC mode" do
-      File.open(@file, File::TRUNC) do |f|
-        f.gets.should == nil
+      if RUBY_PLATFORM.match('solaris')
+         File.open(@file, File::TRUNC) do |f|
+           f.gets.should == nil
+         end
+      else
+        # linux
+         lambda { File.open(@file, File::TRUNC)
+         } .should raise_error(Errno::EINVAL)
       end
     end
 
@@ -407,7 +434,7 @@ describe "File.open" do
     end
   end
 
-  platform_is_not :openbsd do
+  platform_is_not :openbsd , :linux do
     it "can't write in a block when call open with File::TRUNC mode" do
       lambda {
         File.open(@file, File::TRUNC) do |f|

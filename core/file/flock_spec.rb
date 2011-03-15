@@ -29,8 +29,13 @@ describe "File#flock" do
 
     File.open(@name, "w") do |f2|
       # f2.flock(File::LOCK_EX | File::LOCK_NB).should == false
-      status = f2.flock(File::LOCK_EX | File::LOCK_NB)  #
-      (status == 0 || status == false).should == true   # Maglev deviation, Solaris
+      if (RUBY_PLATFORM.match('solaris')) 
+        status = f2.flock(File::LOCK_EX | File::LOCK_NB)  #
+        (status == 0 || status == false).should == true   # Maglev deviation, Solaris
+      else
+        # linux
+        lambda { status = f2.flock(File::LOCK_EX | File::LOCK_NB)  } .should raise_error(SystemCallError)  # EAGAIN
+      end
     end
   end
 
