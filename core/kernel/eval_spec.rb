@@ -30,21 +30,16 @@ describe "Kernel#eval" do
   end
 
   it "updates a local in an enclosing scope" do
-    bzy = 299	# maglev debugging
-    eval("bzy = 334").should == 334
-    bzy.should == 334
-  end
-
-  it "creates an eval-scope local" do
-    eval("eval_only_local = 1; eval_only_local").should == 1
-    lambda { eval_only_local }.should raise_error(NameError)
+    a = 19
+    eval("a = 29")
+    a.should == 29 # maglev debugging
   end
 
   it "updates a local in a surrounding block scope" do
     EvalSpecs.new.f do
-      ba = 147 # maglev debugging
-      eval("ba = 247").should == 247
-      ba.should == 247
+      a = 18
+      eval("a = 28")
+      a.should == 28  # maglev debugging
     end
   end
 
@@ -53,7 +48,7 @@ describe "Kernel#eval" do
     EvalSpecs.new.f do
       azw = 556 # need to force an assign here, else azw is a copying block arg
  		 #   which is not handled yet by RubyBinding(C)>>_bindingInfo:
-      eval("azw = 235").should == 235
+      eval("azw = 235")
       azw.should == 235
     end
     azw.should == 235
@@ -62,27 +57,37 @@ describe "Kernel#eval" do
   it "updates a local in a scope above when modified in a nested block scope" do
     a = 1
     es = EvalSpecs.new
-    eval("es.f { es.f { a = 2 } }").should == 2
+    eval("es.f { es.f { a = 2 } }")
     a.should == 2
   end
 
   ruby_version_is ""..."1.9" do
+    it "updates a local at script scope" do
+      code = fixture __FILE__, "eval_locals.rb"
+      ruby_exe(code).chomp.should == "2"
+    end
+
 not_compliant_on :maglev do
-    it "accepts a Proc object as a binding" do # maglev does not accept Proc
+    it "accepts a Proc object as a binding" do
       x = 1
       bind = proc {}
 
       eval("x", bind).should == 1
-      eval("y = 2", bind).should == 2
+      eval("y = 2", bind)
       eval("y", bind).should == 2
 
-      eval("z = 3").should == 3
+      eval("z = 3")
       eval("z", bind).should == 3
     end
 end
   end
 
   ruby_version_is "1.9" do
+    it "does not share locals across eval scopes" do
+      code = fixture __FILE__, "eval_locals.rb"
+      ruby_exe(code).chomp.should == "NameError"
+    end
+
     it "doesn't accept a Proc object as a binding" do
       x = 1
       bind = proc {}
@@ -98,29 +103,23 @@ end
 
   ruby_version_is ""..."1.9" do
 not_compliant_on :maglev do
-    it "allows a binding to be captured inside an eval" do #
-      outer_binding = binding
-      level1 = eval("binding", outer_binding)
-      level2 = eval("binding", level1)
+    it "stores all locals of nested eval bindings in the first non-eval binding" do
+      non_eval = binding
+      eval1 = eval("binding", non_eval)
+      eval2 = eval("binding", eval1)
 
+      # Set locals an variables depths of nested eval bindings
       eval("w = 1")
-      eval("x = 2", outer_binding)
-      eval("y = 3", level1)
+      eval("x = 2", non_eval)
+      eval("y = 3", eval1)
+      eval("z = 4", eval2)
 
+      # Now read them back and show that they're all accessible via
+      # the toplevel binding.
       eval("w").should == 1
-      eval("w", outer_binding).should == 1
-      eval("w", level1).should == 1
-      eval("w", level2).should == 1
-
       eval("x").should == 2
-      eval("x", outer_binding).should == 2
-      eval("x", level1).should == 2
-      eval("x", level2).should == 2
-
       eval("y").should == 3
-      eval("y", outer_binding).should == 3
-      eval("y", level1).should == 3
-      eval("y", level2).should == 3
+      eval("z").should == 4
     end
 end
   end
@@ -128,6 +127,9 @@ end
   ruby_version_is "1.9" do
     # This differs from the 1.8 example because 1.9 doesn't share scope across
     # sibling evals
+    #
+    # REWRITE ME: This obscures the real behavior of where locals are stored
+    # in eval bindings.
     it "allows a binding to be captured inside an eval" do
       outer_binding = binding
       level1 = eval("binding", outer_binding)
@@ -159,36 +161,35 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-not_compliant_on :maglev do  
-    it "allows Proc and binding to be nested in horrible ways" do #
+# not_compliant_on :maglev do   ???
+    it "allows a Proc invocation to terminate the eval binding chain on local creation" do
       outer_binding = binding
-      proc_binding = eval("proc {l = 5; binding}.call", outer_binding)
-      inner_binding = eval("proc {k = 6; binding}.call", proc_binding)
+      proc_binding = eval("proc {binding}.call", outer_binding)
+      inner_binding = eval("proc {binding}.call", proc_binding)
 
       eval("w = 1")
-      eval("x = 2", outer_binding)
-      eval("yy = 3", proc_binding)
-      eval("z = 4", inner_binding)
 
-      eval("w").should == 1
-      eval("w", outer_binding).should == 1
+      # The proc bindings can see eval locals set above them
       eval("w", proc_binding).should == 1
       eval("w", inner_binding).should == 1
 
-      eval("x").should == 2
-      eval("x", outer_binding).should == 2
-      eval("x", proc_binding).should == 2
-      eval("x", inner_binding).should == 2
+      # Show that creating the local stops at the proc because of the
+      # non-eval binding introduced.
+      eval("yy = 3", proc_binding)
 
       lambda { eval("yy") }.should raise_error(NameError)
       lambda { eval("yy", outer_binding) }.should raise_error(NameError)
       eval("yy", proc_binding).should == 3
-      eval("yy", inner_binding).should == 3
 
-      lambda { eval("z") }.should raise_error(NameError)
-      lambda { eval("z", outer_binding) }.should raise_error(NameError)
-      lambda { eval("z", proc_binding)  }.should raise_error(NameError)
-      eval("z", inner_binding).should == 4
+      # Show that even though there is a non-eval binding, reading the
+      # local is still possible.
+      eval("yy", inner_binding).should == 3
+    end
+
+    it "can access normal locals in nested closures" do
+      outer_binding = binding
+      proc_binding = eval("proc {l = 5; binding}.call", outer_binding)
+      inner_binding = eval("proc {k = 6; binding}.call", proc_binding)
 
       lambda { eval("l") }.should raise_error(NameError)
       lambda { eval("l", outer_binding) }.should raise_error(NameError)
@@ -200,19 +201,19 @@ not_compliant_on :maglev do
       lambda { eval("k", proc_binding)  }.should raise_error(NameError)
       eval("k", inner_binding).should == 6
     end
-end
+# end ??
   end
 
   ruby_version_is ""..."1.9" do
-not_compliant_on :maglev do
+# not_compliant_on :maglev do
     it "allows creating a new class in a binding" do #
       bind = proc {}
       eval "class A; end", bind.binding  # maglev binding is private meth
       eval("A.name", bind.binding).should == "A"
-end
+# end
     end
 
-if false # maglev fails
+# not_compliant_on :maglev do
     it "allows creating a new class in a binding created by #eval" do #
 # maglev confusion in generated code for eval,
 #    $~ = __vc.at(7)  #  vc.at(7) not a MatchData
@@ -221,13 +222,13 @@ if false # maglev fails
       eval "class A; end", bind
       eval("A.name").should == "A"
     end
-end
 
     it "allows creating a new class in a binding returned by a method defined with #eval" do
       bind = eval "def spec_binding; binding; end; spec_binding"
       eval "class A; end", bind
       eval("A.name").should == "A"
     end
+# end
   end
 
   ruby_version_is "1.9" do
@@ -240,14 +241,7 @@ end
       bind = eval "binding"
       eval("class A; end; A.name", bind).should =~ /A$/
     end
-
-    it "allows creating a new class in a binding returned by a method defined with #eval" do
-      bind = eval "def spec_binding; binding; end; spec_binding"
-      eval("class A; end; A.name", bind).should =~ /A$/
-    end
   end
-
-
 
   it "includes file and line information in syntax error" do
     expected = 'speccing.rb'
@@ -304,25 +298,10 @@ end
     eval("self").should equal(self)
     Kernel.eval("self").should equal(Kernel)
   end
-end
-
-describe "Kernel.eval" do
-#  TODO: This is how MRI 1.9 and JRuby behave. Bug or feature?
-#  it "yields to the block of the method when evaling 'yield' inside it" do
-#    class TT
-#      def self.call_yield_from_eval_no_binding
-#        eval('yield')
-#      end
-#    end
-#
-#    (TT.call_yield_from_eval_no_binding {"content"}).should == "content"
-#  end
 
   it "does not pass the block to the method being eval'ed" do
     lambda {
       eval('KernelSpecs::EvalTest.call_yield') { "content" }
     }.should raise_error(LocalJumpError)
   end
-
-  it "needs to be reviewed for spec completeness"
 end

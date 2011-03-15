@@ -117,6 +117,21 @@ end
       out.equal?(hsh).should == false
       out.should == hsh
     end
+
+    it "stops via the callback" do
+      hsh = {:name => "Evan", :sign => :libra}
+
+      out = @s.rb_hash_foreach_stop(hsh)
+      out.size.should == 1
+    end
+
+    it "deletes via the callback" do
+      hsh = {:name => "Evan", :sign => :libra}
+
+      out = @s.rb_hash_foreach_delete(hsh)
+      out.should == {:name => "Evan", :sign => :libra}
+      hsh.should == {}
+    end
   end
 
   # rb_hash_size is a static symbol in MRI
