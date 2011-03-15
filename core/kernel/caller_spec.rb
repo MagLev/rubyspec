@@ -96,7 +96,7 @@ describe "Kernel#caller in a Proc or eval" do
     it "shows the current line in the calling block twice when evaled" do
       stack = CallerFixture.eval_caller(0)
       # stack[0].should == "(eval):1:in `eval_caller'"
-      stack[0].should =~ /\(eval\):.*_compileEval/ # Maglev deviation
+      stack[0].should =~ /\(eval\).*_compileEval/ # Maglev deviation
 #     stack[1].should =~/caller_spec\.rb:85/   
 #     stack[2].should =~/caller_fixture2\.rb:23/
 #     stack[3].should =~/caller_spec\.rb:85/
