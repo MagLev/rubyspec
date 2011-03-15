@@ -5,7 +5,12 @@ describe "Callback" do
   module LibC
     extend FFI::Library  # maglev patch spec, missing FFI::
     callback :qsort_cmp, [ :pointer, :pointer ], :int
-    ffi_lib('libc.so') # maglev needs
+    if RUBY_PLATFORM.match('solaris')
+      ffi_lib('libc.so') # maglev needs
+    end
+    if RUBY_PLATFORM.match('linux')
+      ffi_lib('/lib/libc.so.6') # maglev needs
+    end
     attach_function :qsort, [ :pointer, :int, :int, :qsort_cmp ], :int
   end
   it "arguments get passed correctly" do

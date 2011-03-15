@@ -60,8 +60,14 @@ def compile_extension(path, name)
 
   #cc        = RbConfig::CONFIG["CC"]
   #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
-
-  cc = "/opt/solstudio12.2/bin/cc"   # maglev x86 solaris
+  plat = RUBY_PLATFORM
+  if plat == 'x86_64-linux'
+    cc = 'gcc'
+  elsif plat == 'sparc-solaris' || plat == 'x86_64-solaris'
+    cc = "/opt/sunstudio12.1/bin/cc"   # maglev x86 solaris
+  else 
+    cc = RbConfig::CONFIG["CC"]
+  end
   cflags = "-m64 -fPIC -g"
 
   cflags   += " -fPIC" unless cflags.include?("-fPIC")

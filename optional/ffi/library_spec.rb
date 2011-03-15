@@ -18,16 +18,30 @@ describe "FFI::Library" do
     }.should_not raise_error
   end
 
-  it "attach_function :getpid from [ 'c', 'libc.so.6'] " do
+  it "attach_function :getpid from [ 'c', 'libc.so.6' ] " do
     lambda {
-      mod = new_module('c', 'libc.so') { attach_function :getpid, [ ], :uint } # Maglev, don't specify version of .so
+      libnam = 'libc.so'
+      if RUBY_PLATFORM.match('solaris')
+        libnam = 'libc.so'
+      end
+      if RUBY_PLATFORM.match('linux')
+        libnam = '/lib/libc.so.6'
+      end
+      mod = new_module(libnam) { attach_function :getpid, [ ], :uint } 
       mod.getpid.should == Process.pid
     }.should_not raise_error
   end
 
   it "attach_function :getpid from [ 'libc.so.6', 'c' ] " do
+      libnam = 'libc.so'
+      if RUBY_PLATFORM.match('solaris')
+        libnam = 'libc.so'
+      end
+      if RUBY_PLATFORM.match('linux')
+        libnam = '/lib/libc.so.6'
+      end
     lambda {
-      mod = new_module('libc.so', 'c') { attach_function :getpid, [ ], :uint } # Maglev, don't specify version of .so
+      mod = new_module(libnam, 'c') { attach_function :getpid, [ ], :uint } 
       mod.getpid.should == Process.pid
     }.should_not raise_error
   end
