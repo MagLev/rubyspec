@@ -147,12 +147,14 @@ describe "Time#strftime" do
   
   it "returns the date alone with %x" do
     time = Time.local(2009, 9, 18, 12, 0, 6)
-    time.strftime('%x').should == '09/18/09'
+    e_a = RUBY_PLATFORM.match('solaris') ? '09/18/09' : "09/18/2009"
+    time.strftime('%x').should == e_a
   end
   
   it "returns the time alone with %X" do
     time = Time.local(2009, 9, 18, 12, 0, 6)
-    time.strftime('%X').should == '12:00:06'
+    e_a = RUBY_PLATFORM.match('solaris') ? '12:00:06' : '12:00:06 PM'
+    time.strftime('%X').should == e_a
   end
   
   it "returns the year wihout a century with %y" do

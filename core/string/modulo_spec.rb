@@ -454,21 +454,23 @@ nil.pause
 
   deviates_on :rubinius, :jruby , :maglev do  # execute this for Maglev
     it "supports float formats using %e, but Inf, -Inf, and NaN are not floats" do
-      ("%e" % 1e1020).should == "Inf"
-      ("%e" % -1e1020).should == "-Inf"
-      ("%e" % (-0e0/0)).should == "-NaN" # Maglev has signed nan,  was "Nan"
-      ("%e" % (0.0/0)).should == "-NaN" #
+      sol = RUBY_PLATFORM.match('solaris')
+      ("%e" % 1e1020).should ==  (sol ? "Inf" : "inf")
+      ("%e" % -1e1020).should ==  (sol ? "-Inf" : "-inf")
+      ("%e" % (-0e0/0)).should ==  (sol ? "-NaN" : "-nan" )# Maglev has signed nan,  was "Nan"
+      ("%e" % (0.0/0)).should ==  (sol ? "-NaN" : "-nan" )
     end
 
     it "supports float formats using %E, but Inf, -Inf, and NaN are not floats" do
-      ("%E" % 1e1020).should == "Inf"
-      ("%E" % -1e1020).should == "-Inf"
-      ("%-10E" % 1e1020).should == "Inf       "
-      ("%10E" % 1e1020).should == "       Inf"
-      ("%+E" % 1e1020).should == "+Inf"
-      ("% E" % 1e1020).should == " Inf"
-      ("%E" % (0.0/0)).should == "-NaN" #
-      ("%E" % (-0e0/0)).should == "-NaN" #
+      sol = RUBY_PLATFORM.match('solaris')
+      ("%E" % 1e1020).should == (sol ? "Inf" : "INF")
+      ("%E" % -1e1020).should == (sol ? "-Inf" : "-INF")
+      ("%-10E" % 1e1020).should == (sol ? "Inf       " : "INF       ")
+      ("%10E" % 1e1020).should == (sol ? "       Inf" : "       INF")
+      ("%+E" % 1e1020).should == (sol ? "+Inf" : "+INF")
+      ("% E" % 1e1020).should == (sol ? " Inf" : " INF")
+      ("%E" % (0.0/0)).should == (sol ? "-NaN"  : "-NAN")
+      ("%E" % (-0e0/0)).should == (sol ? "-NaN"  : "-NAN")
     end
   end
 
@@ -930,7 +932,14 @@ end #
     end
     ruby_version_is ""..."1.9.2" do
       it "behaves as if calling Kernel#Float for #{format} arguments, when the passed argument is hexadecimal string" do
-        lambda { format % "0xA" }.should raise_error(ArgumentError)
+        if RUBY_PLATFORM.match('solaris') # maglev deviations
+          lambda { format % "0xA" }.should raise_error(ArgumentError)
+        else
+          hx = { "e"=>'1.000000e+01',  'E'=>'1.000000E+01',
+                'f'=>'10.000000',  'g'=>'10' , 'G'=>'10'
+                }
+          (xx = format % "0xA").should == hx[f]
+        end
       end
     end
     ruby_version_is "1.9.2" do
