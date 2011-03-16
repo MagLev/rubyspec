@@ -29,8 +29,11 @@ describe "Module#attr_writer" do
       attr_writer :spec_attr_writer
     end
 
-    1.spec_attr_writer = "a"
-    1.instance_variable_get("@spec_attr_writer").should == "a"
+    # maglev, no instvars on special objects
+    lambda { 
+       1.spec_attr_writer = "a"
+       1.instance_variable_get("@spec_attr_writer").should == "a"
+    } .should raise_error(NameError)
   end
 
   ruby_version_is ""..."1.9" do

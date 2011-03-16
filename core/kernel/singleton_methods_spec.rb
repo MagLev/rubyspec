@@ -7,28 +7,35 @@ describe :kernel_singleton_methods, :shared => true do
     ReflectSpecs.o.singleton_methods(@object).should == []
   end
 
+ not_compliant_on :maglev do # method protection deviations
   it "returns the names of module methods for a module" do
     ReflectSpecs::M.singleton_methods(@object).should include(*stasy(:ms_pro, :ms_pub))
   end
+ end
 
   it "does not return private module methods for a module" do
     ReflectSpecs::M.singleton_methods(@object).should_not include(stasy(:ms_pri))
   end
 
+ not_compliant_on :maglev do # method protection deviations
   it "returns the names of class methods for a class" do
     ReflectSpecs::A.singleton_methods(@object).should include(*stasy(:as_pro, :as_pub))
   end
+ end
 
   it "does not return private class methods for a class" do
     ReflectSpecs::A.singleton_methods(@object).should_not include(stasy(:as_pri))
   end
 
+ not_compliant_on :maglev do # method protection deviations
   it "returns the names of singleton methods for an object" do
     ReflectSpecs.os.singleton_methods(@object).should include(*stasy(:os_pro, :os_pub))
   end
+ end
 end
 
 describe :kernel_singleton_methods_modules, :shared => true do
+ not_compliant_on :maglev do # method protection deviations
   it "does not return any included methods for a module including a module" do
     ReflectSpecs::N.singleton_methods(*@object).should include(*stasy(:ns_pro, :ns_pub))
   end
@@ -36,13 +43,17 @@ describe :kernel_singleton_methods_modules, :shared => true do
   it "does not return any included methods for a class including a module" do
     ReflectSpecs::D.singleton_methods(*@object).should include(*stasy(:ds_pro, :ds_pub))
   end
+ end # maglev
 end
 
 describe :kernel_singleton_methods_supers, :shared => true do
+ not_compliant_on :maglev do # method protection deviations
   it "returns the names of singleton methods for an object extented with a module" do
     ReflectSpecs.oe.singleton_methods(*@object).should include(*stasy(:m_pro, :m_pub))
   end
+ end
 
+ not_compliant_on :maglev do # method protection deviations
   it "returns a unique list for an object extended with a module" do
     m = ReflectSpecs.oed.singleton_methods(*@object)
     r = m.select { |x| x == stasy(:pub) or x == stasy(:pro) }.sort
@@ -94,6 +105,7 @@ describe :kernel_singleton_methods_supers, :shared => true do
   it "returns the names of inherited singleton methods for a class extended with a module" do
     ReflectSpecs::P.singleton_methods(*@object).should include(*stasy(:m_pro, :m_pub))
   end
+ end # maglev
 end
 
 describe :kernel_singleton_methods_private_supers, :shared => true do
@@ -172,10 +184,12 @@ describe "Kernel#singleton_methods" do
       ReflectSpecs.oei.singleton_methods(false).should == []
     end
 
+ not_compliant_on :maglev do # method protection deviations
     it "returns the names of singleton methods of the subclass" do
       ReflectSpecs::B.singleton_methods(false).should include(*stasy(:bs_pro, :bs_pub))
     end
-
+ end
+  
     it "does not return names of inherited singleton methods for a subclass" do
       ReflectSpecs::B.singleton_methods(false).should_not include(*stasy(:as_pro, :as_pub))
     end

@@ -54,6 +54,7 @@ describe "String#strip!" do
   ruby_version_is ""..."1.9" do
     it "modifies self removing trailing NULL bytes and whitespace after a NULL byte" do
       a = " \x00 goodbye \x00 "
+      b = a.dup
       a.strip!
       a.should == "\x00 goodbye \x00"
     end

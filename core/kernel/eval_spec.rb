@@ -62,13 +62,13 @@ describe "Kernel#eval" do
   end
 
   ruby_version_is ""..."1.9" do
-    it "updates a local at script scope" do
+not_compliant_on :maglev do
+    it "updates a local at script scope" do #
       code = fixture __FILE__, "eval_locals.rb"
       ruby_exe(code).chomp.should == "2"
     end
 
-not_compliant_on :maglev do
-    it "accepts a Proc object as a binding" do
+    it "accepts a Proc object as a binding" do #
       x = 1
       bind = proc {}
 
@@ -161,8 +161,8 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-# not_compliant_on :maglev do   ???
-    it "allows a Proc invocation to terminate the eval binding chain on local creation" do
+not_compliant_on :maglev do   
+    it "allows a Proc invocation to terminate the eval binding chain on local creation" do #
       outer_binding = binding
       proc_binding = eval("proc {binding}.call", outer_binding)
       inner_binding = eval("proc {binding}.call", proc_binding)
@@ -186,7 +186,7 @@ end
       eval("yy", inner_binding).should == 3
     end
 
-    it "can access normal locals in nested closures" do
+    it "can access normal locals in nested closures" do #
       outer_binding = binding
       proc_binding = eval("proc {l = 5; binding}.call", outer_binding)
       inner_binding = eval("proc {k = 6; binding}.call", proc_binding)
@@ -201,16 +201,16 @@ end
       lambda { eval("k", proc_binding)  }.should raise_error(NameError)
       eval("k", inner_binding).should == 6
     end
-# end ??
+end 
   end
 
   ruby_version_is ""..."1.9" do
-# not_compliant_on :maglev do
+ not_compliant_on :maglev do
     it "allows creating a new class in a binding" do #
       bind = proc {}
-      eval "class A; end", bind.binding  # maglev binding is private meth
+      eval "class A; end", bind.binding  # RubyNotImplementedError Proc#binding not supported
       eval("A.name", bind.binding).should == "A"
-# end
+ end
     end
 
 # not_compliant_on :maglev do

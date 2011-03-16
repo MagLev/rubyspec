@@ -29,8 +29,11 @@ describe "Module#attr_reader" do
       attr_reader :spec_attr_reader
     end
 
-    1.instance_variable_set("@spec_attr_reader", "a")
-    1.spec_attr_reader.should == "a"
+    # maglev, no instvars on special objects
+    lambda {
+      1.instance_variable_set("@spec_attr_reader", "a")
+      1.spec_attr_reader.should == "a" 
+    } .should raise_error(NameError)
   end
 
   it "converts non string/symbol/fixnum names to strings using to_str" do

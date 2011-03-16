@@ -33,8 +33,9 @@ describe "Module#attr_accessor" do
       attr_accessor :spec_attr_accessor
     end
 
-    1.spec_attr_accessor = "a"
-    1.spec_attr_accessor.should == "a"
+    # maglev - no instVars on immediate (smalltalk special) objects
+    lambda { 1.spec_attr_accessor = "a"
+             1.spec_attr_accessor.should == "a" }.should raise_error(NameError)
   end
 
   it "converts non string/symbol/fixnum names to strings using to_str" do

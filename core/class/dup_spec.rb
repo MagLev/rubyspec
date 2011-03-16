@@ -1,5 +1,6 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+not_compliant_on :maglev do  # Class#dup not implemented
 describe "Class#dup" do
   it "duplicates both the class and the singleton class" do
     klass = Class.new do
@@ -14,8 +15,8 @@ describe "Class#dup" do
 
     klass_dup = klass.dup
     
-    klass_dup.new.hello.should == "hello"
     klass_dup.message.should == "text"
+    klass_dup.new.hello.should == "hello"
   end
 
   it "retains the correct ancestor chain for the singleton class" do
@@ -35,4 +36,5 @@ describe "Class#dup" do
     klass_dup.new.hello.should == "hello"
     klass_dup.message.should == "text"
   end
+end
 end

@@ -42,7 +42,7 @@ describe "The break statement in a captured block" do
       end
     end
 
-    not_compliant_on :rubinius do
+    not_compliant_on :rubinius , :maglev do
       it "raises a LocalJumpError when invoking the block from the scope creating the block" do
         lambda { @program.break_in_method }.should raise_error(LocalJumpError)
         ScratchPad.recorded.should == [:a, :xa, :d, :b]
@@ -61,15 +61,17 @@ describe "The break statement in a captured block" do
   end
 
   describe "from a scope that has returned" do
-    it "raises a LocalJumpError when calling the block from a method" do
+   not_compliant_on :maglev do
+    it "raises a LocalJumpError when calling the block from a method" do #
       lambda { @program.break_in_method_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :zb]
     end
 
-    it "raises a LocalJumpError when yielding to the block" do
+    it "raises a LocalJumpError when yielding to the block" do #
       lambda { @program.break_in_yield_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :aa, :zb]
     end
+   end #
   end
 end
 
@@ -107,7 +109,7 @@ describe "The break statement in a lambda" do
       end
     end
 
-    not_compliant_on :rubinius do
+    not_compliant_on :rubinius , :maglev do
       it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
         lambda { @program.break_in_nested_scope_yield }.should raise_error(LocalJumpError)
         ScratchPad.recorded.should == [:a, :d, :aaa, :b]
@@ -147,10 +149,13 @@ describe "The break statement in a lambda" do
     # the lambda as a block, which in this case means breaking to a scope that
     # has returned. This is a subtle and confusing semantic where a block pass
     # is removing the lambda-ness of a lambda.
-    it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
+  
+   not_compliant_on :maglev do
+    it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do #
       lambda { @program.break_in_method_yield }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :la, :ld, :aaa, :lb]
     end
+   end
   end
 end
 
