@@ -85,9 +85,14 @@ not_compliant_on :maglev do
 end
 
   it "creates a new file when use File::EXCL mode " do
-    @fh = File.new(@file, File::EXCL)
-    @fh.should be_kind_of(File)
-    File.exists?(@file).should == true
+    if (RUBY_PLATFORM.match('solaris'))
+      @fh = File.new(@file, File::EXCL)
+      @fh.should be_kind_of(File)
+      File.exists?(@file).should == true
+    else
+      # linux
+      lambda { File.new(@file, File::EXCL) } .should raise_error(Errno::EINVAL)
+    end
   end
 
   it "raises an Errorno::EEXIST if the file exists when create a new file with File::CREAT|File::EXCL" do
@@ -102,15 +107,25 @@ end
 
   ruby_bug "[ruby-dev:40397]", "1.8.8" do 
     it "returns a new File when use File::APPEND mode" do
-      @fh = File.new(@file, File::APPEND)
-      @fh.should be_kind_of(File)
-      File.exists?(@file).should == true
+      if (RUBY_PLATFORM.match('solaris'))
+        @fh = File.new(@file, File::APPEND)
+        @fh.should be_kind_of(File)
+        File.exists?(@file).should == true
+      else
+        # linux
+        lambda { File.new(@file, File::APPEND) } .should raise_error(Errno::EINVAL)
+      end
     end
 
     it "returns a new File when use File::RDONLY|File::APPEND mode" do
-      @fh = File.new(@file, File::RDONLY|File::APPEND)
-      @fh.should be_kind_of(File)
-      File.exists?(@file).should == true
+      if (RUBY_PLATFORM.match('solaris'))
+        @fh = File.new(@file, File::RDONLY|File::APPEND)
+        @fh.should be_kind_of(File)
+        File.exists?(@file).should == true
+      else
+        # linux
+        lambda { File.new(@file, File::RDONLY|File::APPEND)  } .should raise_error(Errno::EINVAL)
+      end
     end
   end
 

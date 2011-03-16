@@ -3,7 +3,9 @@ require 'ffi'
 describe "Callback" do
   module LibC
     extend FFI::Library
-    ffi_lib FFI::Platform::LIBC
+    nam = FFI::Platform::LIBC # maglev debugging
+    plat = RUBY_PLATFORM
+    ffi_lib( nam )
     callback( :qsort_cmp, [ :pointer, :pointer ], :int )
     attach_function( :qsort, [ :pointer, :int, :int, :qsort_cmp ], :int )
   end

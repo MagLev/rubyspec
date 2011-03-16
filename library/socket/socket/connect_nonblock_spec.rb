@@ -35,9 +35,11 @@ end
 
     Thread.pass while (thread.status and thread.status != 'sleep') or !ready
 
+    e_a = RUBY_PLATFORM.match('solaris') ? Errno::EINPROGRESS : Errno::EAGAIN
     begin
-      @socket.connect_nonblock(@addr)
-    rescue Errno::EINPROGRESS
+        @socket.connect_nonblock(@addr)
+    rescue e_a
+       #
     end
 
     IO.select nil, [@socket]

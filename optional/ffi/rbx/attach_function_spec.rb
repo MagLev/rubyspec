@@ -8,7 +8,14 @@ describe FFI::Library, "#attach_function" do
 
     @libc = Module.new do
       extend FFI::Library
-      ffi_lib('libc.so') # maglev needs
+      libnam = 'libc.so'
+      if RUBY_PLATFORM.match('solaris')
+        libnam = 'libc.so' # maglev needs
+      end
+      if RUBY_PLATFORM.match('linux')
+        libnam = '/lib/libc.so.6'
+      end
+      ffi_lib( libnam )
       attach_function :gettimeofday, [:pointer, :pointer], :int
     end
   end

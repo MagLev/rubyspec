@@ -58,32 +58,50 @@ def compile_extension(path, name)
   # avoid problems where compilation failed but previous shlib exists
   File.delete lib if File.exists? lib
 
-  cc        = RbConfig::CONFIG["CC"]
-  cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
+  #cc        = RbConfig::CONFIG["CC"]
+  #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
+  plat = RUBY_PLATFORM
+  if plat == 'x86_64-linux'
+    cc = 'gcc'
+  elsif plat == 'sparc-solaris' || plat == 'x86_64-solaris'
+    cc = "/opt/sunstudio12.1/bin/cc"   # maglev x86 solaris
+  else 
+    cc = RbConfig::CONFIG["CC"]
+  end
+  cflags = "-m64 -fPIC -g"
+
   cflags   += " -fPIC" unless cflags.include?("-fPIC")
   incflags  = "-I#{path} -I#{hdrdir}"
   incflags << " -I#{arch_hdrdir}" if arch_hdrdir
   incflags << " -I#{ruby_hdrdir}" if ruby_hdrdir
 
   cmd = "#{cc} #{incflags} #{cflags} -c #{source} -o #{obj}"
-  puts cmd
-  output = `#{cmd}`
-  puts output
+  puts "EXECUTING #{cmd}"
+  output = `#{cmd}` 
 
   if $?.exitstatus != 0 or !File.exists?(obj)
     puts "ERROR:\n#{output}"
     raise "Unable to compile \"#{source}\""
   end
+  if output.index('warning')
+    puts "WARNINGS:\n#{output}"
+    raise "Warnings in compile \"#{source}\""
+  end   
 
   ldshared  = RbConfig::CONFIG["LDSHARED"]
   libpath   = "-L#{path}"
   libs      = RbConfig::CONFIG["LIBS"]
   dldflags  = RbConfig::CONFIG["DLDFLAGS"]
 
-  cmd = "#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}"
-  puts cmd
+  # maglev x86 solaris
+  ldshared = "#{cc} -shared"
+  libs = "-lrt -ldl -lm -lc"  
+  dldflags = "-m64 -L."   
+
+  cmd = `#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}`
+  puts "EXECUTING #{cmd}"
   output = `#{cmd}`
-  puts output
+
 
   if $?.exitstatus != 0
     puts "ERROR:\n#{output}"

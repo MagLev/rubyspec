@@ -151,8 +151,9 @@ describe "File#truncate" do
   end
 
   it "raises an IOError if file is not opened for writing" do
+    exp_err = RUBY_PLATFORM.match('solaris') ? Errno::EBADF : Errno::EINVAL  # maglev
     File.open(@name, 'r') do |file|
-      lambda { file.truncate(42) }.should raise_error(Errno::EBADF) # Maglev, was IOError
+      lambda { file.truncate(42) }.should raise_error(exp_err)
     end
   end
 
