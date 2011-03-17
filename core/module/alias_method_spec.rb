@@ -14,7 +14,6 @@ describe "Module#alias_method" do
     @object.double(12).should == @object.public_two(12)
   end
 
- # not_compliant_on :maglev ??
   it "retains method visibility" do
     @class.make_alias :private_ichi, :private_one
     lambda { @object.private_one  }.should raise_error(NameError)
@@ -25,11 +24,13 @@ describe "Module#alias_method" do
     lambda { @object.protected_ichi }.should raise_error(NameError)
   end
 
+ not_compliant_on :maglev do # gets MNU , private method
   it "handles aliasing a stub that changes visibility" do
     @class.__send__ :public, :private_one
     @class.make_alias :was_private_one, :private_one
     @object.was_private_one.should == 1
   end
+ end #
   
   it "fails if origin method not found" do
     lambda { @class.make_alias :ni, :san }.should raise_error(NameError)

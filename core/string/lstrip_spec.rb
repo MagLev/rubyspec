@@ -5,9 +5,9 @@ describe "String#lstrip" do
   it "returns a copy of self with leading whitespace removed" do
    "  hello  ".lstrip.should == "hello  "
    "  hello world  ".lstrip.should == "hello world  "
-   "\n\r\t\n\v\r hello world  ".lstrip.should == "hello world  "
+   (ax = "\n\r\t\n\v\r hello world  ").lstrip.should == "hello world  "
    "hello".lstrip.should == "hello"
-   "\000 \000hello\000 \000".lstrip.should == "\000 \000hello\000 \000"
+   (bx = "\000 \000hello\000 \000").lstrip.should == "\000 \000hello\000 \000"
   end
 
   # spec/core/string/lstrip_spec.rb

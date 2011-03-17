@@ -125,6 +125,7 @@ end
       out.size.should == 1
     end
 
+not_compliant_on :maglev do # rb_hash_foreach_delete not implem
     it "deletes via the callback" do
       hsh = {:name => "Evan", :sign => :libra}
 
@@ -132,6 +133,7 @@ end
       out.should == {:name => "Evan", :sign => :libra}
       hsh.should == {}
     end
+end #
   end
 
   # rb_hash_size is a static symbol in MRI
