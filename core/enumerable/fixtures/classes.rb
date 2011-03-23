@@ -22,12 +22,10 @@ module EnumerableSpecs
       @times_called += 1
       @times_yielded = 0
       @arguments_passed = arg
-      res = @list.each do |i|
+      @list.each do |i|
         @times_yielded +=1
         yield i
       end
-if Maglev::System.session_temp(:TrapTake) ; nil.pause ; end
-      res
     end
   end
 

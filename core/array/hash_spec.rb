@@ -21,7 +21,7 @@ describe "Array#hash" do
     end
   end
 
- if false # maglev at 1.8.6
+ not_compliant_on :maglev do #
   ruby_bug "redmine #1852", "1.9.1" do   #
     it "returns the same hash for equal recursive arrays" do
       rec = []; rec << rec
@@ -40,7 +40,7 @@ describe "Array#hash" do
       # Like above, this is because rec.eql?([{:x => rec}])
     end
   end
- end # maglev
+ end
 
   #  Too much of an implementation detail? -rue
   not_compliant_on :rubinius , :maglev do
@@ -55,17 +55,17 @@ describe "Array#hash" do
         obj
       end
 
-      ary.hash  
-#       ary.each { |obj| obj.frozen?.should == true } # Maglev not frozen
+      ary.hash
+      ary.each { |obj| obj.frozen?.should == true }
 
-       hash = mock('1')
-       hash.should_receive(:to_int).and_return(1.hash)
+      hash = mock('1')
+      hash.should_receive(:to_int).and_return(1.hash)
 
-       obj = mock('@hash')
-       obj.instance_variable_set(:@hash, hash)
-       def obj.hash() @hash end
+      obj = mock('@hash')
+      obj.instance_variable_set(:@hash, hash)
+      def obj.hash() @hash end
 
-       [obj].hash.should == [1].hash 
+      [obj].hash.should == [1].hash
     end
   end
 

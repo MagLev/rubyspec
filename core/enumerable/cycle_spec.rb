@@ -39,8 +39,12 @@ describe "Enumerable#cycle" do
       it "yields only when necessary" do
         enum = EnumerableSpecs::EachCounter.new(10, 20, 30)
         enum.cycle(3){|x| break if x == 20}
-        # enum.times_yielded.should == 2
-        enum.times_yielded.should == 3 # maglev deviation, cycle does to_a first .
+       not_compliant_on :maglev do
+        enum.times_yielded.should == 2
+       end
+       deviates_on :maglev do
+        enum.times_yielded.should == 3 # cycle does to_a first .
+       end
       end
 
       it "tries to convert n to an Integer using #to_int" do

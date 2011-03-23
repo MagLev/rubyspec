@@ -6,8 +6,7 @@ describe "ENV.select" do
     it "returns the Hash for which block return true" do
       ENV["foo"] = "bar"
       ENV.select { |k, v| k == "foo" }.should == [["foo", "bar"]]
-      # ENV.delete "foo"
-      ENV["foo"] = nil # Maglev
+      ENV.delete "foo"
     end
   end
 
@@ -15,8 +14,7 @@ describe "ENV.select" do
     it "returns the Hash for which block return true" do
       ENV["foo"] = "bar"
       ENV.select { |k, v| k == "foo" }.should == {"foo" => "bar"}
-      # ENV.delete "foo"
-      ENV["foo"] = nil # Maglev
+      ENV.delete "foo"
     end
   end
 

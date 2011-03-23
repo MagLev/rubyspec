@@ -4,6 +4,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 
 describe "ENV.clear" do
   it "deletes all environment variables" do
+   not_compliant_on :maglev do
     orig = ENV.to_hash
     begin
       ENV.clear
@@ -17,6 +18,9 @@ describe "ENV.clear" do
     ensure
       ENV.replace orig
     end
-  end
-
+   end
+   deviates_on :maglev do
+     lambda { ENV.clear }.should raise_error(NotImplementedError)
+   end
+ end
 end

@@ -97,8 +97,8 @@ ruby_version_is "1.8.7" do
       ].sort
     end
     
- not_compliant_on :maglev do
-    it "generates from a defensive copy, ignoring mutations" do #
+   not_compliant_on :maglev do
+    it "generates from a defensive copy, ignoring mutations" do
       accum = []
       ary = [1,2,3]
       ary.permutation(3) do |x|
@@ -108,6 +108,6 @@ ruby_version_is "1.8.7" do
       
       accum.should == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
     end
- end #
+   end 
   end
 end

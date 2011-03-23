@@ -131,7 +131,12 @@ describe "Array#sort" do
 
   it "raises an error if objects can't be compared" do
     a=[ArraySpecs::Uncomparable.new, ArraySpecs::Uncomparable.new]
-    lambda {a.sort}.should raise_error(NoMethodError) # maglev deviation, was ArgumentError
+   not_compliant_on :maglev do
+    lambda {a.sort}.should raise_error(ArgumentError)
+   end
+   deviates_on :maglev do
+    lambda {a.sort}.should raise_error(NoMethodError)
+   end
   end
 
   # From a strange Rubinius bug
@@ -224,7 +229,7 @@ describe "Array#sort!" do
     end
 
     not_compliant_on :rubinius , :maglev do
-      it "temporarily freezes self and recovers after sorted" do #
+      it "temporarily freezes self and recovers after sorted" do
         a = [1, 2, 3]
         a.sort! { |x,y| a.frozen?.should == true; x <=> y }
         a.frozen?.should == false

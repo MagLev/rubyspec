@@ -169,8 +169,12 @@ describe "Array#pop" do
       ruby_version_is '' ... '1.9' do
         it "raises a TypeError on a frozen array" do
           lambda { ArraySpecs.frozen_array.pop(2) }.should raise_error(TypeError)
-          # lambda { ArraySpecs.frozen_array.pop(0) }.should raise_error(TypeError)
-          ArraySpecs.frozen_array.pop(0).should == []  # maglev no error if no modification attempt
+          not_compliant_on :maglev do
+            lambda { ArraySpecs.frozen_array.pop(0) }.should raise_error(TypeError)
+          end
+          deviates_on :maglev do
+            ArraySpecs.frozen_array.pop(0).should == [] # no error if no modification attempt
+          end
         end
       end
     end

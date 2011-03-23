@@ -138,10 +138,13 @@ describe "Array#slice!" do
 
   ruby_version_is "" ... "1.9" do
     it "raises a TypeError on a frozen array" do
-      #lambda { ArraySpecs.frozen_array.slice!(0, 0) }.should raise_error(TypeError)
-      # Maglev, error only on actual modification
+     not_compliant_on :maglev do
+      lambda { ArraySpecs.frozen_array.slice!(0, 0) }.should raise_error(TypeError)
+     end
+     deviates_on :maglev do  # Maglev, error only on actual modification
       ArraySpecs.frozen_array.slice!(0, 0).should == []
       lambda { ArraySpecs.frozen_array.slice!(1, 1) }.should raise_error(TypeError)
+     end
     end
   end
 

@@ -60,14 +60,14 @@ describe "Array#rindex" do
       seen.should == [3]
     end
     
-   not_compliant_on :maglev do # we get no block passed
-    describe "given no argument and no block" do #
+   not_compliant_on :maglev do # gets error, no block passed
+    describe "given no argument and no block" do
       it "produces an Enumerator" do
         enum = [4, 2, 1, 5, 1, 3].rindex
         enum.should be_kind_of(enumerator_class)
         enum.each { |x| x < 2 }.should == 4
       end
     end
-   end #
+   end
   end
 end

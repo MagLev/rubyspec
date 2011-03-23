@@ -7,8 +7,6 @@ describe "Array#<=>" do
       lhs = Array.new(3) { mock("#{result}") }
       rhs = Array.new(3) { mock("#{result}") }
     
-      aa = lhs[0]
-      bb = rhs[0]
       lhs[0].should_receive(:<=>).with(rhs[0]).and_return(0)
       lhs[1].should_receive(:<=>).with(rhs[1]).and_return(result)
       lhs[2].should_not_receive(:<=>)
@@ -95,9 +93,11 @@ describe "Array#<=>" do
     ([5, 6, 7] <=> obj).should == 0
   end
 
-# ruby_bug "redmine:2276", "1.9.1" do # maglev at 186
-#   it "returns nil when the argument is not array-like" do
-#     ([] <=> false).should be_nil
-#   end
-# end
+ not_compliant_on :maglev do
+  ruby_bug "redmine:2276", "1.9.1" do # maglev at 186
+    it "returns nil when the argument is not array-like" do
+      ([] <=> false).should be_nil
+    end
+  end
+ end #
 end

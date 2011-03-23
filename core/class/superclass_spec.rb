@@ -8,7 +8,13 @@ describe "Class#superclass" do
       Class.superclass.should == Module
       Class.new.superclass.should == Object
       Class.new(String).superclass.should == String
-      # Class.new(Fixnum).superclass.should == Fixnum # Maglev, subclasses of special classes not allowed
+     not_compliant_on :maglev do 
+      Class.new(Fixnum).superclass.should == Fixnum
+     end
+     deviates_on :maglev do
+      # subclasses of special classes not allowed
+      lambda { Class.new(Fixnum) }.should raise_error(StandardError)
+     end
     end
   end
 

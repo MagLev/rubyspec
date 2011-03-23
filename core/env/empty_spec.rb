@@ -1,9 +1,8 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-# Maglev, ENV.clear not supported, so Environment never empty
-
 describe "ENV.empty?" do
 
+ not_compliant_on :maglev do  # ENV.clear not supported on maglev
   it "return true if the Environment is empty" do
     if ENV.keys.size > 0
       ENV.empty?.should == false
@@ -16,6 +15,7 @@ describe "ENV.empty?" do
       ENV.replace orig
     end
   end
+ end
 
   it "returns false if not empty" do
     if ENV.keys.size > 0

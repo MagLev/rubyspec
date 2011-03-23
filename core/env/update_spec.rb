@@ -3,13 +3,10 @@ require File.expand_path('../../../spec_helper', __FILE__)
 describe "ENV.update" do
 
   it "add the parameter hash to ENV" do
-    # ENV["foo"].should == nil
-    fx = ENV["foo"]
-    (fx == nil || fx == "").should == true # Maglev , from previous env specx
+    ENV["foo"].should == nil
     ENV.update "foo" => "bar"
     ENV["foo"].should == "bar"
-    # ENV.delete "foo"
-    ENV["foo"] = nil # Maglev
+    ENV.delete "foo"
   end
 
   it "yields key, the old value and the new value when replacing entries" do
@@ -22,8 +19,7 @@ describe "ENV.update" do
       "rab"
     end
     ENV["foo"].should == "rab"
-    # ENV.delete "foo"
-    ENV["foo"] = nil # Maglev
+    ENV.delete "foo"
   end
 
 end

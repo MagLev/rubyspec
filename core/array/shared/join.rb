@@ -11,13 +11,7 @@ describe :array_join, :shared => true do
       @object.new(1, 2, 3, 4, obj).send(@method, ' | ').should == '1 | 2 | 3 | 4 | foo'
 
       obj = mock('o')
-      # Maglev , undef does not result in a NoMethodError , fails to hide Object#to_s
-      # class << obj; undef :to_s; end
-      class << obj   # Maglev workaround
-	def to_s
-	  self.method_missing(:to_s)
-	end
-      end 
+      class << obj; undef :to_s; end
       obj.should_receive(:method_missing).with(:to_s).and_return("o")
       @object.new(1, obj).send(@method, ":").should == "1:o"
     end
@@ -35,12 +29,11 @@ describe :array_join, :shared => true do
     end
   end
 
-# Maglev infinite recursion through Kernel.method_missing if receiver does not respond to  #to_s
-# it "raises a NoMethodError if an element does not respond to #to_s" do
-#   obj = mock('o')
-#   class << obj; undef :to_s; end
-#   lambda{ @object.new(1,obj).send(@method, ':') }.should raise_error(NoMethodError)
-# end
+  it "raises a NoMethodError if an element does not respond to #to_s" do
+    obj = mock('o')
+    class << obj; undef :to_s; end
+    lambda{ @object.new(1,obj).send(@method, ':') }.should raise_error(NoMethodError)
+  end
 
   it "uses the same separator with nested arrays" do
     @object.new(1, @object.new(2, @object.new(3, 4), 5), 6).send(@method, ":").should == "1:2:3:4:5:6"
@@ -108,33 +101,34 @@ describe :array_join, :shared => true do
     end
   end
 
-# it "does not consider taint of either the array or the separator when the array is empty" do # Maglev no taint prop
-#   @object.new.send(@method, ":").tainted?.should == false
-#   @object.new.taint.send(@method, ":").tainted?.should == false
-#   @object.new.send(@method, ":".taint).tainted?.should == false
-#   @object.new.taint.send(@method, ":".taint).tainted?.should == false
-# end
+ not_compliant_on :maglev do # no taint propagation
+  it "does not consider taint of either the array or the separator when the array is empty" do
+    @object.new.send(@method, ":").tainted?.should == false
+    @object.new.taint.send(@method, ":").tainted?.should == false
+    @object.new.send(@method, ":".taint).tainted?.should == false
+    @object.new.taint.send(@method, ":".taint).tainted?.should == false
+  end
 
    # This doesn't work for Enumerable#join on 1.9. See bug #1732
-# Maglev, no taint propagation
-# it "returns a string which would be infected with taint of the array, its elements or the separator when the array is not empty" do
-#   @object.new("a", "b").send(@method, ":").tainted?.should == false
-#   @object.new("a", "b").send(@method, ":".taint).tainted?.should == true
-#   @object.new("a", "b").taint.send(@method, ":").tainted?.should == true
-#   @object.new("a", "b").taint.send(@method, ":".taint).tainted?.should == true
-#   @object.new("a", "b".taint).send(@method, ":").tainted?.should == true
-#   @object.new("a", "b".taint).send(@method, ":".taint).tainted?.should == true
-#   @object.new("a", "b".taint).taint.send(@method, ":").tainted?.should == true
-#   @object.new("a", "b".taint).taint.send(@method, ":".taint).tainted?.should == true
-#   @object.new("a".taint, "b").send(@method, ":").tainted?.should == true
-#   @object.new("a".taint, "b").send(@method, ":".taint).tainted?.should == true
-#   @object.new("a".taint, "b").taint.send(@method, ":").tainted?.should == true
-#   @object.new("a".taint, "b").taint.send(@method, ":".taint).tainted?.should == true
-#   @object.new("a".taint, "b".taint).send(@method, ":").tainted?.should == true
-#   @object.new("a".taint, "b".taint).send(@method, ":".taint).tainted?.should == true
-#   @object.new("a".taint, "b".taint).taint.send(@method, ":").tainted?.should == true
-#   @object.new("a".taint, "b".taint).taint.send(@method, ":".taint).tainted?.should == true
-# end
+  it "returns a string which would be infected with taint of the array, its elements or the separator when the array is not empty" do
+    @object.new("a", "b").send(@method, ":").tainted?.should == false
+    @object.new("a", "b").send(@method, ":".taint).tainted?.should == true
+    @object.new("a", "b").taint.send(@method, ":").tainted?.should == true
+    @object.new("a", "b").taint.send(@method, ":".taint).tainted?.should == true
+    @object.new("a", "b".taint).send(@method, ":").tainted?.should == true
+    @object.new("a", "b".taint).send(@method, ":".taint).tainted?.should == true
+    @object.new("a", "b".taint).taint.send(@method, ":").tainted?.should == true
+    @object.new("a", "b".taint).taint.send(@method, ":".taint).tainted?.should == true
+    @object.new("a".taint, "b").send(@method, ":").tainted?.should == true
+    @object.new("a".taint, "b").send(@method, ":".taint).tainted?.should == true
+    @object.new("a".taint, "b").taint.send(@method, ":").tainted?.should == true
+    @object.new("a".taint, "b").taint.send(@method, ":".taint).tainted?.should == true
+    @object.new("a".taint, "b".taint).send(@method, ":").tainted?.should == true
+    @object.new("a".taint, "b".taint).send(@method, ":".taint).tainted?.should == true
+    @object.new("a".taint, "b".taint).taint.send(@method, ":").tainted?.should == true
+    @object.new("a".taint, "b".taint).taint.send(@method, ":".taint).tainted?.should == true
+  end
+ end # maglev
 
   ruby_version_is '1.9' do
     it "does not consider untrustworthiness of either the array or the separator when the array is empty" do

@@ -14,7 +14,7 @@ describe "Bignum#>" do
   end
   
   it "raises an ArgumentError when given a non-Integer" do
-    lambda { @bignum > "4" }.should raise_error(TypeError) # Maglev, was ArgumentError
-    lambda { @bignum > mock('str') }.should raise_error(TypeError) # Maglev, was ArgumentError
+    lambda { @bignum > "4" }.should raise_error(ArgumentError)
+    lambda { @bignum > mock('str') }.should raise_error(ArgumentError)
   end
 end
