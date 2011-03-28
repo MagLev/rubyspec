@@ -28,7 +28,10 @@ describe "File#flock" do
     @file.flock File::LOCK_EX
 
     File.open(@name, "w") do |f2|
-      # f2.flock(File::LOCK_EX | File::LOCK_NB).should == false
+     not_compliant_on :maglev do
+      f2.flock(File::LOCK_EX | File::LOCK_NB).should == false
+     end
+     deviates_on :maglev do
       if (RUBY_PLATFORM.match('solaris')) 
         status = f2.flock(File::LOCK_EX | File::LOCK_NB)  #
         (status == 0 || status == false).should == true   # Maglev deviation, Solaris
@@ -36,6 +39,7 @@ describe "File#flock" do
         # linux
         lambda { status = f2.flock(File::LOCK_EX | File::LOCK_NB)  } .should raise_error(SystemCallError)  # EAGAIN
       end
+     end
     end
   end
 

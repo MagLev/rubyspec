@@ -53,8 +53,12 @@ describe "IO#sysread on a file" do
   ruby_version_is "" ... "1.9" do
     it "throws IOError when called immediately after a buffered IO#read" do
       @file.read(15)
-      # lambda { @file.sysread(5) }.should raise_error(IOError)
-      @file.sysread(5).should == "56789" # maglev behavior
+      not_compliant_on :maglev do
+        lambda { @file.sysread(5) }.should raise_error(IOError)
+      end
+     deviates_on :maglev do
+       @file.sysread(5).should == "56789" 
+     end
     end
   end
 

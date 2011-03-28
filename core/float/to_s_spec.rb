@@ -1,8 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-# Maglev output like MRI but with 16 instead of 14 digits of precision
-#  to avoid loss of precision.
-
 describe "Float#to_s" do
   it "returns 'NaN' for NaN" do
     nan_value().to_s.should == 'NaN'
@@ -47,12 +44,23 @@ describe "Float#to_s" do
   end
 
   it "uses e format for a positive value with fractional part having 5 decimal places" do
-    # 0.00001.to_s.should == "1.0e-05"
-    0.00001.to_s.should == "1.0000000000000001e-05" # maglev
+    not_compliant_on :maglev do
+      0.00001.to_s.should == "1.0e-05"
+    end
+    deviates_on :maglev do
+      # Maglev defaults to 16 instead of 14 digits of precision
+      #  to avoid loss of precision in printing Floats
+      0.00001.to_s.should == "1.0000000000000001e-05" 
+    end
   end
 
   it "uses e format for a negative value with fractional part having 5 decimal places" do
-    -0.00001.to_s.should == "-1.0000000000000001e-05" # maglev
+    not_compliant_on :maglev do
+      -0.00001.to_s.should == "-1.0e-05"
+    end
+    deviates_on :maglev do
+      -0.00001.to_s.should == "-1.0000000000000001e-05"
+    end
   end
 
   it "uses non-e format for a positive value with whole part having 14 decimal places" do
@@ -65,15 +73,23 @@ describe "Float#to_s" do
 
   ruby_version_is "" ... "1.9" do
     it "uses e format for a positive value with whole part having 15 decimal places" do
-      10000000000000000.to_f.to_s.should == "1.0e+16" # Maglev
-    # 100000000000000.0.to_s.should == "1.0e+14"
-      100000000000000.0.to_s.should == '100000000000000.0'
+      not_compliant_on :maglev do
+        100000000000000.0.to_s.should == "1.0e+14"
+      end
+      deviates_on :maglev do
+        10000000000000000.to_f.to_s.should == "1.0e+16" 
+        100000000000000.0.to_s.should == '100000000000000.0'
+      end
     end
 
     it "uses e format for a negative value with whole part having 15 decimal places" do
-      -10000000000000000.to_f.to_s.should == "-1.0e+16" # Maglev
-    # -100000000000000.0.to_s.should == "-1.0e+14"
-      -100000000000000.0.to_s.should == '-100000000000000.0'
+      not_compliant_on :maglev do
+        -100000000000000.0.to_s.should == "-1.0e+14"
+      end
+      deviates_on :maglev do
+        -10000000000000000.to_f.to_s.should == "-1.0e+16" 
+        -100000000000000.0.to_s.should == '-100000000000000.0'
+      end
     end
   end
 
@@ -106,6 +122,11 @@ describe "Float#to_s" do
   end
 
   it "outputs the minimal, unique form to represent the value" do
-    0.56.to_s.should == "0.5600000000000001" # maglev
+    not_compliant_on :maglev do
+      0.56.to_s.should == "0.56"
+    end
+    deviates_on :maglev do
+      0.56.to_s.should == "0.5600000000000001" 
+    end
   end
 end

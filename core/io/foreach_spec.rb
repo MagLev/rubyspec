@@ -70,13 +70,9 @@ describe "IO.foreach" do
 
    not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
-      count = 1
-      IO.foreach(@name, nil) { 
-        $..should == count  # maglev $.  not implem yet
-        count += 1
-      }
+      IO.foreach(@name, nil) { $..should == @count += 1 }
     end
-   end #
+   end
   end
 
   describe "with an empty String as the separator argument" do
@@ -85,11 +81,11 @@ describe "IO.foreach" do
       ScratchPad.recorded.should == IOSpecs.lines_empty_separator
     end
 
-   #not_compliant_on :maglev do # maglev $. not implem yet
+   not_compliant_on :maglev do # maglev $. not implem yet
     it "updates $. with each yield" do
       IO.foreach(@name, "") { $..should == @count += 1 }
     end
-   #end
+   end
   end
 
   describe "with an arbitrary String as the separator argument" do

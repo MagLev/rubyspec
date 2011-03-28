@@ -9,7 +9,7 @@ describe :enumerable_collect, :shared => true do
   ruby_version_is "" ... "1.9" do
     it "gathers whole arrays as elements when each yields multiple" do
       multi = EnumerableSpecs::YieldsMulti.new
-      multi.send(@method) {|e| e }.should == [[1,2],[3,4,5],[6,7,8,9]]
+      multi.send(@method) {|e| e}.should == [[1,2],[3,4,5],[6,7,8,9]]
     end
   end
 

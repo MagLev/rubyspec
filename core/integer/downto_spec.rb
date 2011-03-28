@@ -28,6 +28,7 @@ describe "Integer#downto [stop] when self and stop are Fixnums" do
 
   it "raises a ArgumentError for invalid endpoints" do
     lambda {1.downto("A") {|x| p x } }.should raise_error(ArgumentError)
+    lambda {1.downto(nil) {|x| p x } }.should raise_error(ArgumentError)
   end
 
   ruby_version_is "" ... "1.8.7" do

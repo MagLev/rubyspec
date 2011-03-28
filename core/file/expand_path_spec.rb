@@ -41,12 +41,10 @@ describe "File.expand_path" do
   end
 
   # FIXME: do not use conditionals like this around #it blocks
-# Maglev , home is not same variable as home within the eval'ed do block
-# unless not home = ENV['HOME']
+not_compliant_on :maglev do
+  unless not home = ENV['HOME']
     platform_is_not :windows do
       it "converts a pathname to an absolute pathname, using ~ (home) as base" do
-        home = ENV['HOME']        # Maglev
-        home.class.should == String       # Maglev
         File.expand_path('~').should == home
         File.expand_path('~', '/tmp/gumby/ddd').should == home
         File.expand_path('~/a', '/tmp/gumby/ddd').should == File.join(home, 'a')
@@ -59,7 +57,18 @@ describe "File.expand_path" do
         File.expand_path('~/a', '/tmp/gumby/ddd').should == File.join(home.tr("\\", '/'), 'a')
       end
     end
-# end
+  end
+end
+deviates_on :maglev do
+	# always not :windows
+      it "converts a pathname to an absolute pathname, using ~ (home) as base" do
+        home = ENV['HOME']       
+        home.class.should == String     
+        File.expand_path('~').should == home
+        File.expand_path('~', '/tmp/gumby/ddd').should == home
+        File.expand_path('~/a', '/tmp/gumby/ddd').should == File.join(home, 'a')
+      end
+end
 
   platform_is_not :windows do
     # FIXME: these are insane!
@@ -67,9 +76,13 @@ describe "File.expand_path" do
       File.expand_path("../../bin", "/tmp/x").should == "/bin"
       File.expand_path("../../bin", "/tmp").should == "/bin"
       File.expand_path("../../bin", "/").should == "/bin"
-      #File.expand_path("../bin", "tmp/x").should == File.join(@base, 'tmp', 'bin')
-      #File.expand_path("../bin", "x/../tmp").should == File.join(@base, 'bin')
+     not_compliant_on :maglev do
+      File.expand_path("../bin", "tmp/x").should == File.join(@base, 'tmp', 'bin')
+      File.expand_path("../bin", "x/../tmp").should == File.join(@base, 'bin')
+     end
+     deviates_on :maglev do
       File.join(@base, 'bin').should == (ENV['MAGLEV_HOME'] + '/spec/mspec/lib/bin') # Maglev
+     end
     end
 
     it "expand_path for commoms unix path  give a full path" do
@@ -85,24 +98,42 @@ describe "File.expand_path" do
       File.expand_path('~/a','~/b').should == "#{ENV['HOME']}/a"
     end
 
-# Maglev collapses multiple prefixed slashes
-#   not_compliant_on :macruby do
-#     it "leaves multiple prefixed slashes untouched" do
-#       File.expand_path('//').should == '//'
-#       File.expand_path('////').should == '////'
-#     end
-#   end
 
-# Maglev fails to raise error
-#   it "raises an ArgumentError if the path is not valid" do
-#     lambda { File.expand_path("~a_not_existing_user") }.should raise_error(ArgumentError)
-#   end
+    not_compliant_on :rubinius, :macruby , :maglev do
+      it "does not replace multiple '/' at the beginning of the path" do
+        File.expand_path('////some/path').should == "////some/path"
+      end
+    end
 
-# Maglev raises NotImplementedError
-#   it "expands ~ENV['USER'] to the user's home directory" do
-#     File.expand_path("~#{ENV['USER']}").should == ENV['HOME']
-#     File.expand_path("~#{ENV['USER']}/a").should == "#{ENV['HOME']}/a"
-#   end
+    deviates_on :rubinius, :macruby , :maglev do
+      it "replaces multiple '/' with a single '/' at the beginning of the path" do
+        File.expand_path('////some/path').should == "/some/path"
+      end
+    end
+
+    it "replaces multiple '/' with a single '/'" do
+      File.expand_path('/some////path').should == "/some/path"
+    end
+
+    it "raises an ArgumentError if the path is not valid" do
+     not_compliant_on :maglev do
+      lambda { File.expand_path("~a_not_existing_user") }.should raise_error(ArgumentError)
+     end
+     deviates_on :maglev do
+      lambda { File.expand_path("~a_not_existing_user") }.should raise_error(NotImplementedError)
+     end
+    end
+
+  not_compliant_on :maglev do  
+    it "expands ~ENV['USER'] to the user's home directory" do
+      File.expand_path("~#{ENV['USER']}").should == ENV['HOME']
+      File.expand_path("~#{ENV['USER']}/a").should == "#{ENV['HOME']}/a"
+    end
+
+    it "does not expand ~ENV['USER'] when it's not at the start" do
+      File.expand_path("/~#{ENV['USER']}/a").should == "/~#{ENV['USER']}/a"
+    end
+  end
 
     it "expands ../foo with ~/dir as base dir to /path/to/user/home/foo" do
       File.expand_path('../foo', '~/dir').should == "#{ENV['HOME']}/foo"

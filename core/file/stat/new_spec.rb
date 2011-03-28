@@ -13,9 +13,7 @@ describe "File::Stat#initialize" do
   end
 
   it "raises an exception if the file doesn't exist" do
-    ts = nil
-    fs = nil
-    lambda { fs = File::Stat.new(ts = tmp("i_am_a_dummy_file_that_doesnt_exist")) }.should raise_error
+    lambda { File::Stat.new(tmp("i_am_a_dummy_file_that_doesnt_exist")) }.should raise_error
   end
 
   it "creates a File::Stat object for the given file" do

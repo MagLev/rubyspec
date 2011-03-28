@@ -58,7 +58,7 @@ describe "Exception#exception" do
 
   it "returns self when passed self as an argument" do
     e = RuntimeError.new
-    e.should == (fx = e.exception(e))
+    e.should == e.exception(e)
   end
 
   class CustomArgumentError < StandardError

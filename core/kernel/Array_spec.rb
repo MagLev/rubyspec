@@ -2,8 +2,8 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel" do
- not_compliant_on :maglev do  # not private yet
-  it "has private instance method Array()" do  #
+ not_compliant_on :maglev do  # method is not private yet
+  it "has private instance method Array()" do
     Kernel.should have_private_instance_method(:Array)
   end
  end

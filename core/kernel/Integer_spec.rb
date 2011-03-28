@@ -15,9 +15,12 @@ describe :kernel_integer, :shared => true do
     obj = mock("object")
     obj.should_receive(:to_int).and_return("1")
     obj.should_not_receive(:to_i)
-    # Maglev deviation, raises TypeError if to_int does not produce an Integer 
-    # Integer(obj).should == "1"
-    lambda { Integer(obj) }.should raise_error(TypeError)
+    not_compliant_on :maglev do
+      Integer(obj).should == "1"
+    end
+    deviates_on :maglev do
+      lambda { Integer(obj) }.should raise_error(TypeError)
+    end
   end
   
   ruby_version_is "1.9" do
@@ -56,11 +59,18 @@ describe :kernel_integer, :shared => true do
 
   it "returns the value of to_int if the result is a Bignum" do
     obj = mock("object")
-    # 2e100 is a Float , not an Integer  # Maglev deviations
-    num = 2e100.to_int
-    obj.should_receive(:to_int).and_return(num)
-    obj.should_not_receive(:to_i)
-    Integer(obj).should == num
+    not_compliant_on :maglev do
+      obj.should_receive(:to_int).and_return(2e100)
+      obj.should_not_receive(:to_i)
+      Integer(obj).should == 2e100
+    end
+    deviates_on :maglev do
+      # 2e100 is a Float , not an Integer  # Maglev deviations
+      num = 2e100.to_int
+      obj.should_receive(:to_int).and_return(num)
+      obj.should_not_receive(:to_i)
+      Integer(obj).should == num
+    end
   end
 
   it "calls to_i on an object whose to_int returns nil" do
@@ -72,11 +82,14 @@ describe :kernel_integer, :shared => true do
 
   it "uncritically return the value of to_int even if it is not an Integer" do
     obj = mock("object")
-    # Maglev deviation, raises TypeError if to_int does not produce an Integer 
     obj.should_receive(:to_int).and_return("1")
-    # obj.should_not_receive(:to_i)
-    # obj.should_receive(:to_i)
-    lambda { Integer(obj) } .should raise_error(TypeError) #
+    not_compliant_on :maglev do
+      obj.should_not_receive(:to_i)
+      Integer(obj).should == "1"
+    end
+    deviates_on :maglev do
+      lambda { Integer(obj) } .should raise_error(TypeError)
+    end
   end
 
   it "raises a TypeError if to_i returns a value that is not an Integer" do
@@ -97,11 +110,21 @@ describe :kernel_integer, :shared => true do
   end
 
   it "raises a FloatDomainError when passed NaN" do
-    lambda { Integer(0.0/0.0) }.should raise_error(TypeError) # Maglev deviation, was FloatDomainError
+   not_compliant_on :maglev do
+    lambda { Integer(0.0/0.0) }.should raise_error(FloatDomainError)
+   end
+   deviates_on :maglev do
+    lambda { Integer(0.0/0.0) }.should raise_error(TypeError)
+   end
   end
 
   it "raises a FloatDomainError when passed Infinity" do
-    lambda { Integer(1.0/0.0) }.should raise_error(TypeError) # Maglev deviation, was FloatDomainError
+   not_compliant_on :maglev do
+    lambda { Integer(1.0/0.0) }.should raise_error(FloatDomainError)
+   end
+   deviates_on :maglev do
+    lambda { Integer(1.0/0.0) }.should raise_error(TypeError)
+   end
   end
 end
 
@@ -532,9 +555,10 @@ describe "Kernel#Integer" do
   ruby_version_is "1.9" do
     it_behaves_like "Integer() given a String and base", :Integer
   end
-
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:Integer)
-# end
+ 
+ not_compliant_on :maglev do # not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:Integer)
+  end
+ end
 end

@@ -131,7 +131,12 @@ describe "Marshal.dump" do
   end
 
   it "dumps an extended_object" do
+   not_compliant_on :maglev do
     Marshal.dump(Object.new.extend(Meths)).should == "#{mv+nv}e:\x0AMethso:\x0BObject\x00"
+   end
+   deviates_on :maglev do
+    Marshal.dump(Object.new.extend(Meths)).should == "\004\bo:\vObject\000" 
+   end
   end
 
   ruby_version_is ""..."1.9" do
@@ -157,7 +162,12 @@ describe "Marshal.dump" do
     it "dumps an extended_user_regexp having ivar" do
       r = UserRegexp.new('').extend(Meths)
       r.instance_variable_set(:@noise, 'much')
+     not_compliant_on :maglev do
       Marshal.dump(r).should == "#{mv+nv}Ie:\x0AMethsC:\x0FUserRegexp/\x00\x00\x06:\x0B@noise\"\x09much"
+     end
+     deviates_on :maglev do
+      Marshal.dump(r).should == "\004\bIC:\017UserRegexp/\000\000\b:\020@_st_source\"\000:\021@_st_optionsi\000:\v@noise\"\tmuch"
+     end
     end
   end
 
@@ -183,7 +193,8 @@ describe "Marshal.dump" do
   end
 
   it "raises a TypeError if dumping a IO/File instance" do
-    lambda { Marshal.dump(STDIN) }.should raise_error(TypeError)
+    ax = nil
+    lambda { ax = Marshal.dump(STDIN) }.should raise_error(TypeError)
     lambda { File.open(__FILE__) { |f| Marshal.dump(f) } }.should raise_error(TypeError)
   end
 
@@ -195,7 +206,12 @@ describe "Marshal.dump" do
     it "dumps an extended_user_hash_default" do
       h = UserHash.new(:Meths).extend(Meths)
       h['three'] = 3
+     not_compliant_on :maglev do
       Marshal.dump(h).should == "#{mv+nv}e:\x0AMethsC:\x0DUserHash}\x06\"\x0Athreei\x08;\x00"
+     end
+     deviates_on :maglev do
+      Marshal.dump(h).should == "\004\bC:\rUserHash}\006\"\nthreei\b:\nMeths"
+     end
     end
   end
 
@@ -212,7 +228,12 @@ describe "Marshal.dump" do
     it "dumps an extended_user_hash with a parameter to initialize" do
       h = UserHashInitParams.new(:abc).extend(Meths)
       h['three'] = 3
+     not_compliant_on :maglev do
       Marshal.dump(h).should == "\004\bIe:\nMethsC:\027UserHashInitParams{\006\"\nthreei\b\006:\a@a:\babc"
+     end
+     deviates_on :maglev do
+      Marshal.dump(h).should == "\004\bIC:\027UserHashInitParams{\006\"\nthreei\b\006:\a@a:\babc"
+     end
     end
   end
 
@@ -230,8 +251,14 @@ describe "Marshal.dump" do
       o1 = UserDefined.new
       o2 = UserDefinedWithIvar.new
       a = [o1, o2, o1, o2]
+     not_compliant_on :maglev do
       Marshal.dump(a).should ==
         "#{mv+nv}[\tu:\020UserDefined\022\004\b[\a\"\nstuff@\006u:\030UserDefinedWithIvar5\004\b[\bI\"\nstuff\006:\t@foo:\030UserDefinedWithIvar\"\tmore@\a@\006@\a"
+     end
+     deviates_on :maglev do
+      Marshal.dump(a).should ==
+         "\004\b[\tu:\020UserDefined\022\004\b[\a\"\nstuff@\006\000u:\030UserDefinedWithIvar5\004\b[\bI\"\nstuff\006:\t@foo:\030UserDefinedWithIvar\"\tmore@\a\000@\006@\a"
+     end
     end
   end
 
@@ -273,20 +300,28 @@ describe "Marshal.dump" do
     Marshal.dump(m)
   end
 
+ not_compliant_on :maglev do
   it "does not use Class#name when using marshal_dump" do
     u = UserMarshalWithClassName.new
 
     m = Marshal.dump(u)
     m.index(u.class.name).should be_nil
   end
+ end
 
   ruby_version_is ""..."1.9" do
     it "dumps an array containing the same objects" do
       s = 'oh'; b = 'hi'; r = //; d = [b, :no, s, :go]; c = String
       a = [:so, 'hello', 100, :so, :so, d, :so, :so, :no, :go, c, nil,
             :go, :no, s, b, r, :so, 'huh', true, b, b, 99, r, b, s, :so, c, :no, d]
+     not_compliant_on :maglev do
       Marshal.dump(a).should ==
         "#{mv+nv}[\x23:\x07so\"\x0Ahelloi\x69;\x00;\x00[\x09\"\x07hi:\x07no\"\x07oh:\x07go;\x00;\x00;\x06;\x07c\x0BString0;\x07;\x06@\x09@\x08/\x00\x00;\x00\"\x08huhT@\x08@\x08i\x68@\x0B@\x08@\x09;\x00@\x0A;\x06@\x07"
+     end
+     deviates_on :maglev do
+      Marshal.dump(a).should ==
+        "\004\b[#:\aso\"\nhelloii;\000;\000[\t\"\ahi:\ano\"\aoh:\ago;\000;\000;\006;\ac\vString0;\a;\006@\t@\bI/\000\000\a:\020@_st_source\"\000:\021@_st_optionsi\000;\000\"\bhuhT@\b@\bih@\v@\b@\t;\000@\n;\006@\a"
+     end
     end
   end
 
@@ -306,8 +341,14 @@ describe "Marshal.dump" do
       s.instance_variable_set(:@foo, 10)
       a = ['5', s, 'hi'].extend(Meths, MethsMore)
       a.instance_variable_set(:@mix, s)
+     not_compliant_on :maglev do
       Marshal.dump(a).should ==
         "#{mv+nv}Ie:\x0AMethse:\x0EMethsMore[\x08\"\x065I\"\x09well\x06:\x09@fooi\x0F\"\x07hi\x06:\x09@mix@\x07"
+     end
+     deviates_on :maglev do
+      Marshal.dump(a).should ==
+        "\004\bI[\b\"\0065I\"\twell\006:\t@fooi\017\"\ahi\006:\t@mix@\a"
+     end
     end
   end
 
@@ -337,8 +378,14 @@ describe "Marshal.dump" do
       s = 'hi'
       st = Struct.new("Ure2", :a, :b).new.extend(Meths)
       st.a = [:a, s]; st.b = [:Meths, s]
+     not_compliant_on :maglev do
       Marshal.dump(st).should ==
         "#{mv+nv}e:\x0AMethsS:\x11Struct::Ure2\x07:\x06a[\x07;\x07\"\x07hi:\x06b[\x07;\x00@\x07"
+     end
+     deviates_on :maglev do
+      Marshal.dump(st).should ==
+         "\004\bS:\021Struct::Ure2\a:\006a[\a;\006\"\ahi:\006b[\a:\nMeths@\a"
+     end
     end
   end
 
@@ -352,6 +399,7 @@ describe "Marshal.dump" do
     end
   end
   
+ not_compliant_on :maglev do
   it "returns an untainted string if object is untainted" do
     obj = Object.new
     m = Marshal.dump(obj)
@@ -374,6 +422,7 @@ describe "Marshal.dump" do
     a.tainted?.should be_false
     m.tainted?.should be_true
   end
+ end
 
   ruby_version_is "1.9" do
     it "returns a trusted string if object is trusted" do
@@ -400,10 +449,11 @@ describe "Marshal.dump" do
   end
   
   ruby_version_is ""..."1.9" do
+   it "dumps a description" do
     MarshalSpec::DATA.each do |description, (object, marshal, attributes)|
-      it "dumps a #{description}" do
+        dx = description
         unless attributes then
-          Marshal.dump(object).should == marshal
+          (ax = Marshal.dump(object)).should == marshal
         else
           # these objects have non-deterministic field order in the
           # marshal stream, so they need a round trip and independent
@@ -413,8 +463,8 @@ describe "Marshal.dump" do
             object.send(attr).should == val
           end
         end
-      end
     end
+   end
   end
 
   ruby_version_is "1.9" do

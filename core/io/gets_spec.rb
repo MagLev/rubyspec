@@ -38,13 +38,13 @@ describe "IO#gets" do
       IOSpecs.lines.each { |line| line.should == @io.gets }
     end
 
-   not_compliant_on :maglev do  #  no taint prop
+   not_compliant_on :maglev do  #  no taint propagation
     it "returns tainted strings" do
       while line = @io.gets
         line.tainted?.should == true
       end
     end
-   end #
+   end
 
     it "updates lineno with each invocation" do
       while line = @io.gets
@@ -73,7 +73,7 @@ describe "IO#gets" do
         line.tainted?.should == true
       end
     end
-   end # maglev
+   end
 
     it "updates lineno with each invocation" do
       while line = @io.gets(nil)
@@ -112,7 +112,7 @@ describe "IO#gets" do
         line.tainted?.should == true
       end
     end
-   end #
+   end
 
     it "updates lineno with each invocation" do
       while line = @io.gets("")
@@ -138,7 +138,7 @@ describe "IO#gets" do
         line.tainted?.should == true
       end
     end
-   end #
+   end
 
     it "updates lineno with each invocation" do
       while (line = @io.gets("la"))

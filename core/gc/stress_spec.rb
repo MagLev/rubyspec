@@ -9,9 +9,15 @@ ruby_version_is "1.8.7" do
 
     it "returns current status of GC stress mode" do
       GC.stress.should be_false
-      GC.stress = true  # maglev, has no effect
-      #GC.stress.should be_true 
-      #GC.stress = false
+      GC.stress = true
+      not_compliant_on :maglev do
+        GC.stress.should be_true
+      end
+      deviates_on :maglev do
+        # GC.stress has no effect
+        GC.stress.should be_false  
+      end
+      GC.stress = false
       GC.stress.should be_false
     end
   end
@@ -23,8 +29,13 @@ ruby_version_is "1.8.7" do
 
     it "sets the stress mode" do
       GC.stress = true    # maglev has no effect
-      # GC.stress.should be_true
-      GC.stress.should be_false
+      not_compliant_on :maglev do
+        GC.stress.should be_true
+      end
+      deviates_on :maglev do
+        # GC.stress has no effect
+        GC.stress.should be_false  
+      end
     end
 
   end

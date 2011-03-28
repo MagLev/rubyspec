@@ -1,23 +1,21 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/common', __FILE__)
 
-#describe "NoMethodError.new" do
-#   Maglev constructor not implemented yet
-# it "allows passing method args" do
-#   NoMethodError.new("msg","name","args").args.should == "args"
-# end
-#end
+describe "NoMethodError.new" do
+ not_compliant_on :maglev do # constructor not implemented yet
+  it "allows passing method args" do
+    NoMethodError.new("msg","name","args").args.should == "args"
+  end
+ end
+end
 
 describe "NoMethodError#args" do
   it "returns an empty array if the caller method had no arguments" do
-    got = false # Maglev debugging
     begin
       NoMethodErrorSpecs::NoMethodErrorB.new.foo
     rescue Exception => e
       e.args.should == []
-      got = true
     end
-    got.should == true
   end
 
   it "returns an array with the same elements as passed to the method" do
@@ -41,15 +39,12 @@ describe "NoMethodError#message" do
   end
 
   it "for an protected method match /protected method/" do
-    got = false
     begin
       NoMethodErrorSpecs::NoMethodErrorC.new.a_protected_method
     rescue Exception => e
       e.should be_kind_of(NoMethodError)
-      got = true
     end
-    got.should == true
-  end
+ end
 
   not_compliant_on :rubinius, :maglev  do
     it "for private method match /private method/" do

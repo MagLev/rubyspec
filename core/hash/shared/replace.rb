@@ -24,21 +24,31 @@ describe :hash_replace, :shared => true do
     hash_a = new_hash
     hash_b = new_hash 5
     hash_a.send(@method, hash_b)
-    # Maglev,  spec description does not agree with code
+    # Maglev change, bug in spec
     # hash_a.default.should == 5
     hash_a.default.should == nil
 
     hash_a = new_hash
     hash_b = new_hash { |h, k| k * 2 }
     hash_a.send(@method, hash_b)
-    # Maglev,  spec description does not agree with code
+    # Maglev change, bug in spec
     # hash_a.default(5).should == 10
     hash_a.default(5).should == nil
 
-    # hash_a = new_hash { |h, k| k * 5 }
-    # hash_b = new_hash(lambda { raise "Should not invoke lambda" })
-    # hash_a.send(@method, hash_b)
+    not_compliant_on :maglev do
+      hash_a = new_hash { |h, k| k * 5 }
+    end
+    deviates_on :maglev do    
+      hash_a = new_hash { |h, k| 
+         h.should == nil 
+         k.should == nil
+      }
+    end
+    hash_b = new_hash(lambda { raise "Should not invoke lambda" })
+    hash_a.send(@method, hash_b)
+    # bug in spec, 
     # hash_a.default.should == hash_b.default
+    hash_a.default.should == nil
   end
 
   ruby_version_is ""..."1.9" do

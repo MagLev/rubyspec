@@ -34,8 +34,12 @@ describe "Float#<=>" do
     end
 
     it "returns 1 when self is negative and other is -Infinity" do
-      # (-Float::MAX.to_i*2 <=> -@inf).should == 1
-      (-Float::MAX.to_i*2 <=> -@inf).should == 0 # Maglev coerces rcvr to Float Infinity before compare
+      not_compliant_on :maglev do
+        (-Float::MAX.to_i*2 <=> -@inf).should == 1
+      end
+      deviates_on :maglev do
+        (-Float::MAX.to_i*2 <=> -@inf).should == 0  # coerces receiver to Float before compare
+      end
     end
   end
 
@@ -55,8 +59,12 @@ describe "Float#<=>" do
     end
 
     it "returns 1 when self is negative and other is -Infinity" do
-      # (-Float::MAX.to_i*2 <=> -@inf).should == 1
-      (-Float::MAX.to_i*2 <=> -@inf).should == 0 # Maglev coerces rcvr to Float before compare
+      not_compliant_on :maglev do
+        (-Float::MAX.to_i*2 <=> -@inf).should == 1
+      end
+      deviates_on :maglev do
+        (-Float::MAX.to_i*2 <=> -@inf).should == 0 # Maglev coerces rcvr to Float before compare
+      end
     end
   end
 end

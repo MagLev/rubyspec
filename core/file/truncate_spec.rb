@@ -147,13 +147,23 @@ describe "File#truncate" do
   it "raises an IOError if file is closed" do
     @file.close
     @file.closed?.should == true
-    lambda { @file.truncate(42) }.should raise_error(Errno::EBADF) # Maglev, was IOError
+    not_compliant_on :maglev do
+      lambda { @file.truncate(42) }.should raise_error(IOError)
+    end
+    deviates_on :maglev do
+      lambda { @file.truncate(42) }.should raise_error(Errno::EBADF)
+    end
   end
 
   it "raises an IOError if file is not opened for writing" do
-    exp_err = RUBY_PLATFORM.match('solaris') ? Errno::EBADF : Errno::EINVAL  # maglev
-    File.open(@name, 'r') do |file|
-      lambda { file.truncate(42) }.should raise_error(exp_err)
+    not_compliant_on :maglev do
+      lambda { file.truncate(42) }.should raise_error(IOError)
+    end
+    deviates_on :maglev do
+      exp_err = RUBY_PLATFORM.match('solaris') ? Errno::EBADF : Errno::EINVAL 
+      File.open(@name, 'r') do |file|
+        lambda { file.truncate(42) }.should raise_error(exp_err)
+      end
     end
   end
 

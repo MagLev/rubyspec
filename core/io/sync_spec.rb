@@ -14,11 +14,16 @@ describe "IO#sync=" do
     @io.sync = true
     @io.sync.should == true
     @io.sync = false
-    @io.sync.should == true # was == false , maglev does not buffer writes
+    not_compliant_on :maglev do
+      @io.sync.should == false
+    end
+    deviates_on :maglev do
+      @io.sync.should == true # maglev does not buffer writes
+    end
   end
 
-if false # maglev has no effect
-  it "accepts non-boolean arguments" do # maglev sync=  has no effect
+ not_compliant_on :maglev do  # maglev sync=  has no effect
+  it "accepts non-boolean arguments" do
     @io.sync = 10
     @io.sync.should == true
     @io.sync = nil
@@ -30,11 +35,11 @@ if false # maglev has no effect
   it "raises an IOError on closed stream" do
     lambda { IOSpecs.closed_io.sync = true }.should raise_error(IOError)
   end
-end # maglev
+ end
 end
 
-if false # maglev has no effect
-describe "IO#sync" do
+not_compliant_on :maglev do
+ describe "IO#sync" do
   before :each do
     @io = IOSpecs.io_fixture "lines.txt"
   end
@@ -50,5 +55,5 @@ describe "IO#sync" do
   it "raises an IOError on closed stream" do
     lambda { IOSpecs.closed_io.sync }.should raise_error(IOError)
   end
-end
-end # maglev
+ end
+end 

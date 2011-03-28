@@ -11,9 +11,8 @@ describe :hash_update, :shared => true do
     h1.send(@method, h2) { |k,x,y| 3.14 }.should equal(h1)
     h1.should == new_hash(:c => 1, :b => -1, :a => 3.14)
 
-    as = h1.inspect
     h1.send(@method, h1) { nil }
-    h1.should == (hx = new_hash(:a => nil, :b => nil, :c => nil))
+    h1.should == new_hash(:a => nil, :b => nil, :c => nil)
   end
 
   it "tries to convert the passed argument to a hash using #to_hash" do
@@ -30,14 +29,8 @@ describe :hash_update, :shared => true do
     h = new_hash(1 => 2, 3 => 4, 5 => 6, "x" => nil, nil => 5, [] => [])
     merge_bang_pairs = []
     merge_pairs = []
-    ax = h.size
-    as = h.inspect
     h.merge(h) { |*arg| merge_pairs << arg }
-    bx = h.size
-    bs = h.inspect
     h.send(@method, h) { |*arg| merge_bang_pairs << arg }
-    cx = h.size 
-    cs = h.inspect
     merge_bang_pairs.should == merge_pairs
   end
 

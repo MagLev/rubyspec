@@ -21,10 +21,11 @@ describe "Kernel#autoload" do
     $".replace @loaded_features
   end
 
-# Maglev not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:autoload)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:autoload)
+  end
+ end
 
   it "registers a file to load the first time the named constant is accessed" do
     Object.autoload?(:KSAutoloadA).should == "autoload_a.rb"
@@ -34,10 +35,9 @@ describe "Kernel#autoload" do
     check_autoload(:KSAutoloadA).should == "autoload_a.rb"
   end
 
-# Maglev fails
-# it "sets the autoload constant in Object's constant table" do
-#   Object.should have_constant(:KSAutoloadA)
-# end
+  it "sets the autoload constant in Object's constant table" do
+    Object.should have_constant(:KSAutoloadA)
+  end
 
   it "loads the file when the constant is accessed" do
     KSAutoloadB.loaded.should == :ksautoload_b
@@ -53,10 +53,11 @@ describe "Kernel#autoload" do
 end
 
 describe "Kernel#autoload?" do
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:autoload?)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:autoload?)
+  end
+ end
 
   it "returns the name of the file that will be autoloaded" do
     check_autoload(:KSAutoloadA).should == "autoload_a.rb"
@@ -90,10 +91,11 @@ describe "Kernel.autoload" do
   end
 
   ruby_version_is "" ... "1.9" do
-# Maglev fails
-#   it "sets the autoload constant in Object's constant table" do
-#     Object.should have_constant(:KSAutoloadBB)
-#   end
+   not_compliant_on :maglev do
+    it "sets the autoload constant in Object's constant table" do
+      Object.should have_constant(:KSAutoloadBB)
+    end
+   end
   end
 
   ruby_version_is "1.9" do
