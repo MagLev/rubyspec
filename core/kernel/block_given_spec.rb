@@ -28,6 +28,7 @@ describe "Kernel#block_given?" do
     Kernel.should have_private_instance_method(:block_given?)
   end
  end
+end
 
 describe "Kernel.block_given?" do
   it_behaves_like :kernel_block_given, :block_given?, KernelSpecs::KernelBlockGiven
