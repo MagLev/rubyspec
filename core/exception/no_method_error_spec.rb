@@ -44,7 +44,7 @@ describe "NoMethodError#message" do
     rescue Exception => e
       e.should be_kind_of(NoMethodError)
     end
- end
+  end
 
   not_compliant_on :rubinius, :maglev  do
     it "for private method match /private method/" do
