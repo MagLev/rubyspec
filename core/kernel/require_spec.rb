@@ -33,4 +33,20 @@ describe "Kernel.require" do
   it_behaves_like :kernel_require_basic, :require, Kernel
 
   it_behaves_like :kernel_require, :require, Kernel
+
+  it "loads a ../file.rb relative path only once " do
+    fn = File.expand_path( "../fixtures/require_a.rb", __FILE__ )
+    @object.send( :require , fn ).should be_true
+    ax = @object.send( :require , fn )
+    (sx = ScratchPad.recorded).should == [ :loaded_a ]
+    ax.should == false
+  end
+
+  it "loads a ../file relative path only once " do
+    fn = File.expand_path( "../fixtures/require_a", __FILE__ )
+    @object.send( :require , fn ).should be_true
+    ax = @object.send( :require , fn )
+    (sx = ScratchPad.recorded).should == [ :loaded_a ]
+    ax.should == false
+  end
 end
