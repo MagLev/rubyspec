@@ -11,8 +11,15 @@ describe "Module#const_missing" do
   end
 
   it "raises NameError and includes the name of the value that wasn't found" do
-    lambda {
-      ConstantSpecs.const_missing("HelloMissing")
-    }.should raise_error(NameError, /HelloMissing/)  # /ConstantSpecs::HelloMissing/) # maglev error message deviation
+    not_compliant_on :maglev do
+      lambda {
+        ConstantSpecs.const_missing("HelloMissing")
+      }.should raise_error(NameError, /ConstantSpecs::HelloMissing/)
+    end
+    deviates_on :maglev do
+      lambda {
+        ConstantSpecs.const_missing("HelloMissing")
+      }.should raise_error(NameError, /HelloMissing/)  
+    end
   end
 end

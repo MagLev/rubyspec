@@ -9,11 +9,14 @@ describe "A block with mismatched arguments" do
   end
 
   it "raises ArgumentError if argument is passed, but the block takes none" do
-    #lambda{
-    #  lambda{ || p "block with no argument" }.call(:arg)
-    #}.should raise_error(ArgumentError)
-    # maglev  deviation
-    lambda{ || 'no_arg99' }.call(:arg).should == 'no_arg99'
+    not_compliant_on :maglev do 
+      lambda{
+        lambda{ || p "block with no argument" }.call(:arg)
+      }.should raise_error(ArgumentError)
+    end
+    deviates_on :maglev do 
+      lambda{ || 'no_arg99' }.call(:arg).should == 'no_arg99'
+    end
   end
 
 end
@@ -61,13 +64,13 @@ describe "A block with multiple arguments" do
     end
   end
 
- not_compliant_on :maglev do
+ not_compliant_on :maglev do  # maglev getting aMockObject for a
   it "tries to use #to_ary to convert a single incoming value" do
     m = mock("to_ary")
     m.should_receive(:to_ary).and_return([:one, :two])
 
     BlockSpecs::Yield.new.yield_this(m) do |a,b|
-      a.should == :one   # maglev getting aMockObject for a
+      a.should == :one
       b.should == :two
     end
  end
@@ -85,4 +88,59 @@ describe "A block with multiple arguments" do
  end
 end
 
-language_version __FILE__, "block"
+describe "Block parameters" do
+  t_ver = "1.9"
+  deviates_on :maglev do
+    t_ver = "1.8.7" # behaves like 1.9
+  end
+
+  ruby_version_is "" ... t_ver do
+    it "assign to local variable" do
+      i = 0
+      a = [1,2,3]
+      a.each {|i| ;}
+      i.should == 3
+    end
+
+    it "captures variables from the outer scope" do
+      a = [1,2,3]
+      sum = 0
+      var = nil
+      a.each {|var| sum += var}
+      sum.should == 6
+      var.should == 3
+    end
+  end
+
+  ruby_version_is t_ver do
+    it "does not override a shadowed variable from the outer scope" do
+      i = 0
+      a = [1,2,3]
+      a.each {|i| ;}
+      i.should == 0
+    end
+
+    it "captures variables from the outer scope" do
+      a = [1,2,3]
+      sum = 0
+      var = nil
+      a.each {|var| sum += var}
+      sum.should == 6
+      var.should == nil
+    end
+  end
+end
+
+
+ruby_version_is "" ... "1.9" do
+  not_compliant_on :maglev do 
+    language_version __FILE__, "block"
+  end
+  # Maglev 1.8.7 gets parse error in block_1.8.rb
+  #   assignment to global not supported as a block arg
+end
+
+ruby_version_is "1.9" do
+  language_version __FILE__, "block"
+end
+

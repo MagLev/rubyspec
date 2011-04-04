@@ -18,7 +18,7 @@ describe :array_clone, :shared => true do
     b.__id__.should_not == a.__id__
   end
 
- not_compliant_on :maglev do 
+ not_supported_on :maglev do 
   it "copies taint status from the original" do #
     a = [1, 2, 3, 4]
     b = [1, 2, 3, 4]

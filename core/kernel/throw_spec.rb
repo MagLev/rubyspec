@@ -90,8 +90,9 @@ describe "Kernel.throw" do
 end
 
 describe "Kernel#throw" do
-# Maglev, not private yet
-#  it "is a private method" do
-#    Kernel.should have_private_instance_method(:throw)
-#  end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:throw)
+  end
+ end
 end

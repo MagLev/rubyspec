@@ -45,13 +45,21 @@ describe "Mutex#lock" do
       Thread.pass while th.status and th.status != "sleep"
 
       ScratchPad.recorded.should be_nil
+     not_compliant_on :maglev do
+      lambda do
+        th.kill
+        th.join
+      end.should raise_error(ThreadError)
+     end
 
+     deviates_on :maglev do
       jx = 99
-      jy = lambda do
+      lambda do
         th.kill
         jx = th.join
-      end # .should raise_error(ThreadError)
+      end 
       jx.should == 99 # Maglev deviation, no exception raised 
+     end
     end
   end
 end

@@ -28,8 +28,9 @@ describe :method_to_s, :shared => true do
     @string.should =~ /MethodSpecs::MyMod/
   end
 
-# Maglev fails
-# it "returns a String containing the Module the method is referenced from" do
-#   @string.should =~ /MethodSpecs::MySub/
-# end
+ not_compliant_on :maglev do  # getting   "#<Method: MethodSpecs::MyMod#bar>"
+  it "returns a String containing the Module the method is referenced from" do
+    @string.should =~ /MethodSpecs::MySub/
+  end
+ end
 end

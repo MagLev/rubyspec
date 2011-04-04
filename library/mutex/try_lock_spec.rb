@@ -13,8 +13,18 @@ describe "Mutex#try_lock" do
   it "returns false if lock can not be aquired immediately" do
     m1 = Mutex.new
     m2 = Mutex.new
-
     m2.lock
+
+    th = nil
+   not_compliant_on :maglev do
+    th = Thread.new do
+      m1.lock
+      m2.lock 
+    end
+    Thread.pass while th.status and th.status != "sleep"
+   end
+
+   deviates_on :maglev do
     th = Thread.new do
       # m1.lock  # Maglev deviation, thread exit does not release mutexes
       # m2.lock
@@ -22,8 +32,8 @@ describe "Mutex#try_lock" do
         m2.synchronize {  }
       }
     end
-
     Thread.pass # while th.status and th.status != "sleep"
+   end
 
     # th owns m1 so try_lock should return false
     m1.try_lock.should be_false

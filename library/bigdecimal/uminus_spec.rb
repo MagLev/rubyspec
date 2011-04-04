@@ -47,9 +47,13 @@ describe "BigDecimal#-@" do
     @infinity_minus.send(:-@).infinite?.should == 1
 
     @zero.send(:-@).should == @zero
-#   @zero.send(:-@).sign.should == -1 # Maglev gets +1
+    zp_sign = -1
+    deviates_on :maglev do
+      zp_sign = 1
+    end
+    @zero.send(:-@).sign.should == zp_sign
     @zero_pos.send(:-@).should == @zero
-#   @zero_pos.send(:-@).sign.should == -1  # Maglev gets +1
+    @zero_pos.send(:-@).sign.should == zp_sign
     @zero_neg.send(:-@).should == @zero
     @zero_neg.send(:-@).sign.should == 1
 

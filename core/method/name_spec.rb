@@ -9,8 +9,8 @@ describe "Method#name" do
 
     it "returns the name even when aliased" do
       obj = MethodSpecs::Methods.new
-      (ma = obj.method(:foo)).name.should == "foo"
-      (mb = obj.method(:bar)).name.should == "bar"
+      obj.method(:foo).name.should == "foo"
+      obj.method(:bar).name.should == "bar"
       obj.method(:bar).unbind.bind(obj).name.should == "bar"
     end
   end

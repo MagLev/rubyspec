@@ -30,7 +30,7 @@ describe "Module#alias_method" do
     @class.make_alias :was_private_one, :private_one
     @object.was_private_one.should == 1
   end
- end #
+ end
   
   it "fails if origin method not found" do
     lambda { @class.make_alias :ni, :san }.should raise_error(NameError)

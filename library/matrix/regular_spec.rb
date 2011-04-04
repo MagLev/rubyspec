@@ -17,8 +17,15 @@ describe "Matrix#regular?" do
     end
   end
 
-  # ruby_bug "", "1.8.7" do
-  not_compliant_on :maglev do #  MRI 1.8.7 does not have Matrix.empty
+ do_test = true
+ deviates_on :maglev do
+   do_test = false
+   ruby_version_is "1.8.8" do
+     do_test = true # 1.8.7 does not have Matrix.empty
+   end
+ end
+ if do_test
+  ruby_bug "", "1.8.7" do
     it "returns true for an empty 0x0 matrix" do
       Matrix.empty(0,0).regular?.should be_true
     end
@@ -31,6 +38,7 @@ describe "Matrix#regular?" do
        lambda {
          Matrix.empty(3,0).regular?
        }.should raise_error(Matrix::ErrDimensionMismatch)
-     end
+    end
   end
+ end
 end

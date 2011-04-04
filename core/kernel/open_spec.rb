@@ -18,7 +18,7 @@ describe "Kernel#open" do
   it "is a private method" do
     Kernel.should have_private_instance_method(:open)
   end
- end #
+ end
 
   it "opens a file when given a valid filename" do
     @file = open(@name)
@@ -41,7 +41,7 @@ describe "Kernel#open" do
       @output = open("|date") { |f| f.gets }
       @output.should_not == ''
     end
-   end #
+   end
     
   end
 

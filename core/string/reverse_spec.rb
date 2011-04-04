@@ -8,11 +8,12 @@ describe "String#reverse" do
     "".reverse.should == ""
   end
 
-  # Maglev, no taint propagation
-# it "taints the result if self is tainted" do
-#   "".taint.reverse.tainted?.should == true
-#   "m".taint.reverse.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result if self is tainted" do
+    "".taint.reverse.tainted?.should == true
+    "m".taint.reverse.tainted?.should == true
+  end
+ end
 end
 
 describe "String#reverse!" do

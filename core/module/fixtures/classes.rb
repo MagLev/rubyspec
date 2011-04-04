@@ -222,7 +222,7 @@ module ModuleSpecs
 
     Nesting[:basic] = Module.nesting
 
-    module ::ModuleSpecs			  
+    module ::ModuleSpecs
       Nesting[:open_first_level] = Module.nesting
       #  correct value is   [ModuleSpecs, ModuleSpecs::Nesting, ModuleSpecs]
     end
@@ -232,9 +232,8 @@ module ModuleSpecs
     end
 
     def self.called_from_module_method
-      rx = Module.nesting  # maglev debugging
+      Module.nesting
       # correct value is [ ModuleSpecs::Nesting, ModuleSpecs ]
-      rx
     end
 
     class NestedClass
@@ -305,10 +304,7 @@ module ModuleSpecs
   end
 
   class SubModule < Module
-    # attr_reader :special 
-    def special	# Maglev debugging
-      @special
-    end 
+    attr_reader :special
     def initialize
       @special = 10
     end

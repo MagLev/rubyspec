@@ -29,10 +29,14 @@ describe "Module#instance_method" do
     @parent_um.inspect.should =~ /\bModuleSpecs::InstanceMeth\b/
     @child_um.inspect.should  =~ /\bfoo\b/
     @child_um.inspect.should  =~ /\bModuleSpecs::InstanceMeth\b/
-    # @child_um.inspect.should  =~ /\bModuleSpecs::InstanceMethChild\b/ # maglev fails
+   not_compliant_on :maglev do
+    @child_um.inspect.should  =~ /\bModuleSpecs::InstanceMethChild\b/
+   end
     @mod_um.inspect.should    =~ /\bbar\b/
     @mod_um.inspect.should    =~ /\bModuleSpecs::InstanceMethMod\b/
-    # @mod_um.inspect.should    =~ /\bModuleSpecs::InstanceMethChild\b/ # maglev fails
+   not_compliant_on :maglev do
+    @mod_um.inspect.should    =~ /\bModuleSpecs::InstanceMethChild\b/
+   end
   end
 
   ruby_version_is ""..."1.9" do

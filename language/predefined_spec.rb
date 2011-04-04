@@ -153,22 +153,26 @@ describe "Predefined global $stdout" do
     $stdout = @old_stdout
   end
 
-# $defout marked as obsolete in Pickaxe,  Maglev does not support $defout
-#  ruby_version_is "" ... "1.9" do
-#    it "is the same as $defout" do
-#      $stdout.should == $defout
-#
-#      $stdout = IOStub.new
-#      $stdout.should == $defout
-#    end
-#  end
+  not_compliant_on :maglev do
+   # $defout marked as obsolete in Pickaxe,  Maglev does not support $defout
+   ruby_version_is "" ... "1.9" do
+     it "is the same as $defout" do
+       $stdout.should == $defout
+ 
+       $stdout = IOStub.new
+       $stdout.should == $defout
+     end
+   end
+  end
 
   it "is the same as $DEFAULT_OUTPUT from 'English' library" do
     require 'English'
     $stdout.should == $DEFAULT_OUTPUT
 
+   not_compliant_on :maglev do
     $stdout = IOStub.new
-    # $stdout.should == $DEFAULT_OUTPUT  # Maglev fails, Expected "" to equal aPersistentFile
+    $stdout.should == $DEFAULT_OUTPUT  
+   end
   end
 
   it "raises TypeError error if assigned to nil" do
@@ -359,14 +363,16 @@ describe "Execution variable $:" do
     end
   end
 
-# it "does not include '.' when the taint check level > 1" do  # Maglev taint check not supported
-#   begin
-#     orig_opts, ENV['RUBYOPT'] = ENV['RUBYOPT'], '-T'
-#     `#{RUBY_EXE} -e 'p $:.include?(".")'`.should == "false\n"
-#   ensure
-#     ENV['RUBYOPT'] = orig_opts
-#   end
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "does not include '.' when the taint check level > 1" do
+    begin
+      orig_opts, ENV['RUBYOPT'] = ENV['RUBYOPT'], '-T'
+      `#{RUBY_EXE} -e 'p $:.include?(".")'`.should == "false\n"
+    ensure
+      ENV['RUBYOPT'] = orig_opts
+    end
+  end
+ end
 
   it "is the same object as $LOAD_PATH and $-I" do
     $:.__id__.should == $LOAD_PATH.__id__
@@ -554,14 +560,18 @@ TRUE                 TrueClass   Synonym for true.
 =end
 
 describe "The predefined global constants" do
-# Maglev, DATA not implemented yet , TODO for RubyParser only
-#  it "includes DATA when main script contains __END__" do
-#    ruby_exe(fixture(__FILE__, "predefined.rb")).chomp.should == "true"
-#  end
-#
-#  it "does not include DATA when main script contains no __END__" do
-#    ruby_exe("puts Object.const_defined?(:DATA)").chomp.should == 'false'
-#  end
+   it "includes DATA when main script contains __END__" do
+    not_compliant_on :maglev do
+     ruby_exe(fixture(__FILE__, "predefined.rb")).chomp.should == "true"
+    end
+    deviates_on :maglev do
+     ruby_exe(fixture(__FILE__, "predefined.rb")).chomp.should == 'false'
+    end
+   end
+ 
+   it "does not include DATA when main script contains no __END__" do
+     ruby_exe("puts Object.const_defined?(:DATA)").chomp.should == 'false'
+   end
 
   it "includes TRUE" do
     Object.const_defined?(:TRUE).should == true
@@ -615,7 +625,7 @@ describe "The predefined global constants" do
 
 end
 
-not_compliant_on :maglev do  # not getting RuntimeError
+not_compliant_on :maglev do 
 describe "Processing RUBYOPT" do
   before (:each) do
     @rubyopt, ENV["RUBYOPT"] = ENV["RUBYOPT"], nil
@@ -833,4 +843,4 @@ describe "Processing RUBYOPT" do
     ruby_exe("", :args => '2>&1').should =~ /RuntimeError/
   end
 end
-end #maglev
+end  # maglev

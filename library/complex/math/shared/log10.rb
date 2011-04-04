@@ -31,10 +31,18 @@ describe :complex_math_log10_bang, :shared => true do
     @object.send(:log10!, 10e15).should be_close(16.0, TOLERANCE)
   end
 
-# maglev x86 solaris libs not returning NaN
-# it "raises an Errno::EDOM when the passed argument is negative" do
-#   lambda { @object.send(:log10!, -10) }.should raise_error(Errno::EDOM)
-# end
+do_test = true
+deviates_on :maglev do
+  if RUBY_PLATFORM.match('solaris')
+    do_test = false # x86 solaris libs fail to return NaN
+  end
+end
+
+if do_test
+  it "raises an Errno::EDOM when the passed argument is negative" do
+    lambda { @object.send(:log10!, -10) }.should raise_error(Errno::EDOM)
+  end
+end
 
   it "raises a TypeError when passed a Complex number" do
     lambda { @object.send(:log10!, Complex(4, 5)) }.should raise_error(TypeError)

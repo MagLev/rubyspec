@@ -2,9 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel#sprintf" do
-
   it "is a private method" do
-   # Maglev not private?
     Kernel.should have_private_instance_method(:sprintf)
   end
 
@@ -29,7 +27,7 @@ describe "Kernel#sprintf" do
 
     sprintf("%#x", 123).should == "0x7b"
     sprintf("%#0x", 123).should == "0x7b"
-   if false # maglev needs fixes
+   not_compliant_on :maglev do # needs fixes
     sprintf("%# x", 123).should == " 0x7b"    #
     sprintf("%#+x", 123).should == "+0x7b"
     sprintf("%#+0x", 123).should == "+0x7b"
@@ -67,13 +65,13 @@ describe "Kernel#sprintf" do
     sprintf("%+010.8x", 123).should == " +0000007b"
     sprintf("%+ 10.8x", 123).should == " +0000007b"
     sprintf("% 010.8x", 123).should == "  0000007b"
-   end #
+   end
   end
 
   ruby_bug "svn r29502", "1.9.2.135" do
     describe "with negative values" do
       describe "with format %x" do
-not_compliant_on :maglev do # bugs
+       not_compliant_on :maglev do # bugs
         it "precedes the number with '..'" do
           [ ["%0x",     "..f85"],
             ["%#0x",    "0x..f85"],
@@ -85,11 +83,11 @@ not_compliant_on :maglev do # bugs
             ["%010.8x", "  ..ffff85"],
           ].should be_computed_by_function(:sprintf, -123)
         end
-end #
+       end #
       end
 
       describe "with format %u" do
-not_compliant_on :maglev do # bugs
+       not_compliant_on :maglev do # bugs
         it "precedes the number with '-'" do
           [ ["%u",        "-123"],
             ["%0u",       "-123"],
@@ -113,7 +111,7 @@ not_compliant_on :maglev do # bugs
             ["%#030.24u", "     -000000000000000000000123"],
           ].should be_computed_by_function(:sprintf, -123)
         end
-end
+       end
       end
 
       describe "with format %b or %B" do
@@ -131,7 +129,7 @@ end
 
   it "passes some tests for negative %x" do
     sprintf("%x", -123).should == "..f85"
-if false # maglev needs fixes
+   not_compliant_on :maglev do # maglev needs fixes
     sprintf("% x", -123).should == "-7b"  
     sprintf("%+x", -123).should == "-7b"
     sprintf("%+0x", -123).should == "-7b"
@@ -170,7 +168,7 @@ if false # maglev needs fixes
     sprintf("%+010.8x", -123).should == " -0000007b"
     sprintf("%+ 10.8x", -123).should == " -0000007b"
     sprintf("% 010.8x", -123).should == " -0000007b"
-end
+   end
   end
 
   it "passes some tests for negative %u" do
@@ -237,25 +235,26 @@ end
         sprintf("%#8u", -123).should == "..18446744073709551493"
         sprintf("%#08u", -123).should == "18446744073709551493"
 
-# maglev bug, fixes needed
         sprintf("%30u", -123).should == "        ..18446744073709551493"
-#       sprintf("%030u", -123).should == "..........18446744073709551493"
+not_compliant_on :maglev do # bug, fixes needed
+        sprintf("%030u", -123).should == "..........18446744073709551493"
 
         sprintf("%#30u", -123).should == "        ..18446744073709551493"
-#       sprintf("%#030u", -123).should == "..........18446744073709551493"
+        sprintf("%#030u", -123).should == "..........18446744073709551493"
 
-#       sprintf("%24.30u", -123).should == "..........18446744073709551493"
-#       sprintf("%024.30u", -123).should == "..........18446744073709551493"
+        sprintf("%24.30u", -123).should == "..........18446744073709551493"
+        sprintf("%024.30u", -123).should == "..........18446744073709551493"
 
-#       sprintf("%#24.30u", -123).should == "..........18446744073709551493"
-#       sprintf("%#024.30u", -123).should == "..........18446744073709551493"
+        sprintf("%#24.30u", -123).should == "..........18446744073709551493"
+        sprintf("%#024.30u", -123).should == "..........18446744073709551493"
 
 
-#       sprintf("%30.24u", -123).should == "      ....18446744073709551493"
-#       sprintf("%030.24u", -123).should == "      ....18446744073709551493"
+        sprintf("%30.24u", -123).should == "      ....18446744073709551493"
+        sprintf("%030.24u", -123).should == "      ....18446744073709551493"
 
-#       sprintf("%#30.24u", -123).should == "      ....18446744073709551493"
-#       sprintf("%#030.24u", -123).should == "      ....18446744073709551493"
+        sprintf("%#30.24u", -123).should == "      ....18446744073709551493"
+        sprintf("%#030.24u", -123).should == "      ....18446744073709551493"
+end
       end
     end
   end
@@ -308,10 +307,14 @@ end
 
 
     sprintf("%30.24u", 123).should == "      000000000000000000000123"
-    # sprintf("%030.24u", 123).should == "      000000000000000000000123" # maglev bug
+not_compliant_on :maglev do # bug
+    sprintf("%030.24u", 123).should == "      000000000000000000000123"
+end
 
     sprintf("%#30.24u", 123).should == "      000000000000000000000123"
-    # maglev bug #sprintf("%#030.24u", 123).should == "      000000000000000000000123"
+not_compliant_on :maglev do # bug
+    maglev bug #sprintf("%#030.24u", 123).should == "      000000000000000000000123"
+end
   end
 
   it "passes some tests for positive %f" do

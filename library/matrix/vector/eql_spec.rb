@@ -12,7 +12,12 @@ describe "Vector#eql?" do
 
   ruby_bug("[ruby-dev:36298]", "1.8.7") do
     it "returns false when there are a pair corresponding elements which are not equal in the sense of Object#eql?" do
-      @vector.eql?(Vector[1, 2, 3, 4, 5.0]).should be_true # Maglev 1.8.6,  was  be_false
+     not_compliant_on :maglev do
+      @vector.eql?(Vector[1, 2, 3, 4, 5.0]).should be_false
+     end
+     deviates_on :maglev do
+      @vector.eql?(Vector[1, 2, 3, 4, 5.0]).should be_true # Maglev 1.8.6
+     end
     end
   end
 end

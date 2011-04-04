@@ -38,7 +38,7 @@ describe "IO#gets" do
       IOSpecs.lines.each { |line| line.should == @io.gets }
     end
 
-   not_compliant_on :maglev do  #  no taint propagation
+   not_supported_on :maglev do  #  no taint propagation
     it "returns tainted strings" do
       while line = @io.gets
         line.tainted?.should == true
@@ -67,7 +67,7 @@ describe "IO#gets" do
       @io.gets(nil).should == IOSpecs.lines.join("")
     end
 
-   not_compliant_on :maglev do  #  no taint propagation
+   not_supported_on :maglev do  #  no taint propagation
     it "returns tainted strings" do #
       while line = @io.gets(nil)
         line.tainted?.should == true
@@ -106,7 +106,7 @@ describe "IO#gets" do
       @io.gets.should == IOSpecs.lines[4]
     end
 
-   not_compliant_on :maglev do  #  no taint prop
+   not_supported_on :maglev do  #  no taint prop
     it "returns tainted strings" do
       while line = @io.gets("")
         line.tainted?.should == true
@@ -132,7 +132,7 @@ describe "IO#gets" do
       @io.gets("la linea").should == "Voici la ligne une.\nQui \303\250 la linea"
     end
 
-   not_compliant_on :maglev do  #  no taint prop
+   not_supported_on :maglev do  #  no taint prop
     it "returns tainted strings" do
       while line = @io.gets("la")
         line.tainted?.should == true

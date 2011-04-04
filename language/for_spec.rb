@@ -49,15 +49,10 @@ describe "The for expression" do
     n.should == 3
   end
   
-# it "allows a class variable as an iterator name" do  # Maglev parse error, not supported
-#   m = [1,2,3]
-#   n = 0
-#   for @@var in m
-#     n += 1
-#   end
-#   @@var.should == 3
-#   n.should == 3
-# end
+  # "allows a class variable as an iterator name" 
+  not_compliant_on :maglev do
+    require File.expand_path('../fixtures/class_var_iter_name.rb', __FILE__)
+  end
 
   ruby_version_is ""..."1.9" do
     it "splats multiple arguments together if there are fewer arguments than values" do

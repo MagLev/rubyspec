@@ -101,7 +101,7 @@ describe :array_join, :shared => true do
     end
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "does not consider taint of either the array or the separator when the array is empty" do
     @object.new.send(@method, ":").tainted?.should == false
     @object.new.taint.send(@method, ":").tainted?.should == false

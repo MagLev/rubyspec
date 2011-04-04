@@ -24,7 +24,12 @@ ScratchPad << __LINE__
 ScratchPad << __LINE__
     EOC
 
-    ScratchPad.recorded.should == [19, 23] # maglev deviation, was [1, 5]
+   not_compliant_on :maglev do
+    ScratchPad.recorded.should == [1, 5]
+   end
+   deviates_on :maglev do
+    ScratchPad.recorded.should == [19, 23]
+   end
   end
 end
 

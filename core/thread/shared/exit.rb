@@ -8,11 +8,18 @@ describe :thread_exit, :shared => true do
       sleep
       ScratchPad.record :after_sleep
     end
+   not_compliant_on :maglev do
+    Thread.pass while sleeping_thread.status and sleeping_thread.status != "sleep"
+   end
+   deviates_on :maglev do 
     Thread.pass while sleeping_thread.status and sleeping_thread.status != "sleep" and sleeping_thread.status != "run"
+   end
     sleeping_thread.send(@method)
     sleeping_thread.join
     ScratchPad.recorded.should == nil
-    # ScratchPad.recorded.should == :after_sleep # Maglev bug
+   not_compliant_on :maglev do
+    ScratchPad.recorded.should == :after_sleep
+   end
   end
   
   it "kills current thread" do
@@ -31,12 +38,17 @@ describe :thread_exit, :shared => true do
   end
 
   it "runs nested ensure clauses" do
-    inner_started = nil		# Maglev thread sched. differences
+    inner_started = nil	# accomodate thread scheduler differences
+    deviates_on :maglev do
+      inner_started = 0
+    end 
     ScratchPad.record []
     outer = Thread.new do
       begin
         inner = Thread.new do
-          inner_started = true 
+          if inner_started == 0
+            inner_started = 1
+          end
           begin
             sleep
           ensure
@@ -46,13 +58,14 @@ describe :thread_exit, :shared => true do
         sleep
       ensure
         ScratchPad << :outer_ensure_clause
-        Thread.pass while inner_started == nil  # Maglev
+        Thread.pass while inner_started == 0 
         inner.send(@method)
         inner.join
       end
     end
-    Thread.pass while inner_started == nil  # Maglev
+    Thread.pass while inner_started == 0 
     outer.send(@method)
+
     outer.join
     ScratchPad.recorded.should include(:inner_ensure_clause)
     ScratchPad.recorded.should include(:outer_ensure_clause)
@@ -78,14 +91,16 @@ describe :thread_exit, :shared => true do
   end
  
   ruby_version_is "" ... "1.9" do 
-# Maglev bug, scheduler deadlock
-#   it "killing dying sleeping thread wakes up thread" do
-#     t = ThreadSpecs.dying_thread_ensures { Thread.stop; ScratchPad.record :after_stop }
-#     Thread.pass while (st = t.status) and st != "run" and st != 'sleep'
-#     t.send(@method)
-#     t.join
-#     ScratchPad.recorded.should == :after_stop
-#   end
+
+   not_compliant_on :maglev do # Maglev bug, scheduler deadlock
+    it "killing dying sleeping thread wakes up thread" do
+      t = ThreadSpecs.dying_thread_ensures { Thread.stop; ScratchPad.record :after_stop }
+      Thread.pass while (st = t.status) and st != "run" and st != 'sleep'
+      t.send(@method)
+      t.join
+      ScratchPad.recorded.should == :after_stop
+    end
+   end
   end
 
   # This spec is a mess. It fails randomly, it hangs on MRI, it needs to be removed
@@ -119,7 +134,7 @@ describe :thread_exit, :shared => true do
       ScratchPad.recorded.should == :in_outer_ensure_clause
     end
 
-    it "sets $! in outer ensure clause if inner ensure clause raises exception" do # Maglev was failing
+    it "sets $! in outer ensure clause if inner ensure clause raises exception" do
       thread = ThreadSpecs.join_dying_thread_with_outer_ensure(@method) { ScratchPad.record $! }
       ScratchPad.recorded.to_s.should == "In dying thread"
     end
@@ -139,15 +154,22 @@ describe :thread_exit, :shared => true do
       :end_of_thread_block
     end
 
-    thread.value.should == nil # was == :end_of_thread_block # maglev fails
-    ScratchPad.recorded.to_s.should == "" # was == "In dying thread"
+   not_compliant_on :maglev do 
+    thread.value.should == :end_of_thread_block
+    ScratchPad.recorded.to_s.should == "In dying thread"
+   end
+   deviates_on :maglev do 
+    thread.value.should == nil
+    ScratchPad.recorded.to_s.should == ""
+   end
   end
   
-# maglev not supported, cannot resume a terminated thread
-# it "is deferred if ensure clause does Thread.stop" do
-#   ThreadSpecs.wakeup_dying_sleeping_thread(@method) { Thread.stop; ScratchPad.record :after_sleep }
-#   ScratchPad.recorded.should == :after_sleep
-# end
+ not_compliant_on :maglev do # maglev error, cannot resume a terminated thread
+  it "is deferred if ensure clause does Thread.stop" do
+    ThreadSpecs.wakeup_dying_sleeping_thread(@method) { Thread.stop; ScratchPad.record :after_sleep }
+    ScratchPad.recorded.should == :after_sleep
+  end
+ end
 
   # Hangs on 1.8.6.114 OS X, possibly also on Linux
   # FIX: There is no such thing as not_compliant_on(:ruby)!!!
@@ -167,11 +189,10 @@ describe :thread_exit, :shared => true do
   # probability that the deadlock will occur. It was sufficient to reliably
   # reproduce the deadlock in JRuby.
 
-  # maglev, seeing deadlock with new Thread termination implem. (28dec09)
   it "does not deadlock when called from within the thread while being joined from without" do
     k = 0
     100.times do
-      k += 1	 # maglev debugging
+      k += 1	 # make debugging easier
       t = Thread.new { Thread.stop; Thread.current.send(@method) }
       Thread.pass while (st = t.status) and st != 'sleep' and st != 'run'
       t.wakeup.should == t

@@ -25,13 +25,14 @@ describe "Proc as an implicit block pass argument" do
     Proc::new
   end
 
-# Maglev, creating Proc without a block not supported
-#  it "remains the same object if re-vivified by the target method" do
-#    p = Proc.new {}
-#    p2 = revivify(&p)
-#    p.object_id.should == p2.object_id
-#    p.should == p2
-#  end
+  not_supported_on :maglev do  # cannot create a Proc without a block
+   it "remains the same object if re-vivified by the target method" do
+     p = Proc.new {}
+     p2 = revivify(&p)
+     p.object_id.should == p2.object_id
+     p.should == p2
+   end
+  end
 
   it "remains the same object if reconstructed with Proc.new" do
     p = Proc.new {}

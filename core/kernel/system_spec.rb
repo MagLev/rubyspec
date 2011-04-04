@@ -31,15 +31,22 @@ describe "Kernel#system" do
   end
 
   it "returns false when the command has a non-zero exit status" do
-     # maglev +d to turn off debug flag
-    result = system("#{RUBY_EXE} +d -e 'exit(1)'")
-    result.should be_false
+    not_compliant_on :maglev do
+      result = system("#{RUBY_EXE} -e 'exit(1)'")
+      result.should be_false
+    end
+    deviates_on :maglev do
+      # +d to ensure debug flag is off if running specs in debug mode
+      result = system("#{RUBY_EXE} +d -e 'exit(1)'")
+      result.should be_false
+    end
   end
 
-# Maglev, output_to_fd not working yet, needs IO.reopen
-# it "does not write to stderr when it can't find a command" do
-#   system("sad").should output_to_fd("") # nothing in stderr
-# end  
+ not_compliant_on :maglev do # generalized IO.reopen not implem yet
+  it "does not write to stderr when it can't find a command" do
+    system("sad").should output_to_fd("") # nothing in stderr
+  end  
+ end
 
   it "uses /bin/sh if freaky shit is in the command" do
     begin
@@ -54,10 +61,11 @@ describe "Kernel#system" do
     end
   end
 
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:system)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:system)
+  end
+ end
 
   before :each do
     ENV['TEST_SH_EXPANSION'] = 'foo'

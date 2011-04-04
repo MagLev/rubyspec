@@ -4,8 +4,12 @@ require File.expand_path('../fixtures/classes', __FILE__)
 ruby_version_is ""..."1.9" do
   describe "Kernel#to_a" do
     it "is defined on Kernel" do
-      # Kernel.should have_instance_method('to_a')
-      Object.should have_instance_method('to_a') # maglev deviation
+      not_compliant_on :maglev do
+        Kernel.should have_instance_method('to_a')
+      end
+      deviates_on :maglev do
+        Object.should have_instance_method('to_a')
+      end
     end
   end
 

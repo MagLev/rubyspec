@@ -1,6 +1,12 @@
-def f
-  # send(@method) # maglev, sends of __callee__, __method__ not supported
-  __method__ 
+not_compliant_on :maglev do # sends of __callee__, __method__ not supported
+ def f
+   send(@method)
+ end
+end
+deviates_on :maglev do
+ def f
+   __method__ 
+ end
 end
 alias g f
 
@@ -11,26 +17,35 @@ describe :kernel___method__, :shared => true do
   end
 
   it "returns the original name when aliased method" do
-    # g.should == :f
+   not_compliant_on :maglev do
+    g.should == :f
+   end
+   deviates_on :maglev do
     g.should == :g  # maglev returns aliased name
+   end
   end
 
   it "returns the caller from blocks too" do
-    def h
-      #(1..2).map { send(@method) } # maglev send of __method__ not supported
-      (1..2).map { __method__ }
+    not_compliant_on :maglev do 
+      def h
+        (1..2).map { send(@method) } 
+      end
+    end
+    deviates_on :maglev do
+      def h
+        (1..2).map { __method__ }  # # maglev send of __method__ not supported
+      end
     end
     h.should == [:h, :h]
   end
 
-  it "returns the caller from define_method too" do #
+ not_compliant_on :maglev do
+  it "returns the caller from define_method too" do 
     klass = Class.new {define_method(:f) {__method__}}
-    # klass.new.f.should == :f
-    klass.new.f.should ==  nil # maglev not supported yet
+    klass.new.f.should == :f
   end
 
- not_compliant_on :maglev do
-  it "returns the caller from block inside define_method too" do #
+  it "returns the caller from block inside define_method too" do
     klass = Class.new {define_method(:f) { 1.times{break __method__}}}
     klass.new.f.should == :f
   end
@@ -52,8 +67,12 @@ describe :kernel___method__, :shared => true do
   end
 
   it "returns nil when not called from a method" do
-    #send(@method).should == nil # maglev, send not supported
-    __method__.should == nil
+    not_compliant_on :maglev do 
+      send(@method).should == nil 
+    end
+    deviates_on :maglev do
+      __method__.should == nil
+    end
   end
 
 end

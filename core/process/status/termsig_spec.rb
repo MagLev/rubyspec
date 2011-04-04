@@ -2,7 +2,7 @@ require File.expand_path('../../../../spec_helper', __FILE__)
 
 describe "Process::Status#termsig" do
 
- not_compliant_on :maglev do # undefined method `termsig'
+ not_compliant_on :maglev do # termsig not implemented yet
   describe "for a child that exited normally" do
 
     before :each do
@@ -37,5 +37,5 @@ describe "Process::Status#termsig" do
     end
 
   end
- end #
+ end
 end

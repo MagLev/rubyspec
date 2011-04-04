@@ -34,8 +34,8 @@ describe "UNIXSocket#recvfrom" do
       sock.close
     end
 
-   not_compliant_on :maglev do 
-    it "uses different message options" do   # maglev MSG_PEEK not supported
+   not_compliant_on :maglev do # MSG_PEEK not supported yet
+    it "uses different message options" do
       @client.send("foobar", Socket::MSG_PEEK)
       sock = @server.accept
       peek_data = sock.recvfrom(6, Socket::MSG_PEEK) # Does not retrieve the message
@@ -45,7 +45,7 @@ describe "UNIXSocket#recvfrom" do
       peek_data.should == ["foobar", ["AF_UNIX", ""]]
       sock.close
     end
-   end #
+   end
   end
 
 end

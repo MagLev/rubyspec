@@ -16,7 +16,7 @@ describe "Kernel#load" do
   it "is a private method" do
     Kernel.should have_private_instance_method(:load)
   end
- end #
+ end
 
   it_behaves_like :kernel_require_basic, :load, CodeLoadingSpecs::Method.new
 end
@@ -37,6 +37,6 @@ describe "Kernel.load" do
   it_behaves_like :kernel_require_basic, :load, Kernel
 end
 
-describe "Kernel#load" do
+describe "Kernel.load" do
   it_behaves_like :kernel_load, :load, Kernel
 end

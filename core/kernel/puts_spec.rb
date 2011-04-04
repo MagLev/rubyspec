@@ -18,7 +18,7 @@ describe "Kernel#puts" do
   it "is a private method" do
     Kernel.should have_private_instance_method(:puts)
   end
- end #
+ end
 
   it "writes just a newline when given no args" do
     $stdout.should_receive(:write).with("\n")
@@ -49,7 +49,7 @@ describe "Kernel#puts" do
 
     $stdout.should_receive(:write).with("hola")
     $stdout.should_receive(:write).with("\n")
-    (rx = Kernel.puts(object)).should == nil
+    Kernel.puts(object).should == nil
   end
 
   it "writes each arg if given several" do

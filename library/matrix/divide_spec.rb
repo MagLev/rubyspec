@@ -11,10 +11,15 @@ describe "Matrix#/" do
 
   ruby_bug "?", "1.8.7" do
     it "returns the result of dividing self by another Matrix" do
-      # patch spec, inverse of matrix does not assume Floats (unless Rational loaded)
+not_compliant_on :maglev do
+     (@a / @b).should be_close_to_matrix([[2.5, -1.5], [1.5, -0.5]])
+end
+deviates_on :maglev do
+      # inverse of matrix does not assume Floats (unless Rational loaded)
       ax = @a 
       bx = Matrix[ [4.0, 5.0], [6.0, 7.0] ] # @b with floats
       (cx = (ax / bx)).should be_close_to_matrix([[2.5, -1.5], [1.5, -0.5]])
+end
     end
   end
 
@@ -44,10 +49,14 @@ describe "Matrix#/" do
 
   ruby_bug "redmine:2365", "1.8.7" do
     it "raises a TypeError if other is of wrong type" do
-      lambda { @a / nil        }.should raise_error(NoMethodError)
-      lambda { @a / "a"        }.should raise_error(NoMethodError)
-      lambda { @a / [ [1, 2] ] }.should raise_error(NoMethodError)
-      lambda { @a / Object.new }.should raise_error(NoMethodError)
+      exp_err = TypeError
+      deviates_on :maglev do
+        exp_err = NoMethodError
+      end
+      lambda { @a / nil        }.should raise_error(exp_err)
+      lambda { @a / "a"        }.should raise_error(exp_err)
+      lambda { @a / [ [1, 2] ] }.should raise_error(exp_err)
+      lambda { @a / Object.new }.should raise_error(exp_err)
     end
   end
 end

@@ -29,15 +29,20 @@ describe "BigDecimal#remainder" do
     @neg_int.remainder(@neg_frac).should == @neg_int % @neg_frac
   end
 
- not_compliant_on :maglev do  
-  it "means self-arg*(self/arg).truncate" do #
-    # maglev getting bx == 0.0E1, ax == -0.2E-9998 , by using modulo to compute remainder
-    (ax = @mixed.remainder(@neg_frac)).should == (bx = @mixed - @neg_frac * (@mixed / @neg_frac).truncate)
+  it "means self-arg*(self/arg).truncate" do
+   not_compliant_on :maglev do  
+    @mixed.remainder(@neg_frac).should == @mixed - @neg_frac * (@mixed / @neg_frac).truncate
     @pos_int.remainder(@neg_frac).should == @pos_int - @neg_frac * (@pos_int / @neg_frac).truncate
     @neg_frac.remainder(@pos_int).should == @neg_frac - @pos_int * (@neg_frac / @pos_int).truncate
     @neg_int.remainder(@pos_frac).should == @neg_int - @pos_frac * (@neg_int / @pos_frac).truncate
+   end
+   deviates_on :maglev do
+    ax = @mixed.remainder(@neg_frac)
+    bx = @mixed - @neg_frac * (@mixed / @neg_frac).truncate
+    bx.should == 0.0E1  #  by using modulo to compute remainder
+    ax.should == BigDecimal('-0.2E-9998')
+   end
   end
- end #
 
   it "returns NaN used with zero" do
     @mixed.remainder(@zero).nan?.should == true

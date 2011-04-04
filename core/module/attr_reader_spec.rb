@@ -28,12 +28,17 @@ describe "Module#attr_reader" do
     class Integer
       attr_reader :spec_attr_reader
     end
-
-    # maglev, no instvars on special objects
-    lambda {
-      1.instance_variable_set("@spec_attr_reader", "a")
-      1.spec_attr_reader.should == "a" 
-    } .should raise_error(NameError)
+    not_compliant_on :maglev do
+     1.instance_variable_set("@spec_attr_reader", "a")
+     1.spec_attr_reader.should == "a"
+    end
+    deviates_on :maglev do
+      # maglev, no instvars on special objects
+      lambda {
+        1.instance_variable_set("@spec_attr_reader", "a")
+        1.spec_attr_reader.should == "a" 
+      } .should raise_error(NameError)
+    end
   end
 
   it "converts non string/symbol/fixnum names to strings using to_str" do
@@ -53,12 +58,12 @@ describe "Module#attr_reader" do
     lambda { Class.new { attr_reader o } }.should raise_error(TypeError)
   end
 
-# it "applies current visibility to methods created" do  # Maglev fails
-#   c = Class.new do
-#     protected
-#     attr_reader :foo
-#   end
+  it "applies current visibility to methods created" do
+    c = Class.new do
+      protected
+      attr_reader :foo
+    end
 
-#   lambda { c.new.foo }.should raise_error(NoMethodError)
-# end
+    lambda { c.new.foo }.should raise_error(NoMethodError)
+  end
 end

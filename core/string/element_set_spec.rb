@@ -6,7 +6,8 @@ require File.expand_path('../fixtures/classes.rb', __FILE__)
 #   String#[re] = obj
 #   String#[re, idx] = obj
 #   String#[str] = obj
-describe "simple missing tests" do
+
+describe "simple String#[]= tests" do
   it 'String#[range] = obj' do
     s = 'abcdefghijk'
     s[3..5] = 'AB' 
@@ -115,16 +116,17 @@ describe "String#[]= with String" do
     a.should == "bamelo"
   end
 
-# Maglev no taint propagation
-# it "taints self if other_str is tainted" do
-#   a = "hello"
-#   a[0] = "".taint
-#   a.tainted?.should == true
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if other_str is tainted" do
+    a = "hello"
+    a[0] = "".taint
+    a.tainted?.should == true
 
-#   a = "hello"
-#   a[0] = "x".taint
-#   a.tainted?.should == true
-# end
+    a = "hello"
+    a[0] = "x".taint
+    a.tainted?.should == true
+  end
+ end
 
   it "raises an IndexError without changing self if idx is outside of self" do
     str = "hello"
@@ -289,16 +291,17 @@ describe "String#[]= with index, count" do
     a.should == "hellobob"
   end
 
-# Maglev no taint propagation
-# it "taints self if other_str is tainted" do
-#   a = "hello"
-#   a[0, 0] = "".taint
-#   a.tainted?.should == true
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if other_str is tainted" do
+    a = "hello"
+    a[0, 0] = "".taint
+    a.tainted?.should == true
 
-#   a = "hello"
-#   a[1, 4] = "x".taint
-#   a.tainted?.should == true
-# end
+    a = "hello"
+    a[1, 4] = "x".taint
+    a.tainted?.should == true
+  end
+ end
 
   it "raises an IndexError if |idx| is greater than the length of the string" do
     lambda { "hello"[6, 0] = "bob"  }.should raise_error(IndexError)

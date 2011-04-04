@@ -44,7 +44,7 @@ describe "Array#+" do
   it "does not get infected even if an original array is tainted" do
     ([1, 2] + [3, 4]).tainted?.should be_false
     ([1, 2] + [3, 4].taint).tainted?.should be_false
-   not_compliant_on :maglev do
+   not_supported_on :maglev do
     ([1, 2].taint + [3, 4]).tainted?.should be_false
     ([1, 2].taint + [3, 4].taint).tainted?.should be_false
    end

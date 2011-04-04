@@ -28,9 +28,13 @@ describe "BigDecimal#div" do
 
   it "returns a / b with optional precision" do
     @two.div(@one).should == @two
-    #@one.div(@two))).should == @zero
-    # ^^ is this really intended for a class with arbitrary precision?
-    @one.div(@two).should == BigDecimal("0.5") # Maglev, div() defaults to unlimited precision
+   not_compliant_on :maglev do
+    @one.div(@two).should == @zero
+   end
+   deviates_on :maglev do
+    # Maglev, div() defaults to unlimited precision
+    @one.div(@two).should == BigDecimal("0.5") 
+   end
 
     @one.div(@two, 1).should == BigDecimal("0.5")
     @one.div(@one_minus).should == @one_minus
@@ -40,7 +44,7 @@ describe "BigDecimal#div" do
 
     res = "0." + "3" * 1000
     (1..100).each { |idx|
-      (nc = (na = @one).div((nb = @three), idx)).to_s("F").should == (str = "0." + res[2, idx])
+      @one.div(@three, idx).to_s("F").should == "0." + res[2, idx]
     }
   end
 
@@ -69,7 +73,12 @@ describe "BigDecimal#div" do
   end
 
   it "returns 0 if divided by Infinity with given precision" do
+   not_compliant_on :maglev do
+    @zero.div(@infinity, 0).should == 0
+   end
+   deviates_on :maglev do
     @zero.div(@infinity, 1).should == 0 # Maglev, 0 implies unlimited precision
+   end
     @frac_2.div(@infinity, 1).should == 0
     @zero.div(@infinity, 100000).should == 0
     @frac_2.div(@infinity, 100000).should == 0
@@ -132,9 +141,18 @@ describe "BigDecimal#div" do
   end
 
   it "returns (+|-)Infinity if (+|-)Infinity by 1 and precision given" do
-    @infinity_minus.div(@one, 5).should == @infinity_minus #  Maglev, precision given means prec>0
+   not_compliant_on :maglev do
+    @infinity_minus.div(@one, 0).should == @infinity_minus
+    @infinity.div(@one, 0).should == @infinity
+    @infinity_minus.div(@one_minus, 0).should == @infinity
+   end
+
+   deviates_on :maglev do
+    # 'precision given' means precision arg > 0
+    @infinity_minus.div(@one, 5).should == @infinity_minus
     @infinity.div(@one, 5).should == @infinity
     @infinity_minus.div(@one_minus, 5).should == @infinity
+   end
   end
 
   it "returns NaN if Infinity / ((+|-) Infinity)" do

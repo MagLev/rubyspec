@@ -33,10 +33,10 @@ describe "Process::Status#success?" do
     platform_is_not :windows do
 
      not_compliant_on :maglev do # Need fix
-      it "returns nil" do #
+      it "returns nil" do
         $?.success?.should be_nil
       end
-     end #
+     end 
 
     end
 

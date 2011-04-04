@@ -220,7 +220,7 @@ describe "Kernel#eval" do
   end
 
   ruby_version_is ""..."1.9" do
-   not_compliant_on :maglev do # Proc#binding not supported
+   not_supported_on :maglev do # Proc#binding not supported
     it "allows creating a new class in a binding" do
       bind = proc {}
       eval "class A; end", bind.binding

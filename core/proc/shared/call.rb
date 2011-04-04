@@ -21,9 +21,7 @@ describe :proc_call, :shared => true do
 
   ruby_version_is ""..."1.9" do
     it "sets self's single parameter to an Array of all given values" do
-      cnt = 0 # Maglev debugging
-      [ Proc.new { |x| [x] }, lambda { |x| [x] }, proc { |x| [x] }].each do |p|
-        cnt += 1 # Maglev debugging
+      [Proc.new { |x| [x] }, lambda { |x| [x] }, proc { |x| [x] }].each do |p|
         a = p.send(@method)
         a.should be_kind_of(Array)
         a.should == [nil]
@@ -38,8 +36,12 @@ describe :proc_call, :shared => true do
         
         a = p.send(@method, 1, 2, 3)
         a.should be_kind_of(Array)
-        # a.should == [[1, 2, 3]]
-        a.should == [ 1 ] # Maglev deviation
+       not_compliant_on :maglev do
+        a.should == [[1, 2, 3]]
+       end
+       deviates_on :maglev do
+        a.should == [ 1 ] 
+       end
       end
     end
   end
@@ -82,13 +84,20 @@ describe :proc_call_on_proc_or_lambda, :shared => true do
     it "treats a single Array argument as a single argument" do
       lambda { |a| [a] }.send(@method, [1, 2]).should == [[1, 2]]
 
-      # lambda { lambda { |a, b| [a, b] }.send(@method, [1, 2]) }.should raise_error(ArgumentError)
-      lambda { |a, b| [a, b] }.send(@method, [1, 2]).should == [1,2] # Maglev deviation
-
+     not_compliant_on :maglev do
+      lambda { lambda { |a, b| [a, b] }.send(@method, [1, 2]) }.should raise_error(ArgumentError)
+     end
+     deviates_on :maglev do
+      lambda { |a, b| [a, b] }.send(@method, [1, 2]).should == [1,2]
+     end
       proc { |a| [a] }.send(@method, [1, 2]).should == [[1, 2]]
 
-      # lambda { proc { |a, b| [a, b] }.send(@method, [1, 2]) }.should raise_error(ArgumentError)
-      proc { |a, b| [a, b] }.send(@method, [1, 2]).should == [1,2] # Maglev deviation
+     not_compliant_on :maglev do
+      lambda { proc { |a, b| [a, b] }.send(@method, [1, 2]) }.should raise_error(ArgumentError)
+     end
+     deviates_on :maglev do
+      proc { |a, b| [a, b] }.send(@method, [1, 2]).should == [1,2]
+     end
     end
   end
 

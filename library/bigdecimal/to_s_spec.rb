@@ -50,8 +50,12 @@ describe "BigDecimal#to_s" do
     BigDecimal.new('1.2500').to_s('F').should == "1.25"
     BigDecimal.new('0000.00000').to_s('F').should == "0.0"
     BigDecimal.new('-00.000010000').to_s('F').should == "-0.00001"
-#   BigDecimal.new("5.00000E-2").to_s("F").should == "0.05"
-    BigDecimal.new("5.00000E-2").to_s("F").should == "0.050" # Maglev deviation
+not_compliant_on :maglev do
+    BigDecimal.new("5.00000E-2").to_s("F").should == "0.05"
+end
+deviates_on :maglev do
+    BigDecimal.new("5.00000E-2").to_s("F").should == "0.050"
+end
 
     BigDecimal.new("500000").to_s("F").should == "500000.0"
     BigDecimal.new("5E2").to_s("F").should == "500.0"

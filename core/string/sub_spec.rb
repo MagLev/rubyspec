@@ -129,26 +129,27 @@ describe "String#sub with pattern, replacement" do
     "hello".sub(/./, 'hah\\').should == 'hah\\ello'
   end
 
-# Maglev, no taint propagation
-# it "taints the result if the original string or replacement is tainted" do
-#   hello = "hello"
-#   hello_t = "hello"
-#   a = "a"
-#   a_t = "a"
-#   empty = ""
-#   empty_t = ""
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result if the original string or replacement is tainted" do
+    hello = "hello"
+    hello_t = "hello"
+    a = "a"
+    a_t = "a"
+    empty = ""
+    empty_t = ""
 
-#   hello_t.taint; a_t.taint; empty_t.taint
+    hello_t.taint; a_t.taint; empty_t.taint
 
-#   hello_t.sub(/./, a).tainted?.should == true
-#   hello_t.sub(/./, empty).tainted?.should == true
+    hello_t.sub(/./, a).tainted?.should == true
+    hello_t.sub(/./, empty).tainted?.should == true
 
-#   hello.sub(/./, a_t).tainted?.should == true
-#   hello.sub(/./, empty_t).tainted?.should == true
-#   hello.sub(//, empty_t).tainted?.should == true
+    hello.sub(/./, a_t).tainted?.should == true
+    hello.sub(/./, empty_t).tainted?.should == true
+    hello.sub(//, empty_t).tainted?.should == true
 
-#   hello.sub(//.taint, "foo").tainted?.should == false
-# end
+    hello.sub(//.taint, "foo").tainted?.should == false
+  end
+ end
 
   it "tries to convert pattern to a string using to_str" do
     pattern = mock('.')
@@ -234,23 +235,24 @@ describe "String#sub with pattern and block" do
     offsets.should == [[1, 2]]
   end
 
-# Maglev, spec inconstent with 'sets $~ to MatchData of last match' spec below
-# # The conclusion of bug #1749 was that this example was version-specific...
-# ruby_version_is "".."1.9" do
-#   it "restores $~ after leaving the block" do
-#     [/./, "l"].each do |pattern|
-#       old_md = nil
-#       "hello".sub(pattern) do
-#         old_md = $~
-#         "ok".match(/./)
-#         "x"
-#       end
-#
-#       $~.should == old_md  # Maglev fails
-#       $~.string.should == "hello"
-#     end
-#   end
-# end
+ not_compliant_on :maglev do # inconsistent wth 'sets $~ to MatchData of last match' below
+  # The conclusion of bug #1749 was that this example was version-specific...
+  ruby_version_is "".."1.9" do
+    it "restores $~ after leaving the block" do
+      [/./, "l"].each do |pattern|
+        old_md = nil
+        "hello".sub(pattern) do
+          old_md = $~
+          "ok".match(/./)
+          "x"
+        end
+ 
+        $~.should == old_md
+        $~.string.should == "hello"
+      end
+    end
+  end
+ end
 
   it "sets $~ to MatchData of last match and nil when there's none for access from outside" do
     'hello.'.sub('l') { 'x' }
@@ -267,18 +269,20 @@ describe "String#sub with pattern and block" do
     $~.should == nil
   end
 
-# Maglev , no error raised
-# it "doesn't raise a RuntimeError if the string is modified while substituting" do
-#   str = "hello"
-#   str.sub(//) { str[0] = 'x' }.should == "xhello"
-#   str.should == "xello"
-# end
+ not_compliant_on :maglev do  # no error
+  it "doesn't raise a RuntimeError if the string is modified while substituting" do
+    str = "hello"
+    str.sub(//) { str[0] = 'x' }.should == "xhello"
+    str.should == "xello"
+  end
+ end
 
-# Maglev fails
-# it "doesn't interpolate special sequences like \\1 for the block's return value" do
-#   repl = '\& \0 \1 \` \\\' \+ \\\\ foo'
-#   "hello".sub(/(.+)/) { repl }.should == repl
-# end
+ not_compliant_on :maglev do 
+  it "doesn't interpolate special sequences like \\1 for the block's return value" do
+    repl = '\& \0 \1 \` \\\' \+ \\\\ foo'
+    "hello".sub(/(.+)/) { repl }.should == repl
+  end
+ end
 
   it "converts the block's return value to a string using to_s" do
     obj = mock('hello_replacement')
@@ -290,26 +294,27 @@ describe "String#sub with pattern and block" do
     "hello".sub(/.+/) { obj }.should == "ok"
   end
 
-# Maglev, no taint propagation
-# it "taints the result if the original string or replacement is tainted" do
-#   hello = "hello"
-#   hello_t = "hello"
-#   a = "a"
-#   a_t = "a"
-#   empty = ""
-#   empty_t = ""
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result if the original string or replacement is tainted" do
+    hello = "hello"
+    hello_t = "hello"
+    a = "a"
+    a_t = "a"
+    empty = ""
+    empty_t = ""
 
-#   hello_t.taint; a_t.taint; empty_t.taint
+    hello_t.taint; a_t.taint; empty_t.taint
 
-#   hello_t.sub(/./) { a }.tainted?.should == true
-#   hello_t.sub(/./) { empty }.tainted?.should == true
+    hello_t.sub(/./) { a }.tainted?.should == true
+    hello_t.sub(/./) { empty }.tainted?.should == true
 
-#   hello.sub(/./) { a_t }.tainted?.should == true
-#   hello.sub(/./) { empty_t }.tainted?.should == true
-#   hello.sub(//) { empty_t }.tainted?.should == true
+    hello.sub(/./) { a_t }.tainted?.should == true
+    hello.sub(/./) { empty_t }.tainted?.should == true
+    hello.sub(//) { empty_t }.tainted?.should == true
 
-#   hello.sub(//.taint) { "foo" }.tainted?.should == false
-# end
+    hello.sub(//.taint) { "foo" }.tainted?.should == false
+  end
+ end
 end
 
 describe "String#sub! with pattern, replacement" do
@@ -319,12 +324,13 @@ describe "String#sub! with pattern, replacement" do
     a.should == "h*llo"
   end
 
-# Maglev, no taint propagation
-# it "taints self if replacement is tainted" do
-#   a = "hello"
-#   a.sub!(/./.taint, "foo").tainted?.should == false
-#   a.sub!(/./, "foo".taint).tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if replacement is tainted" do
+    a = "hello"
+    a.sub!(/./.taint, "foo").tainted?.should == false
+    a.sub!(/./, "foo".taint).tainted?.should == true
+  end
+ end
 
   it "returns nil if no modifications were made" do
     a = "hello"
@@ -381,13 +387,13 @@ describe "String#sub! with pattern and block" do
     offsets.should == [[1, 2]]
   end
 
- not_compliant_on :maglev do # Maglev, no taint propagation
-  it "taints self if block's result is tainted" do #
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if block's result is tainted" do
     a = "hello"
     a.sub!(/./.taint) { "foo" }.tainted?.should == false
     a.sub!(/./) { "foo".taint }.tainted?.should == true
   end
- end #
+ end
 
   it "returns nil if no modifications were made" do
     a = "hello"
@@ -396,7 +402,7 @@ describe "String#sub! with pattern and block" do
     a.should == "hello"
   end
 
-  not_compliant_on :rubinius, :maglev do  # Maglev not compliant either
+  not_compliant_on :rubinius, :maglev do
     it "raises a RuntimeError if the string is modified while substituting" do
       str = "hello"
       lambda { str.sub!(//) { str << 'x' } }.should raise_error(RuntimeError)
@@ -417,7 +423,15 @@ describe "String#sub! with pattern and block" do
         lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(TypeError)
       end
     end
-
+    deviates_on :maglev do 
+      it "raises a TypeError when self is frozen" do
+        s = "hello"
+        s.freeze
+        s.sub!(/ROAR/) { "x" } # ok
+        lambda { s.sub!(/e/) { "e" }       }.should raise_error(TypeError)
+        lambda { s.sub!(/[aeiou]/) { '*' } }.should raise_error(TypeError)
+      end
+    end
     not_compliant_on :rubinius , :maglev do
       it "raises a RuntimeError when self is frozen" do
         s = "hello"

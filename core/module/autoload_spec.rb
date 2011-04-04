@@ -90,12 +90,14 @@ describe "Module#autoload" do
     ModuleSpecs::Autoload::HClass.new.loaded.should == :autoload_h
   end
 
+ not_compliant_on :maglev do
   it "does not load the file when the constant is already set" do
     ModuleSpecs::Autoload.autoload :I, fixture(__FILE__, "autoload_i.rb")
     ModuleSpecs::Autoload.const_set :I, 3
     ModuleSpecs::Autoload::I.should == 3
     ScratchPad.recorded.should be_nil
   end
+ end
 
   it "loads a file with .rb extension when passed the name without the extension" do
     ModuleSpecs::Autoload.autoload :J, fixture(__FILE__, "autoload_j")
@@ -127,6 +129,19 @@ describe "Module#autoload" do
     ModuleSpecs::Autoload.autoload?(:S).should be_nil
   end
 
+  it "retains the autoload even if the request to require fails" do
+    filename = fixture(__FILE__, "a_path_that_should_not_exist.rb")
+
+    ModuleSpecs::Autoload.autoload :NotThere, filename
+    ModuleSpecs::Autoload.autoload?(:NotThere).should == filename
+
+    lambda {
+      require filename
+    }.should raise_error(LoadError)
+
+    ModuleSpecs::Autoload.autoload?(:NotThere).should == filename
+  end
+
   it "allows multiple autoload constants for a single file" do
     filename = fixture(__FILE__, "autoload_lm.rb")
     ModuleSpecs::Autoload.autoload :L, filename
@@ -142,6 +157,7 @@ describe "Module#autoload" do
   end
 
   ruby_version_is "" ... "1.9" do
+ not_compliant_on :maglev do
     it "removes the constant from the constant table if load fails" do
       ModuleSpecs::Autoload.autoload :Fail, @non_existent
       ModuleSpecs::Autoload.should have_constant(:Fail)
@@ -149,6 +165,7 @@ describe "Module#autoload" do
       lambda { ModuleSpecs::Autoload::Fail }.should raise_error(LoadError)
       ModuleSpecs::Autoload.should_not have_constant(:Fail)
     end
+ end
 
     it "removes the constant from the constant table if the loaded files does not define it" do
       ModuleSpecs::Autoload.autoload :O, fixture(__FILE__, "autoload_o.rb")
@@ -239,6 +256,7 @@ describe "Module#autoload" do
   # (only one on MRI), and autoload uses require logic, so we can only pull in
   # autoload_w.rb ONCE. Thusly, it now uses autoload_w2.rb.
 
+not_compliant_on :maglev do
   ruby_version_is ""..."1.9" do
     # [ruby-core:19127]
     it "raises a NameError when the autoload file did not define the constant and a module is opened with the same name" do
@@ -255,6 +273,7 @@ describe "Module#autoload" do
       ScratchPad.recorded.should == :loaded
     end
   end
+end
 
   ruby_version_is "1.9" do
     it "calls #to_path on non-string filenames" do
@@ -280,6 +299,7 @@ describe "Module#autoload" do
     lambda { ModuleSpecs.autoload "a name", @non_existent }.should raise_error(NameError)
   end
 
+not_compliant_on :maglev do
   ruby_bug "redmine #620", "1.8.6.322" do
     it "shares the autoload request across dup'ed copies of modules" do
       filename = fixture(__FILE__, "autoload_t.rb")
@@ -294,6 +314,7 @@ describe "Module#autoload" do
       lambda { mod2::T }.should raise_error(NameError)
     end
   end
+end
 
   it "raises a TypeError if opening a class with a different superclass than the class defined in the autoload file" do
     ModuleSpecs::Autoload.autoload :Z, fixture(__FILE__, "autoload_z.rb")
@@ -359,8 +380,10 @@ describe "Module#autoload" do
     end
   end
 
+not_compliant_on :maglev do
   it "does not call Kernel#require or Kernel#load dynamically" do
     ModuleSpecs::Autoload.autoload :N, fixture(__FILE__, "autoload_n.rb")
     ModuleSpecs::Autoload::N.should == :autoload_n
   end
+end
 end

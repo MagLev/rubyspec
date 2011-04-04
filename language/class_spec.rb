@@ -48,10 +48,12 @@ describe "A class definition" do
 
   it "allows using self as the superclass if self is a class" do
     ClassSpecs::I::J.superclass.should == ClassSpecs::I
-
-    lambda {
-      class ShouldNotWork < self; end
-    }.should raise_error(NoMethodError) # Maglev,  was TypeError
+   not_compliant_on :maglev do 
+    lambda { class ShouldNotWork < self; end }.should raise_error(TypeError)
+   end
+   deviates_on :maglev do 
+    lambda { class ShouldNotWork < self; end }.should raise_error(NoMethodError)
+   end
   end
 
   it "raises a TypeError if inheriting from a metaclass" do
@@ -187,8 +189,12 @@ describe "A class definition extending an object (sclass)" do
   end
 
   it "can use return to cause the enclosing method to return" do
-    # ClassSpecs.sclass_with_return.should == :inner
-    ClassSpecs.sclass_with_return.should == :outer # maglev not compliant yet
+   not_compliant_on :maglev do 
+    ClassSpecs.sclass_with_return.should == :inner
+   end
+   deviates_on :maglev do 
+    ClassSpecs.sclass_with_return.should == :outer
+   end
   end
 end
 

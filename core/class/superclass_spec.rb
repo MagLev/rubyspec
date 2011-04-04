@@ -8,7 +8,7 @@ describe "Class#superclass" do
       Class.superclass.should == Module
       Class.new.superclass.should == Object
       Class.new(String).superclass.should == String
-     not_compliant_on :maglev do 
+     not_supported_on :maglev do 
       Class.new(Fixnum).superclass.should == Fixnum
      end
      deviates_on :maglev do

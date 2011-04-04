@@ -16,10 +16,14 @@ describe "String#scan" do
     "cruel world".scan(/.../).should == ["cru", "el ", "wor"]
 
     # Edge case
-    # "hello".scan(//).should == ["", "", "", "", "", ""]
-    "hello".scan(//).should ==   ["", "", "", "", "" ]  # Maglev fails, missing one result
-    # "".scan(//).should == [""]
-    "".scan(//).should ==   [] # Maglev fails, empty result
+   not_compliant_on :maglev do 
+    "hello".scan(//).should == ["", "", "", "", "", ""]
+    "".scan(//).should == [""]
+   end
+   deviates_on :maglev do 
+    "hello".scan(//).should ==   ["", "", "", "", "" ]
+    "".scan(//).should ==   []
+   end
   end
 
  not_compliant_on :maglev do
@@ -34,8 +38,14 @@ describe "String#scan" do
  end #
 
   it "stores groups as arrays in the returned arrays" do
-    "hello".scan(/()/).should == [[""]] * 5 # Maglev fails, was  * 6
-    "hello".scan(/()()/).should == [["", ""]] * 5 # Maglev fails, was  * 6
+   not_compliant_on :maglev do 
+    "hello".scan(/()/).should == [[""]] * 6
+    "hello".scan(/()()/).should == [["", ""]] * 6
+   end
+   deviates_on :maglev do 
+    "hello".scan(/()/).should == [[""]] * 5
+    "hello".scan(/()()/).should == [["", ""]] * 5
+   end
     "cruel world".scan(/(...)/).should == [["cru"], ["el "], ["wor"]]
     "cruel world".scan(/(..)(..)/).should == [["cr", "ue"], ["l ", "wo"]]
   end
@@ -78,7 +88,7 @@ describe "String#scan" do
     lambda { "cruel world".scan(mock('x')) }.should raise_error(TypeError)
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   ruby_bug "#4087", "1.9.2.135" do
     it "taints the results if the String argument is tainted" do
       a = "hello hello hello".scan("hello".taint)
@@ -183,7 +193,7 @@ describe "String#scan with pattern and block" do
     $~.should == nil
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   ruby_bug "#4087", "1.9.2.135" do
     it "taints the results if the String argument is tainted" do
       "hello hello hello".scan("hello".taint).each { |m| m.tainted?.should be_true }

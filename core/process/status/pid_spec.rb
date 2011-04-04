@@ -7,9 +7,9 @@ describe "Process::Status#pid" do
   end
 
  not_compliant_on :maglev do # Need fix
-  it "returns the pid of the process" do #
+  it "returns the pid of the process" do
     $?.pid.should == @pid  #  undefined method `pid'
   end
- end #
+ end
 
 end

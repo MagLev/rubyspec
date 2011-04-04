@@ -33,14 +33,22 @@ describe :complex_math_asin_bang, :shared => true do
     @object.send(:asin!, 0.75).should be_close(0.8480620789814816,TOLERANCE)
   end
 
-# maglev x86 solaris libs not returning NaN
-# it "raises an Errno::EDOM if the argument is greater than 1.0" do
-#   lambda { @object.send(:asin!, 1.0001) }.should raise_error( Errno::EDOM)
-# end
+do_test = true
+deviates_on :maglev do
+  if RUBY_PLATFORM.match('solaris')
+    do_test = false # x86 solaris libs fail to return NaN
+  end
+end
 
-# it "raises an Errno::EDOM if the argument is less than -1.0" do
-#   lambda { @object.send(:asin!, -1.0001) }.should raise_error( Errno::EDOM)
-# end
+if do_test
+  it "raises an Errno::EDOM if the argument is greater than 1.0" do
+    lambda { @object.send(:asin!, 1.0001) }.should raise_error( Errno::EDOM)
+  end
+
+  it "raises an Errno::EDOM if the argument is less than -1.0" do
+    lambda { @object.send(:asin!, -1.0001) }.should raise_error( Errno::EDOM)
+  end
+end
 
   it "raises a TypeError when passed a Complex number" do
     lambda { @object.send(:asin!, Complex(4, 5)) }.should raise_error(TypeError)

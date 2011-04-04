@@ -34,12 +34,18 @@ describe "Thread#alive?" do
     ThreadSpecs.status_of_dying_running_thread.alive?.should == true
   end
 
-# Maglev deadlock or infinite loop
-#  it "describes a dying sleeping thread" do
-#    ThreadSpecs.status_of_dying_sleeping_thread.alive?.should == true
-#  end
+ not_compliant_on :maglev do  # error, cannot resume a terminated Thread
+  it "describes a dying sleeping thread" do
+    ThreadSpecs.status_of_dying_sleeping_thread.alive?.should == true
+  end
+ end
 
   it "reports aborting on a killed thread" do
-    ThreadSpecs.status_of_aborting_thread.alive?.should == false # Maglev, a killed thread not alive
+   not_compliant_on :maglev do  
+    ThreadSpecs.status_of_aborting_thread.alive?.should == true
+   end
+   deviates_on :maglev do 
+    ThreadSpecs.status_of_aborting_thread.alive?.should == false # a killed thread is not alive
+   end
   end
 end

@@ -3,10 +3,11 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 ruby_version_is ""..."1.9" do
   describe "Kernel#scan" do
-# Maglev not private yet
-#   it "is a private method" do
-#     Kernel.should have_private_instance_method(:scan)
-#   end
+   not_compliant_on :maglev do #  not private yet
+    it "is a private method" do
+      Kernel.should have_private_instance_method(:scan)
+    end
+   end
   end
 
   describe "Kernel.scan" do

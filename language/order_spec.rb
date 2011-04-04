@@ -50,15 +50,19 @@ describe "A method call" do
       a = 0
       p = proc {true}
       ox = @obj
-#      @obj.foo1(a += 1, &(a += 1; p)).should == [1, true]
-#      @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, true]
-#      @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, true]
-#      @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, true]
-# Maglev devation,  p not evaluated at end 
-      @obj.foo1(a += 1, &(a += 1; p)).should == [1, p]
-      @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, p]
-      @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, p]
-      @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, p]
+     not_compliant_on :maglev do
+       @obj.foo1(a += 1, &(a += 1; p)).should == [1, true]
+       @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, true]
+       @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, true]
+       @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, true]
+     end
+     deviates_on :maglev do
+        # p not evaluated at end 
+       @obj.foo1(a += 1, &(a += 1; p)).should == [1, p]
+       @obj.foo2(a += 1, a += 1, &(a += 1; p)).should == [3, 4, p]
+       @obj.foo3(a += 1, a += 1, a += 1, &(a += 1; p)).should == [6, 7, 8, p]
+       @obj.foo4(a += 1, a += 1, a += 1, a += 1, &(a += 1; p)).should == [10, 11, 12, 13, p]
+     end
       a.should == 14
     end
  
@@ -70,7 +74,7 @@ describe "A method call" do
       p = p1
       (p = p2; @obj).foo0(&p).should == [false]
       p = p1
-      (p = p2; @obj).foo1(1, &p).should == [1, false]  
+      (p = p2; @obj).foo1(1, &p).should == [1, false]
       p = p1
       (p = p2; @obj).foo2(1, 1, &p).should == [1, 1, false]
       p = p1

@@ -33,14 +33,15 @@ describe "String#*" do
     (StringSpecs::MyString.new("cool") * 2).should be_kind_of(StringSpecs::MyString)
   end
   
-  # Maglev, no taint propagation
-# it "always taints the result when self is tainted" do
-#   ["", "OK", StringSpecs::MyString.new(""), StringSpecs::MyString.new("OK")].each do |str|
-#     str.taint
-#
-#     [0, 1, 2].each do |arg|
-#       (str * arg).tainted?.should == true
-#     end
-#   end
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "always taints the result when self is tainted" do
+    ["", "OK", StringSpecs::MyString.new(""), StringSpecs::MyString.new("OK")].each do |str|
+      str.taint
+ 
+      [0, 1, 2].each do |arg|
+        (str * arg).tainted?.should == true
+      end
+    end
+  end
+ end
 end

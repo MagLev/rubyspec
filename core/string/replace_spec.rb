@@ -8,13 +8,14 @@ describe "String#replace" do
     a.should == "another string"
   end
 
-  # Maglev, no taint propagation
-# it "replaces the taint status of self with that of other" do
-#   a = "an untainted string"
-#   b = "a tainted string".taint
-#   a.replace(b)
-#   a.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "replaces the taint status of self with that of other" do
+    a = "an untainted string"
+    b = "a tainted string".taint
+    a.replace(b)
+    a.tainted?.should == true
+  end
+ end
 
   it "tries to convert other to string using to_str" do
     other = mock('x')

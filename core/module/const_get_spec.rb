@@ -47,15 +47,12 @@ describe "Module#const_get" do
     ConstantSpecs::ContainerA.const_get(:CS_CONSTX)
   end
 
-# it "does not search the singleton class of a Class or Module" do # Maglev finds it
-#   lambda do
-#     ConstantSpecs::ContainerA::ChildA.const_get(:CS_CONST14)
-#   end.should raise_error(NameError)
-#   cx = nil
-#   rx = nil
-#   lambda { cx = ConstantSpecs
-#           rx = cx.const_get(:CS_CONST14) }.should raise_error(NameError)
-# end
+  it "does not search the singleton class of a Class or Module" do
+    lambda do
+      ConstantSpecs::ContainerA::ChildA.const_get(:CS_CONST14)
+    end.should raise_error(NameError)
+    lambda { ConstantSpecs.const_get(:CS_CONST14) }.should raise_error(NameError)
+  end
 
   it "does not search the containing scope" do
     ConstantSpecs::ContainerA::ChildA.const_get(:CS_CONST20).should == :const20_2
@@ -106,11 +103,15 @@ describe "Module#const_get" do
     end
 
     it "returns a toplevel constant when the receiver is a Module" do
-      #ConstantSpecs.const_get(:CS_CONST1).should == :const1
-      #ConstantSpecs::ModuleA.const_get(:CS_CONST1).should == :const1
-      # maglev deviation, be consistent with const_defined? after fix of Trac672
-      lambda { ConstantSpecs.const_get(:CS_CONST1) }.should raise_error(NameError)
-      lambda { ConstantSpecs::ModuleA.const_get(:CS_CONST1) }.should raise_error(NameError)
+     not_compliant_on :maglev do
+      ConstantSpecs.const_get(:CS_CONST1).should == :const1
+      ConstantSpecs::ModuleA.const_get(:CS_CONST1).should == :const1
+     end
+     deviates_on :maglev do
+       # maglev deviation, be consistent with const_defined? after fix of Trac672
+       lambda { ConstantSpecs.const_get(:CS_CONST1) }.should raise_error(NameError)
+       lambda { ConstantSpecs::ModuleA.const_get(:CS_CONST1) }.should raise_error(NameError)
+     end
     end
   end
 
@@ -159,11 +160,15 @@ describe "Module#const_get" do
 
     it "returns a toplevel constant when the receiver is a Module" do
       Object::CS_CONST308 = :const308
-      #ConstantSpecs.const_get(:CS_CONST308).should == :const308
-      #ConstantSpecs::ModuleA.const_get(:CS_CONST308).should == :const308
-      # maglev deviation, be consistent with const_defined? after fix of Trac672
-      lambda { ConstantSpecs.const_get(:CS_CONST308).should == :const308  }.should raise_error(NameError)
-      lambda { ConstantSpecs::ModuleA.const_get(:CS_CONST308).should == :const308  }.should raise_error(NameError)
+     not_compliant_on :maglev do
+      ConstantSpecs.const_get(:CS_CONST308).should == :const308
+      ConstantSpecs::ModuleA.const_get(:CS_CONST308).should == :const308
+     end
+     deviates_on :maglev do
+       # maglev deviation, be consistent with const_defined? after fix of Trac672
+       lambda { ConstantSpecs.const_get(:CS_CONST308).should == :const308  }.should raise_error(NameError)
+       lambda { ConstantSpecs::ModuleA.const_get(:CS_CONST308).should == :const308  }.should raise_error(NameError)
+     end
     end
 
     it "returns the updated value of a constant" do

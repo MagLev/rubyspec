@@ -8,8 +8,12 @@ describe "The __FILE__ pseudo-variable" do
   end
 
   it "equals (eval) inside an eval" do
-    #eval("__FILE__").should == "(eval)"
-    eval("__FILE__").index( '(eval)' ).should == 0 # maglev
+   not_compliant_on :maglev do
+    eval("__FILE__").should == "(eval)"
+   end
+   deviates_on :maglev do
+    eval("__FILE__").index( '(eval)' ).should == 0 
+   end
   end
 end
 

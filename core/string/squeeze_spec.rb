@@ -61,7 +61,7 @@ describe "String#squeeze" do
     end
   end
 
- not_compliant_on :maglev do # Maglev no taint prop.
+ not_supported_on :maglev do # no taint propagation
   it "taints the result when self is tainted" do
     "hello".taint.squeeze("e").tainted?.should == true
     "hello".taint.squeeze("a-z").tainted?.should == true

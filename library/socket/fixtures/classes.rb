@@ -14,13 +14,19 @@ module SocketSpecs
   end
   
   def self.port
-    # 40001
-    10202  # For solaris, port number needs to be resolvable, and free
+    p = 40001
+    deviates_on :maglev do
+      p = 10202  # For solaris, a port in services database
+    end
+    p 
   end
   
   def self.str_port
-    # "40001"
-    "10202"  # For solaris, port number needs to be resolvable
+    s = "40001"
+    deviates_on :maglev do
+      s = "10202" # For solaris, a port in services database
+    end
+    s
   end
 
   def self.sockaddr_in(port, host)

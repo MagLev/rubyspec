@@ -70,9 +70,11 @@ describe "Module#remove_const" do
   end
 
   ruby_version_is "" ... "1.9" do
-#   it "is a private method" do	# Maglev, not private yet
-#     Module.private_methods.should include("remove_const")
-#   end
+   not_compliant_on :maglev do #  not private yet
+    it "is a private method" do	# Maglev, not private yet
+      Module.private_methods.should include("remove_const")
+    end
+   end
   end
 
   ruby_version_is "1.9" do

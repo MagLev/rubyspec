@@ -19,8 +19,7 @@ describe "BigDecimal.limit" do
 
     BigDecimalSpecs::with_limit(1) do
       (BigDecimal('0.888') + BigDecimal('0')).should == BigDecimal('0.9')
-# Maglev debugging
-      (c=( (a =BigDecimal('0.888')) * (b=BigDecimal('3')))).should == BigDecimal('3')
+      (BigDecimal('0.888') * BigDecimal('3')).should == BigDecimal('3')
     end
 
     BigDecimalSpecs::with_limit(2) do

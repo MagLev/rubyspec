@@ -43,12 +43,12 @@ describe "UnboundMethod#==" do
   end
 
  not_compliant_on :maglev do
-  it "returns true if either is an alias for the other" do #
+  it "returns true if either is an alias for the other" do 
     ((ma = @from_module) == (mb = @alias_1)).should == true
     (@alias_1 == @from_module).should == true
   end
 
-  it "returns true if both are aliases for a third method" do #
+  it "returns true if both are aliases for a third method" do
     (@from_module == @alias_1).should == true
     (@alias_1 == @from_module).should == true
 
@@ -58,7 +58,7 @@ describe "UnboundMethod#==" do
     (@alias_1 == @alias_2).should == true
     (@alias_2 == @alias_1).should == true
   end
- end #
+ end
 
   it "returns true if same method is extracted from the same subclass" do
     (@child1 == @child1_alt).should == true
@@ -93,7 +93,7 @@ describe "UnboundMethod#==" do
     (@identical_body == @original_name).should == false
   end
 
-  # See above for Rubinius
+  # See above for Rubinius , Maglev
    not_compliant_on :rubinius , :maglev do  
     it "returns false if same method but one extracted from a subclass" do
       (@parent == @child1).should == false

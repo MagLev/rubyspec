@@ -11,8 +11,13 @@ describe "Kernel#instance_variables" do
 
     ruby_version_is ""..."1.9" do
       it "returns the correct array if an instance variable is added" do
-        # a = 0
-        a = 'abc'  # maglev cannot use specials 
+       a = nil
+       not_compliant_on :maglev do
+        a = 0
+       end
+       deviates_on :maglev do
+        a = 'abc'  # maglev cannot use a special object here
+       end
         a.instance_variable_set("@test", 1)
         a.instance_variables.should == ["@test"]
       end
@@ -20,8 +25,13 @@ describe "Kernel#instance_variables" do
 
     ruby_version_is "1.9" do
       it "returns the correct array if an instance variable is added" do
-        # a = 0
-        a = 'abc'  # maglev cannot use specials 
+       a = nil
+       not_compliant_on :maglev do
+        a = 0 
+       end
+       deviates_on :maglev do
+        a = 'abc'  # maglev cannot use a special object here
+       end
         a.instance_variable_set("@test", 1)
         a.instance_variables.should == [:@test]
       end

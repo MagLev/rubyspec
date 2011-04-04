@@ -33,5 +33,5 @@ describe "Process::Status#signaled?" do
     end
 
   end
- end #
+ end 
 end

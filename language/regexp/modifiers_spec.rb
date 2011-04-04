@@ -54,9 +54,13 @@ describe "Regexps with modifers" do
       o1 = LanguageSpecs::ClassWith_to_s.new(to_s_callback1)
       ScratchPad << LanguageSpecs.get_regexp_with_substitution(o1)
   
+     not_compliant_on :maglev do
+      ScratchPad.recorded.should == [:to_s_callback1, :to_s_callback2, /class_with_to_s2/, /class_with_to_s2/]
+     end
+     deviates_on :maglev do
       # Maglev thread scheduling differences
-#     ScratchPad.recorded.should == [:to_s_callback1, :to_s_callback2, /class_with_to_s2/, /class_with_to_s2/]
       ScratchPad.recorded.should == [:to_s_callback1, :to_s_callback2, /class_with_to_s2/, /class_with_to_s1/]
+     end
     end
   end
   

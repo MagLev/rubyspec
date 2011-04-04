@@ -5,7 +5,7 @@ describe "Module.constants" do
   it "returns an array of the names of all toplevel constants" do
     count = Module.constants.size
     module ConstantSpecsAdded
-      CS_CONST1
+      CS_CONST1 = 1
     end
     Module.constants.size.should == count + 1
   end

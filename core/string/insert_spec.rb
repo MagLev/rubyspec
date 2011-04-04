@@ -39,16 +39,17 @@ describe "String#insert with index, other" do
     "abcd".insert(-3, other).should == "abXYZcd"
   end
 
-# Maglev, no taint propagate
-# it "taints self if string to insert is tainted" do
-#   str = "abcd"
-#   str.insert(0, "T".taint).tainted?.should == true
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if string to insert is tainted" do
+    str = "abcd"
+    str.insert(0, "T".taint).tainted?.should == true
 
-#   str = "abcd"
-#   other = mock('T')
-#   def other.to_str() "T".taint end
-#   str.insert(0, other).tainted?.should == true
-# end
+    str = "abcd"
+    other = mock('T')
+    def other.to_str() "T".taint end
+    str.insert(0, other).tainted?.should == true
+  end
+ end
 
   it "raises a TypeError if other can't be converted to string" do
     lambda { "abcd".insert(-6, Object.new)}.should raise_error(TypeError)
@@ -59,7 +60,9 @@ describe "String#insert with index, other" do
   ruby_version_is ""..."1.9" do 
     it "raises a TypeError if self is frozen" do
       str = "abcd".freeze
-      # lambda { str.insert(4, '')  }.should raise_error(TypeError) # Maglev error only on actual modify
+     not_compliant_on :maglev do  # error only on actual modification attempt
+      lambda { str.insert(4, '')  }.should raise_error(TypeError)
+     end
       lambda { str.insert(4, 'X') }.should raise_error(TypeError)
     end
   end

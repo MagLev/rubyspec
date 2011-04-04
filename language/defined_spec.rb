@@ -1,6 +1,13 @@
 require File.expand_path('../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/defined', __FILE__)
 
+nil_exp = nil
+is_maglev = false
+deviates_on :maglev do
+  nil_exp = 'expression'
+  is_maglev = true
+end
+
 describe "The defined? keyword for literals" do
   it "returns 'self' for self" do
     ret = defined?(self)
@@ -40,14 +47,14 @@ describe "The defined? keyword when called with a method name" do
     end
 
    not_compliant_on :maglev do # public/private not conformant yet
-    it "returns nil if the method is private" do #
+    it "returns nil if the method is private" do
       defined?(Object.print).should be_nil
     end
 
     it "returns nil if the method is protected" do
       defined?(DefinedSpecs::Basic.new.protected_method).should be_nil
     end
-   end #
+   end
 
     it "returns nil if the method is not defined" do
       defined?(Kernel.defined_specs_undefined_method).should be_nil
@@ -174,7 +181,12 @@ describe "The defined? keyword for an expression" do
   end
 
   it "returns 'assignment' for assigning multiple variables" do
-    defined?((a, b = 1, 2)).should == 'expression' # maglev deviation, was "assignment"
+   not_compliant_on :maglev do
+    defined?((a, b = 1, 2)).should == "assignment"
+   end
+   deviates_on :maglev do
+    defined?((a, b = 1, 2)).should == 'expression'
+   end
   end
 
   it "returns 'assignment' for an expression with '%='" do
@@ -238,13 +250,11 @@ describe "The defined? keyword for an expression" do
   end
 
   it "returns nil for an expression with != and an undefined method" do
-    # defined?(defined_specs_undefined_method != 2).should be_nil
-    defined?(defined_specs_undefined_method != 2).should == 'expression' # maglev 
+    defined?(defined_specs_undefined_method != 2).should == nil_exp
   end
 
   it "returns nil for an expression with !~ and an undefined method" do
-    # defined?(defined_specs_undefined_method !~ 2).should be_nil
-    defined?(defined_specs_undefined_method !~ 2).should == 'expression' # maglev
+    defined?(defined_specs_undefined_method !~ 2).should == nil_exp
   end
 
   it "returns 'method' for an expression with '=='" do
@@ -278,24 +288,24 @@ describe "The defined? keyword for an expression" do
 
   describe "with logical connectives" do
     it "returns nil for an expression with '!' and an undefined method" do
-      defined?(!defined_specs_undefined_method).should == 'expression' # maglev, was be_nil
+      defined?(!defined_specs_undefined_method).should == nil_exp
     end
 
     it "returns nil for an expression with '!' and an unset class variable" do
-      defined?(!@@defined_specs_undefined_class_variable).should == 'expression' # maglev, was be_nil
+      defined?(!@@defined_specs_undefined_class_variable).should == nil_exp
     end
 
     it "returns nil for an expression with 'not' and an undefined method" do
-      defined?(not defined_specs_undefined_method).should == 'expression' # maglev, was be_nil
+      defined?(not defined_specs_undefined_method).should == nil_exp
     end
 
     it "returns nil for an expression with 'not' and an unset class variable" do
-      defined?(not @@defined_specs_undefined_class_variable).should == 'expression' # maglev, was be_nil
+      defined?(not @@defined_specs_undefined_class_variable).should == nil_exp
     end
 
     it "does not propagate an exception raised by a method in a 'not' expression" do
-      defined?(not DefinedSpecs.exception_method).should == 'expression' # maglev, was be_nil
-      ScratchPad.recorded.should == nil # maglev, was == :defined_specs_exception
+      defined?(not DefinedSpecs.exception_method).should == nil_exp
+      ScratchPad.recorded.should == (is_maglev ? nil :  :defined_specs_exception)
     end
 
     it "returns 'expression' for an expression with '&&/and' and an unset global variable" do
@@ -341,9 +351,9 @@ describe "The defined? keyword for an expression" do
         defined?(!@defined_specs_undefined_instance_variable).should == "expression"
       end
 
-      it "calls a method in a 'not' expression and returns 'expression'" do # maglev does not call method
+      it "calls a method in a 'not' expression and returns 'expression'" do
         defined?(not DefinedSpecs.side_effects).should == "expression"
-        ScratchPad.recorded.should == nil # maglev deviation, was :defined_specs_side_effects
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_side_effects )
       end
 
       it "returns 'expression' for an expression with 'not' and an unset global variable" do
@@ -355,63 +365,63 @@ describe "The defined? keyword for an expression" do
       end
 
       it "returns nil for an expression with '&&/and' and an undefined method" do
-        defined?(defined_specs_undefined_method && true).should == 'expression' # maglev, was be_nil
-        defined?(defined_specs_undefined_method or true).should == 'expression' # maglev, was be_nil
+        defined?(defined_specs_undefined_method && true).should == nil_exp
+        defined?(defined_specs_undefined_method or true).should == nil_exp
       end
 
       it "returns nil for an expression with '&&/and' and an unset class variable" do
-        defined?(@@defined_specs_undefined_class_variable && true).should == 'expression' # maglev, was be_nil
-        defined?(@@defined_specs_undefined_class_variable or true).should == 'expression' # maglev, was be_nil
+        defined?(@@defined_specs_undefined_class_variable && true).should == nil_exp
+        defined?(@@defined_specs_undefined_class_variable or true).should == nil_exp
       end
 
       it "does not propagate an exception raised by a method in an '&&' expression" do
-        defined?(DefinedSpecs.exception_method && true).should == 'expression' # maglev, was be_nil
-        ScratchPad.recorded.should == nil # maglev, was == :defined_specs_exception
+        defined?(DefinedSpecs.exception_method && true).should == nil_exp
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_exception )
       end
 
       it "calls a method in an '&&' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects && true).should == "expression"
-        ScratchPad.recorded.should == nil # maglev, was == :defined_specs_side_effects
+        ScratchPad.recorded.should == (is_maglev ? nil :  :defined_specs_side_effects)
       end
 
       it "does not propagate an exception raised by a method in an 'and' expression" do
-        defined?(DefinedSpecs.exception_method and true).should == 'expression' # maglev, was be_nil
-        ScratchPad.recorded.should == nil # maglev, was == :defined_specs_exception
+        defined?(DefinedSpecs.exception_method and true).should == nil_exp 
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_exception )
       end
 
       it "calls a method in an 'and' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects and true).should == "expression"
-        ScratchPad.recorded.should == nil # maglev, was == :defined_specs_side_effects
+        ScratchPad.recorded.should == (is_maglev ? nil :  :defined_specs_side_effects)
       end
 
       it "returns nil for an expression with '||/or' and an undefined method" do
-        defined?(defined_specs_undefined_method || true).should == 'expression' # maglev, was be_nil
-        defined?(defined_specs_undefined_method or true).should == 'expression' # maglev, was be_nil
+        defined?(defined_specs_undefined_method || true).should == nil_exp 
+        defined?(defined_specs_undefined_method or true).should == nil_exp 
       end
 
       it "returns nil for an expression with '||/or' and an unset class variable" do
-        defined?(@@defined_specs_undefined_class_variable || true).should == 'expression' # maglev, was be_nil
-        defined?(@@defined_specs_undefined_class_variable or true).should == 'expression' # maglev, was be_nil
+        defined?(@@defined_specs_undefined_class_variable || true).should == nil_exp 
+        defined?(@@defined_specs_undefined_class_variable or true).should == nil_exp 
       end
 
       it "does not propagate an exception raised by a method in an '||' expression" do
-        defined?(DefinedSpecs.exception_method || true).should == 'expression' # maglev, was be_nil
-        ScratchPad.recorded.should == nil # maglev was == :defined_specs_exception
+        defined?(DefinedSpecs.exception_method || true).should == nil_exp 
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_exception )
       end
 
       it "calls a method in an '||' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects || true).should == "expression"
-        ScratchPad.recorded.should == nil # maglev was == :defined_specs_side_effects
+        ScratchPad.recorded.should == (is_maglev ? nil :  :defined_specs_side_effects)
       end
 
       it "does not propagate an exception raised by a method in an 'or' expression" do
-        defined?(DefinedSpecs.exception_method or true).should == 'expression' # maglev, was be_nil
-        ScratchPad.recorded.should == nil # maglev was == :defined_specs_exception
+        defined?(DefinedSpecs.exception_method or true).should == nil_exp 
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_exception )
       end
 
       it "calls a method in an 'or' expression and returns 'expression'" do
         defined?(DefinedSpecs.side_effects or true).should == "expression"
-        ScratchPad.recorded.should == nil # maglev was == :defined_specs_side_effects
+        ScratchPad.recorded.should == (is_maglev ? nil :  :defined_specs_side_effects)
       end
     end
 
@@ -498,26 +508,21 @@ describe "The defined? keyword for an expression" do
 
     ruby_version_is ""..."1.9" do
       it "returns nil when the String contains a call to an undefined method" do
-        # defined?("garble #{DefinedSpecs.undefined_method}").should be_nil
-        defined?("garble #{DefinedSpecs.undefined_method}").should == 'expression' # maglev
+        defined?("garble #{DefinedSpecs.undefined_method}").should == nil_exp
       end
 
       it "calls the method in the String" do
         defined?("garble #{DefinedSpecs.side_effects}").should == "expression"
-        # ScratchPad.recorded.should == :defined_specs_side_effects
-        ScratchPad.recorded.should == nil # maglev 
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_side_effects )
       end
 
       it "returns nil if any of the interpolated method calls are undefined" do
-        # defined?("#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}").should be_nil
-        # ScratchPad.recorded.should == :defined_specs_side_effects
-        defined?("#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}").should == 'expression' # maglev
-        ScratchPad.recorded.should == nil # maglev
+        defined?("#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}").should == nil_exp
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_side_effects) 
       end
 
       it "returns nil and stops processing if any of the interpolated method calls are undefined" do
-        # defined?("#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}").should be_nil
-        defined?("#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}").should == 'expression' # maglev
+        defined?("#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}").should == nil_exp
         ScratchPad.recorded.should be_nil
       end
     end
@@ -545,26 +550,21 @@ describe "The defined? keyword for an expression" do
 
     ruby_version_is ""..."1.9" do
       it "returns nil when the Regexp contains a call to an undefined method" do
-        # defined?(/garble #{DefinedSpecs.undefined_method}/).should be_nil
-        defined?(/garble #{DefinedSpecs.undefined_method}/).should == 'expression' # maglev
+        defined?(/garble #{DefinedSpecs.undefined_method}/).should == nil_exp
       end
 
       it "calls the method in the Regexp" do
         defined?(/garble #{DefinedSpecs.side_effects}/).should == "expression"
-        # ScratchPad.recorded.should == :defined_specs_side_effects
-        ScratchPad.recorded.should == nil # maglev
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_side_effects)
       end
 
       it "returns nil if any of the interpolated method calls are undefined" do
-        #defined?(/#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}/).should be_nil
-        #ScratchPad.recorded.should == :defined_specs_side_effects
-        defined?(/#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}/).should == 'expression' # maglev
-        ScratchPad.recorded.should == nil # maglev
+        defined?(/#{DefinedSpecs.side_effects} #{DefinedSpecs.undefined_method}/).should == nil_exp
+        ScratchPad.recorded.should == (is_maglev ? nil : :defined_specs_side_effects)
       end
 
       it "returns nil and stops processing if any of the interpolated method calls are undefined" do
-        # defined?(/#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}/).should be_nil
-        defined?(/#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}/).should == 'expression' # maglev
+        defined?(/#{DefinedSpecs.undefined_method} #{DefinedSpecs.side_effects}/).should == nil_exp
         ScratchPad.recorded.should be_nil
       end
     end
@@ -645,13 +645,12 @@ describe "The defined? keyword for variables" do
   # 'global-variable' even if no match has been done.
 
   it "returns 'global-variable' for $!" do
-    # defined?($!).should == "global-variable"
-    defined?($!).should == nil # maglev
+    defined?($!).should == (is_maglev ? nil : "global-variable" )
   end
 
   it "returns 'global-variable for $~" do
-    # defined?($~).should == "global-variable"
-    defined?($~).should == 'local-variable' # maglev , because it is frame-local
+    # maglev says local-variable because it is a frame-local
+    defined?($~).should == (is_maglev ? 'local-variable' : "global-variable" )
   end
 
   describe "when a String does not match a Regexp" do
@@ -660,41 +659,35 @@ describe "The defined? keyword for variables" do
     end
 
     it "returns 'global-variable' for $~" do
-      # defined?($~).should == "global-variable"
-      defined?($~).should == "local-variable" # maglev
+      defined?($~).should == (is_maglev ? 'local-variable' : "global-variable" )
     end
 
     it "returns nil for $&" do
-      # defined?($&).should be_nil
-      defined?($&).should == 'expression' # maglev
+      defined?($&).should == nil_exp
     end
 
     it "returns nil for $`" do
-      # defined?($`).should be_nil
-      defined?($`).should == 'expression' # maglev
+      defined?($`).should == nil_exp
     end
 
     it "returns nil for $'" do
-      # defined?($').should be_nil
-      defined?($').should == 'expression' # maglev
+      defined?($').should == nil_exp
     end
 
     it "returns nil for $+" do
-      # defined?($+).should be_nil
-      defined?($+).should == 'expression' # maglev
+      defined?($+).should == nil_exp
     end
 
     it "returns nil for $1-$9" do
-      # defined?($1).should be_nil
-      defined?($1).should == 'expression' # maglev
-      defined?($2).should == 'expression' # maglev
-      defined?($3).should == 'expression' # maglev
-      defined?($4).should == 'expression' # maglev
-      defined?($5).should == 'expression' # maglev
-      defined?($6).should == 'expression' # maglev
-      defined?($7).should == 'expression' # maglev
-      defined?($8).should == 'expression' # maglev
-      defined?($9).should == 'expression' # maglev
+      defined?($1).should == nil_exp
+      defined?($2).should == nil_exp
+      defined?($3).should == nil_exp
+      defined?($4).should == nil_exp
+      defined?($5).should == nil_exp
+      defined?($6).should == nil_exp
+      defined?($7).should == nil_exp
+      defined?($8).should == nil_exp
+      defined?($9).should == nil_exp
     end
   end
 
@@ -705,35 +698,28 @@ describe "The defined? keyword for variables" do
 
     ruby_version_is ""..."1.9" do
       it "returns 'global-variable' for $~" do
-        # defined?($~).should == "global-variable"
-        defined?($~).should == "local-variable" # maglev
+        defined?($~).should == (is_maglev ? "local-variable" : "global-variable")
       end
 
       it "returns 'global-variable' for $&" do
-        # defined?($&).should == "$&"
-        defined?($&).should == 'expression' # maglev
+        defined?($&).should == (is_maglev ? 'expression' : "$&")
       end
 
       it "returns 'global-variable' for $`" do
-        # defined?($`).should == "$`"
-        defined?($`).should == 'expression' # maglev
+        defined?($`).should == (is_maglev ?  'expression' : "$`")
       end
 
       it "returns 'global-variable' for $'" do
-        # defined?($').should == "$'"
-        defined?($').should == 'expression' # maglev
+        defined?($').should == (is_maglev ? 'expression' : "$'")
       end
 
       it "returns 'global-variable' for $+" do
-        # defined?($+).should == "$+"
-        defined?($+).should == 'expression' # maglev
+        defined?($+).should == (is_maglev ? 'expression' : "$+")
       end
 
       it "returns 'global-variable' for the capture references" do
-        # defined?($1).should == "$1"
-        # defined?($2).should == "$2"
-        defined?($1).should == 'expression' # maglev
-        defined?($2).should == 'expression' # maglev
+        defined?($1).should == (is_maglev ? 'expression' : "$1" )
+        defined?($2).should == (is_maglev ? 'expression' : "$2" )
       end
     end
 
@@ -765,14 +751,13 @@ describe "The defined? keyword for variables" do
     end
 
     it "returns nil for non-captures" do
-      # defined?($3).should be_nil
-      defined?($3).should == 'expression' # maglev
-      defined?($4).should == 'expression' # maglev
-      defined?($5).should == 'expression' # maglev
-      defined?($6).should == 'expression' # maglev
-      defined?($7).should == 'expression' # maglev
-      defined?($8).should == 'expression' # maglev
-      defined?($9).should == 'expression' # maglev
+      defined?($3).should == nil_exp
+      defined?($4).should == nil_exp
+      defined?($5).should == nil_exp
+      defined?($6).should == nil_exp
+      defined?($7).should == nil_exp
+      defined?($8).should == nil_exp
+      defined?($9).should == nil_exp
     end
   end
 
@@ -782,36 +767,35 @@ describe "The defined? keyword for variables" do
     end
 
     it "returns 'global-variable' for $~" do
-      # defined?($~).should == "global-variable"
-      defined?($~).should == "local-variable" # maglev
+      defined?($~).should == (is_maglev ? "local-variable" : "global-variable")
     end
 
     it "returns nil for $&" do
-      defined?($&).should == 'expression' # maglev, was be_nil
+      defined?($&).should == nil_exp
     end
 
     it "returns nil for $`" do
-      defined?($`).should == 'expression' # maglev, was be_nil
+      defined?($`).should == nil_exp
     end
 
     it "returns nil for $'" do
-      defined?($').should == 'expression' # maglev, was be_nil
+      defined?($').should == nil_exp
     end
 
     it "returns nil for $+" do
-      defined?($+).should == 'expression' # maglev, was be_nil
+      defined?($+).should == nil_exp
     end
 
     it "returns nil for $1-$9" do
-      defined?($1).should == 'expression' # maglev, was be_nil
-      defined?($2).should == 'expression' # maglev, was be_nil
-      defined?($3).should == 'expression' # maglev, was be_nil
-      defined?($4).should == 'expression' # maglev, was be_nil
-      defined?($5).should == 'expression' # maglev, was be_nil
-      defined?($6).should == 'expression' # maglev, was be_nil
-      defined?($7).should == 'expression' # maglev, was be_nil
-      defined?($8).should == 'expression' # maglev, was be_nil
-      defined?($9).should == 'expression' # maglev, was be_nil
+      defined?($1).should == nil_exp
+      defined?($2).should == nil_exp
+      defined?($3).should == nil_exp
+      defined?($4).should == nil_exp
+      defined?($5).should == nil_exp
+      defined?($6).should == nil_exp
+      defined?($7).should == nil_exp
+      defined?($8).should == nil_exp
+      defined?($9).should == nil_exp
     end
   end
 
@@ -822,29 +806,28 @@ describe "The defined? keyword for variables" do
 
     ruby_version_is ""..."1.9" do
       it "returns 'global-variable' for $~" do
-        # defined?($~).should == "global-variable"
-        defined?($~).should == "local-variable"
+        defined?($~).should == (is_maglev ? "local-variable" : "global-variable")
       end
 
       it "returns 'global-variable' for $&" do
-        defined?($&).should == 'expression' # maglev, was "$&"
+        defined?($&).should == (is_maglev ? 'expression' : "$&" )
       end
 
       it "returns 'global-variable' for $`" do
-        defined?($`).should == 'expression' # maglev, was "$`"
+        defined?($`).should == (is_maglev ? 'expression' :  "$`" )
       end
 
       it "returns 'global-variable' for $'" do
-        defined?($').should == 'expression' # maglev, was "$'"
+        defined?($').should == (is_maglev ? 'expression' :  "$'" )
       end
 
       it "returns 'global-variable' for $+" do
-        defined?($+).should == 'expression' # maglev, was "$+"
+        defined?($+).should == (is_maglev ? 'expression' :  "$+" )
       end
 
       it "returns 'global-variable' for the capture references" do
-        defined?($1).should == 'expression' # maglev, was "$1"
-        defined?($2).should == 'expression' # maglev, was "$2"
+        defined?($1).should == (is_maglev ? 'expression' :  "$1" )
+        defined?($2).should == (is_maglev ? 'expression' :  "$2" )
       end
     end
 
@@ -876,13 +859,13 @@ describe "The defined? keyword for variables" do
     end
 
     it "returns nil for non-captures" do
-      defined?($3).should == 'expression' # maglev, was be_nil
-      defined?($4).should == 'expression' # maglev, was be_nil
-      defined?($5).should == 'expression' # maglev, was be_nil
-      defined?($6).should == 'expression' # maglev, was be_nil
-      defined?($7).should == 'expression' # maglev, was be_nil
-      defined?($8).should == 'expression' # maglev, was be_nil
-      defined?($9).should == 'expression' # maglev, was be_nil
+      defined?($3).should == nil_exp
+      defined?($4).should == nil_exp
+      defined?($5).should == nil_exp
+      defined?($6).should == nil_exp
+      defined?($7).should == nil_exp
+      defined?($8).should == nil_exp
+      defined?($9).should == nil_exp
     end
   end
   it "returns 'global-variable' for a global variable that has been assigned" do
@@ -902,15 +885,14 @@ describe "The defined? keyword for variables" do
   end
 
   ruby_version_is ""..."1.9" do
-    not_compliant_on :rubinius do
+    not_compliant_on :rubinius, :maglev do
       it "returns 'local-variable(in-block)' when called with the name of a block local" do
         block = Proc.new { |xxx| defined?(xxx) }
-        # block.call(1).should == "local-variable(in-block)"
-        block.call(1).should == 'local-variable' # maglev
+        block.call(1).should == "local-variable(in-block)"
       end
     end
 
-  deviates_on :rubinius do
+  deviates_on :rubinius, :maglev do
     # Rubinius does not care about dynamic vars
     it "returns 'local-variable' when called with the name of a block local" do
       block = Proc.new { |x| defined?(x) }
@@ -982,9 +964,13 @@ describe "The defined? keyword for a scoped constant" do # [
     end
 
     it "calls .const_missing for the parent and uses the return constant for scope" do
-#      Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
-#      defined?(DefinedSpecsUndefined::Child).should == "constant"
-       defined?(DefinedSpecsUndefined::Child).should == nil   # maglev deviation
+      not_compliant_on :maglev do
+       Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
+       defined?(DefinedSpecsUndefined::Child).should == "constant"
+      end
+      deviates_on :maglev do
+       defined?(DefinedSpecsUndefined::Child).should == nil  
+      end
     end
   end
 
@@ -1008,15 +994,23 @@ describe "The defined? keyword for a scoped constant" do # [
   ruby_version_is ""..."1.9" do
     describe "when the scope chain has undefined constants" do
       it "calls .const_missing for each constant in the scope chain and returns nil if any are not defined" do
-        #Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
-        #DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(nil)
+       not_compliant_on :maglev do
+         Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
+         DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(nil)
+       end
+       deviates_on :maglev do
         defined?(DefinedSpecsUndefined::Undefined::Undefined).should be_nil
+       end
       end
 
       it "calls .const_missing and returns 'constant' if all constants are defined" do
-        #Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
-        #DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(DefinedSpecs::Child)
-        defined?(DefinedSpecsUndefined::Undefined::A).should == nil # maglev, was "constant"
+       not_compliant_on :maglev do
+        Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
+        DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(DefinedSpecs::Child)
+       end
+       deviates_on :maglev do
+        defined?(DefinedSpecsUndefined::Undefined::A).should == nil
+       end
       end
     end
   end
@@ -1059,14 +1053,22 @@ describe "The defined? keyword for a top-level scoped constant" do
     describe "when the scope chain has undefined constants" do
       it "calls .const_missing for each constant in the scope chain and returns nil if any are not defined" do
         Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
-        # DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(nil)
+       not_compliant_on :maglev do
+        DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(nil)
+       end
+       deviates_on :maglev do
         defined?(::DefinedSpecsUndefined::Undefined::Undefined).should be_nil
+       end
       end
 
       it "calls .const_missing and returns 'constant' if all constants are defined" do
         Object.should_receive(:const_missing).with(:DefinedSpecsUndefined).and_return(DefinedSpecs)
-        # DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(DefinedSpecs::Child)
-        defined?(::DefinedSpecsUndefined::Undefined::A).should == nil # maglev, was "constant"
+       not_compliant_on :maglev do
+        DefinedSpecs.should_receive(:const_missing).with(:Undefined).and_return(DefinedSpecs::Child)
+       end
+       deviates_on :maglev do
+        defined?(::DefinedSpecsUndefined::Undefined::A).should == nil
+       end
       end
     end
   end
@@ -1137,15 +1139,15 @@ describe "The defined? keyword for a module method call scoped constant" do
     defined?(DefinedSpecs.defined_method::Basic::A).should == "constant"
   end
 
-# Maglev gets NameError on Undefined 
-# it "returns nil if the outer scope constant in the receiver is not defined" do
-#   defined?(Undefined::DefinedSpecs.defined_method::Basic).should be_nil
-# end
+ not_compliant_on :maglev do # Maglev gets NameError on Undefined 
+  it "returns nil if the outer scope constant in the receiver is not defined" do
+    defined?(Undefined::DefinedSpecs.defined_method::Basic).should be_nil
+  end
 
-# Maglev gets NameError on Undefined 
-# it "returns nil if the scoped constant in the receiver is not defined" do
-#   defined?(DefinedSpecs::Undefined.defined_method::Basic).should be_nil
-# end
+  it "returns nil if the scoped constant in the receiver is not defined" do
+    defined?(DefinedSpecs::Undefined.defined_method::Basic).should be_nil
+  end
+ end 
 
   it "returns 'constant' if all the constants in the receiver are defined" do
     defined?(Object::DefinedSpecs.defined_method::Basic).should == "constant"
@@ -1210,43 +1212,42 @@ end
 
 describe "The defined? keyword for yield" do
   it "returns nil if no block is passed to a method not taking a block parameter" do
-    DefinedSpecs::Basic.new.no_yield_block.should == 'expression' # maglev, was be_nil
+    DefinedSpecs::Basic.new.no_yield_block.should == nil_exp
   end
 
   it "returns nil if no block is passed to a method taking a block parameter" do
-    DefinedSpecs::Basic.new.no_yield_block_parameter.should == 'expression' # maglev, was be_nil
+    DefinedSpecs::Basic.new.no_yield_block_parameter.should == nil_exp
   end
 
   it "returns 'yield' if a block is passed to a method not taking a block parameter" do
-    DefinedSpecs::Basic.new.yield_block.should == 'expression' # maglev, was "yield"
+    DefinedSpecs::Basic.new.yield_block.should == (is_maglev ? 'expression' : "yield" )
   end
 
   it "returns 'yield' if a block is passed to a method taking a block parameter" do
-    DefinedSpecs::Basic.new.yield_block_parameter.should == 'expression' # maglev, was "yield"
+    DefinedSpecs::Basic.new.yield_block_parameter.should == (is_maglev ? 'expression' : "yield" )
   end
 end
 
 describe "The defined? keyword for super" do
   it "returns nil when a superclass undef's the method" do
-    # DefinedSpecs::ClassWithoutMethod.new.test.should be_nil
-    DefinedSpecs::ClassWithoutMethod.new.test.should == 'super' # Maglev deviation
+    DefinedSpecs::ClassWithoutMethod.new.test.should == (is_maglev ? 'super' : nil )
   end
 
   describe "for a method taking no arguments" do
     it "returns nil when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_method_no_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_method_no_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a block when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_method_block_no_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_method_block_no_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a #define_method when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_define_method_no_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_define_method_no_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a block in a #define_method when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_define_method_block_no_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_define_method_block_no_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns 'super' when a superclass method exists" do
@@ -1272,19 +1273,19 @@ describe "The defined? keyword for super" do
 
   describe "for a method taking arguments" do
     it "returns nil when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_method_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_method_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a block when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_method_block_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_method_block_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a #define_method when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_define_method_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_define_method_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns nil from a block in a #define_method when no superclass method exists" do
-      DefinedSpecs::Super.new.no_super_define_method_block_args.should == 'super' # Maglev was be_nil
+      DefinedSpecs::Super.new.no_super_define_method_block_args.should == (is_maglev ? 'super' : nil )
     end
 
     it "returns 'super' when a superclass method exists" do

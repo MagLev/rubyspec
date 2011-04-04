@@ -14,12 +14,12 @@ describe "String#inspect" do
     end
   end
 
- not_compliant_on :maglev do 
+ not_supported_on :maglev do # no taint propagation
   it "taints the result if self is tainted" do
     "foo".taint.inspect.tainted?.should == true
     "foo\n".taint.inspect.tainted?.should == true
   end
- end #
+ end
 
   it "does not return subclass instances" do
     str = StringSpecs::MyString.new

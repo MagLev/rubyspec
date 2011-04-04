@@ -29,7 +29,7 @@ describe :array_pack_basic_non_float, :shared => true do
     [@obj, @obj].pack(d).should be_an_instance_of(String)
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "taints the output string if the format string is tainted" do
     [@obj, @obj].pack("x"+pack_format.taint).tainted?.should be_true
   end

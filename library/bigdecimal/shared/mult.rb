@@ -33,19 +33,25 @@ describe :bigdecimal_mult, :shared => true do
   end
 
   it "returns zero of appropriate sign if self or argument is zero" do
-   # note @object is an array of size 0 or 1 , optional precision arg to mult()
+    # note @object is an array of size 0 or 1 , optional precision arg to mult()
     @zero.send(@method, @zero, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO  
     @zero_neg.send(@method, @zero_neg, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO
-    @zero.send(@method, @zero_neg, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO # Maglev deviation, was SIGN_NEGATIVE_ZERO
-    @zero_neg.send(@method, @zero, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO # Maglev deviation, was SIGN_NEGATIVE_ZERO
+
+    a_zero = BigDecimal::SIGN_NEGATIVE_ZERO
+    deviates_on :maglev do
+      a_zero = BigDecimal::SIGN_POSITIVE_ZERO
+    end
+
+    @zero.send(@method, @zero_neg, *@object).sign.should == a_zero
+    @zero_neg.send(@method, @zero, *@object).sign.should == a_zero
 
     @one.send(@method, @zero, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO
-    @one.send(@method, @zero_neg, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO # Maglev deviation, was SIGN_NEGATIVE_ZERO
+    @one.send(@method, @zero_neg, *@object).sign.should == a_zero
 
     @zero.send(@method, @one, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO
-    @zero.send(@method, @one_minus, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO # Maglev deviation, was SIGN_NEGATIVE_ZERO
+    @zero.send(@method, @one_minus, *@object).sign.should == a_zero
     @zero_neg.send(@method, @one_minus, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO
-    @zero_neg.send(@method, @one, *@object).sign.should == BigDecimal::SIGN_POSITIVE_ZERO # Maglev deviation, was SIGN_NEGATIVE_ZERO
+    @zero_neg.send(@method, @one, *@object).sign.should == a_zero
   end
 
   it "returns NaN if NaN is involved" do

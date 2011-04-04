@@ -32,10 +32,14 @@ describe "Module#attr_accessor" do
     class Integer
       attr_accessor :spec_attr_accessor
     end
-
-    # maglev - no instVars on immediate (smalltalk special) objects
-    lambda { 1.spec_attr_accessor = "a"
-             1.spec_attr_accessor.should == "a" }.should raise_error(NameError)
+   not_supported_on :maglev do  # no instVars allowed on special objects
+    1.spec_attr_accessor = "a"
+    1.spec_attr_accessor.should == "a"
+   end
+   deviates_on :maglev do
+     lambda { 1.spec_attr_accessor = "a"
+              1.spec_attr_accessor.should == "a" }.should raise_error(NameError)
+   end
   end
 
   it "converts non string/symbol/fixnum names to strings using to_str" do
@@ -55,14 +59,13 @@ describe "Module#attr_accessor" do
     lambda { Class.new { attr_accessor o } }.should raise_error(TypeError)
   end
 
-# Maglev fails
-# it "applies current visibility to methods created" do
-#   c = Class.new do
-#     protected
-#     attr_accessor :foo
-#   end
+  it "applies current visibility to methods created" do
+    c = Class.new do
+      protected
+      attr_accessor :foo
+    end
 
-#   lambda { c.new.foo }.should raise_error(NoMethodError)
-#   lambda { c.new.foo=1 }.should raise_error(NoMethodError)
-# end
+    lambda { c.new.foo }.should raise_error(NoMethodError)
+    lambda { c.new.foo=1 }.should raise_error(NoMethodError)
+  end
 end

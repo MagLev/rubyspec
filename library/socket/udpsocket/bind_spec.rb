@@ -27,9 +27,9 @@ describe "UDPSocket.bind" do
   end
 
   it "binds to INADDR_ANY if the hostname is empty" do
-    ax = @socket.bind("", SocketSpecs.port)
-    ax.should == 0
-    # port, host = Socket.unpack_sockaddr_in(@socket.getsockname) # Maglev not implemented yet
-    # host.should == "0.0.0.0"
+    sx = @socket.bind("", SocketSpecs.port)
+    sx.should == 0
+    port, host = Socket.unpack_sockaddr_in(@socket.getsockname)
+    host.should == "0.0.0.0"
   end
 end

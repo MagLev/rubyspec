@@ -42,7 +42,7 @@ describe "Array#pack" do
     ["abc", "def"].pack("A*#junk junk junk junk junk\rA10").should == "abc"
   end
 
- not_compliant_on :maglev do # taint not propagated
+ not_supported_on :maglev do # taint not propagated
   ruby_version_is '1.8.8' do
     it "returns a tainted string when the format is tainted" do
       ["abcd", 0x20].pack("A3C".taint).tainted?.should be_true

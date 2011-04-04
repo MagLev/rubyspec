@@ -2,7 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 require File.expand_path('../shared/indexes', __FILE__)
 
-not_compliant_on :maglev do # Array#indices is deprecated 
+not_supported_on :maglev do # Array#indices is deprecated 
 ruby_version_is '' ... '1.9' do
   describe "Array#indices" do
     it_behaves_like(:array_indexes, :indices)

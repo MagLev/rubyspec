@@ -37,7 +37,7 @@ describe "ENV.reject!" do
     end
   end
 
- not_compliant_on :maglev do  # ENV.clear not allowed
+ not_supported_on :maglev do  # ENV.clear not allowed
   it "doesn't raise if empty" do
     orig = ENV.to_hash
     begin
@@ -83,7 +83,7 @@ describe "ENV.reject" do
     end
   end
 
- not_compliant_on :maglev do  # ENV.clear not allowed
+ not_supported_on :maglev do  # ENV.clear not allowed
   it "doesn't raise if empty" do
     orig = ENV.to_hash
     begin

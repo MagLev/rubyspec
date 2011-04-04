@@ -1,4 +1,6 @@
-require 'complex' # maglev
+deviates_on :maglev do
+  require 'complex' 
+end
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../../../shared/complex/conjugate', __FILE__)
 

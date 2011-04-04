@@ -103,7 +103,7 @@ describe "Array#* with an integer" do
     end
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "copies the taint status of the original array even if the array is empty" do
     ary = []
     ary.taint

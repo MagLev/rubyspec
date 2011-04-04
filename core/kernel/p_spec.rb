@@ -10,10 +10,11 @@ describe "Kernel#p" do
     $/, $\, $, = @rs_f, @rs_b, @rs_c
   end
 
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:p)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:p)
+  end
+ end
   
   # TODO: fix
   it "flushes output if receiver is a File" do
@@ -51,15 +52,16 @@ describe "Kernel#p" do
     o = mock("Inspector Gadget")
     o.should_receive(:inspect).any_number_of_times.and_return "Next time, Gadget, NEXT TIME!"
 
-# Maglev  IO.reopen not supported yet, so output_to_fd broken
-#   $, = " *helicopter sound*\n"
-#   lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
+   not_compliant_on :maglev do  # generalized IO.reopen not supported yet
+    $, = " *helicopter sound*\n"
+    lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
 
-#   $\ = " *helicopter sound*\n"
-#   lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
+    $\ = " *helicopter sound*\n"
+    lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
 
-#   $/ = " *helicopter sound*\n"
-#   lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
+    $/ = " *helicopter sound*\n"
+    lambda { p(o) }.should output_to_fd("Next time, Gadget, NEXT TIME!\n")
+   end
   end
 
   it "prints nothing if no argument is given" do

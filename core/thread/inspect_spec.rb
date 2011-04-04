@@ -7,8 +7,13 @@ describe "Thread#inspect" do
   end
 
   it "describes a running thread" do
+   not_compliant_on :maglev do 
+    ThreadSpecs.status_of_running_thread.inspect.should include('run')
+   end
+   deviates_on :maglev do 
     # Maglev,  only the current thread is running
-    ThreadSpecs.status_of_running_thread.inspect.should include('sleep') # Maglev, was run
+    ThreadSpecs.status_of_running_thread.inspect.should include('sleep')
+   end
   end
 
   it "describes a sleeping thread" do
@@ -20,30 +25,57 @@ describe "Thread#inspect" do
   end
 
   it "describes a completed thread" do
-    ThreadSpecs.status_of_completed_thread.inspect.should include('false') # Maglev bug, was 'dead'
+   not_compliant_on :maglev do
+    ThreadSpecs.status_of_completed_thread.inspect.should include('dead')
+   end
+   deviates_on :maglev do
+    ThreadSpecs.status_of_completed_thread.inspect.should include('false') # Maglev bug
+   end
   end
 
   it "describes a killed thread" do
+   not_compliant_on :maglev do
+    ThreadSpecs.status_of_killed_thread.inspect.should include('dead')
+   end
+   deviates_on :maglev do
     x = ThreadSpecs.status_of_killed_thread.inspect 
     x.should include('nil') # Maglev bug, was 'dead'
+   end
   end
 
   it "describes a thread with an uncaught exception" do
-    ThreadSpecs.status_of_thread_with_uncaught_exception.inspect.should include('false') # Maglev bug, was 'dead'
+   not_compliant_on :maglev do
+    ThreadSpecs.status_of_thread_with_uncaught_exception.inspect.should include('dead')
+   end
+   deviates_on :maglev do
+    ThreadSpecs.status_of_thread_with_uncaught_exception.inspect.should include('false') # Maglev bug
+   end
   end
+
 
   ruby_version_is ""..."1.9" do
     it "describes a dying running thread" do
-      ThreadSpecs.status_of_dying_running_thread.inspect.should include('run') # Maglev, was 'aborting'
+     not_compliant_on :maglev do
+      ThreadSpecs.status_of_dying_running_thread.inspect.should include('aborting')
+     end
+     deviates_on :maglev do
+      ThreadSpecs.status_of_dying_running_thread.inspect.should include('run')
+     end
     end
   end
 
-# Maglev, deadlock or infinite loop
-# it "describes a dying sleeping thread" do
-#   ThreadSpecs.status_of_dying_sleeping_thread.status.should include('run') # Maglev, was 'sleep'
-# end
+ not_compliant_on :maglev do # maglev error cannot resume a terminated process
+  it "describes a dying sleeping thread" do
+    ThreadSpecs.status_of_dying_sleeping_thread.status.should include('sleep')
+  end
+ end
 
   it "reports aborting on a killed thread" do
-    ThreadSpecs.status_of_aborting_thread.inspect.should include('nil') # Maglev, was aborting'
+   not_compliant_on :maglev do
+    ThreadSpecs.status_of_aborting_thread.inspect.should include('aborting')
+   end
+   deviates_on :maglev do
+    ThreadSpecs.status_of_aborting_thread.inspect.should include('nil')
+   end
   end
 end

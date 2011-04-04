@@ -55,9 +55,19 @@ describe :kernel_object_id, :shared => true do
 
   not_compliant_on :macruby do
     it "returns a different value for two Float literals" do
-      o1 = 1.0e200  # Maglev use e200 because SmallDoubles are canonicalized
-      o2 = 1.0e200  #
-      o1.send(@method).should_not == o2.send(@method)
+      not_compliant_on :maglev do
+        o1 = 1.0
+        o2 = 1.0
+        o1.send(@method).should_not == o2.send(@method)
+      end
+      deviates_on :maglev do
+        o1 = 1.0
+        o2 = 1.0
+        o1.send(@method).should == o2.send(@method)  # 1.0 is a SmallDouble
+        o1 = 1.0e200  
+        o2 = 1.0e200 
+        o1.send(@method).should_not == o2.send(@method)
+      end
     end
   end
 

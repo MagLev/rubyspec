@@ -66,8 +66,8 @@ describe :kernel_load, :shared => true do
     lambda { @object.load(path) }.should raise_error(LoadError)
   end
 
- not_compliant_on :maglev do # wrap arg to load not implem
-  it "sets the enclosing scope to an anonymous module if passed true for 'wrap'" do #
+ not_compliant_on :maglev do  # wrap==true not implemented yet
+  it "sets the enclosing scope to an anonymous module if passed true for 'wrap'" do
     path = File.expand_path "wrap_fixture.rb", CODE_LOADING_DIR
     @object.load(path, true).should be_true
     Object.const_defined?(:LoadSpecWrap).should be_false

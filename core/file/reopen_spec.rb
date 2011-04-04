@@ -1,9 +1,6 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-t_ver = nil
-not_compliant_on :maglev do
-  t_ver = "1.9"
-end 
+t_ver = "1.9"
 deviates_on :maglev do
   t_ver = "1.8.7"
 end

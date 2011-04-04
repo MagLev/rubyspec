@@ -1,7 +1,11 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
-ruby_version_is "1.8.7" do
+t_ver = "1.9"
+deviates_on :maglev do
+  t_ver = "1.8.7"
+end
+ruby_version_is t_ver do
   describe "StringIO#readpartial" do
     before :each do
       @string = StringIO.new('Stop, look, listen')
@@ -36,8 +40,11 @@ ruby_version_is "1.8.7" do
       @string.write("f").should == 1
       @string.rewind
       c = @string.getc
-      #c.should == 'f'
-      c.should == ?f  # maglev 1.8.7
+      if t_ver == "1.8.7"
+        c.should == ?f 
+      else
+        c.should == 'f'
+      end
       @string.ungetc(c).should == nil
       
       @string.readpartial(2).should == "f"

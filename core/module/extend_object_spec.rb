@@ -1,7 +1,7 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
-# Maglev does not implemented  Module#extend_object yet, do not run
+not_supported_on :maglev do
 
 describe "Module#extend_object" do
   before :each do
@@ -27,4 +27,6 @@ describe "Module#extend_object" do
     obj.extend ModuleSpecs::ExtendObjectPrivate
     ScratchPad.recorded.should == :extended
   end
+end
+
 end

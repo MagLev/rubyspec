@@ -25,19 +25,36 @@ describe "The alias keyword" do
 
   it "adds the new method to the list of methods" do
     original_methods = @obj.methods
-    @meta.class_eval do
-     # alias __value value # Maglev methods() excludes those with '__' prefix
-     alias x_value value  
+    not_compliant_on :maglev do 
+      @meta.class_eval do
+        alias __value value
+      end
+      (@obj.methods - original_methods).map {|m| m.to_s }.should == ["__value"]
     end
-    (@obj.methods - original_methods).map {|m| m.to_s }.should == ["x_value"] #
+    deviates_on :maglev do 
+      # Maglev methods() excludes those with '__' prefix
+      @meta.class_eval do
+        alias x_value value  
+      end
+      (@obj.methods - original_methods).map {|m| m.to_s }.should == ["x_value"] 
+    end
   end
 
-  it "adds the new method to the list of public methods" do  
+  it "adds the new method to the list of public methods" do
     original_methods = @obj.public_methods
-    @meta.class_eval do
-      alias x_value value  # Maglev methods() excludes those with '__' prefix
+    not_compliant_on :maglev do
+      @meta.class_eval do
+        alias __value value
+      end
+      (@obj.public_methods - original_methods).map {|m| m.to_s }.should == ["__value"]
     end
-    (@obj.public_methods - original_methods).map {|m| m.to_s }.should == ["x_value"] #
+    deviates_on :maglev do
+      # Maglev methods() excludes those with '__' prefix
+      @meta.class_eval do
+        alias x_value value
+      end
+      (@obj.public_methods - original_methods).map {|m| m.to_s }.should == ["x_value"]
+    end 
   end
 
   it "overwrites an existing method with the target name" do

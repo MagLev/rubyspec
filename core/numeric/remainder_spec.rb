@@ -1,8 +1,11 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
-# Maglev: this spec makes too many assumptions about the algorithm 
-#  chosen.  Do not run this file.  Numeric#remainder  covered by Bignum specs
+not_compliant_on :maglev do
+  # Maglev: this spec makes too many assumptions about the algorithm 
+  #  chosen, and the maglev implementation does not work for arguments
+  #  not a kind of Numeric .
+  #  Numeric#remainder is covered by Bignum specs
 
 describe "Numeric#remainder" do
   before(:each) do
@@ -68,3 +71,4 @@ describe "Numeric#remainder" do
     @obj.remainder(@other).should == :result
   end
 end
+end # maglev

@@ -52,7 +52,7 @@ describe "ConditionVariable#signal" do
       m.synchronize do
         cv.signal
       end
-      Thread.pass until (sx = r2.size) == i+1
+      Thread.pass until r2.size == i+1
     end
 
     threads.each {|t| t.join }

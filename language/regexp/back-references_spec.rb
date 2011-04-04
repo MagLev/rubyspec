@@ -21,22 +21,23 @@ describe "Regexps with back-references" do
     $9.should == "9"
   end
 
-# Fails in Maglev because all $~ references are to home context
-# it 'will not clobber capture variables across threads' do 
-#   cap1, cap2, cap3 = nil
-#   "foo" =~ /(o+)/
-#   cap1 = [$~.to_a, $1]
-#   Thread.new do
-#     cap2 = [$~.to_a, $1]
-#     "bar" =~ /(a)/
-#     cap3 = [$~.to_a, $1]
-#   end.join
-#   cap4 = [$~.to_a, $1]
-#   cap1.should == [["oo", "oo"], "oo"]
-#   cap2.should == [[], nil]
-#   cap3.should == [["a", "a"], "a"]
-#   cap4.should == [["oo", "oo"], "oo"]
-# end
+ not_compliant_on :maglev do # because  all $~ references are in blocks sharing a home context
+  it 'will not clobber capture variables across threads' do 
+    cap1, cap2, cap3 = nil
+    "foo" =~ /(o+)/
+    cap1 = [$~.to_a, $1]
+    Thread.new do
+      cap2 = [$~.to_a, $1]
+      "bar" =~ /(a)/
+      cap3 = [$~.to_a, $1]
+    end.join
+    cap4 = [$~.to_a, $1]
+    cap1.should == [["oo", "oo"], "oo"]
+    cap2.should == [[], nil]
+    cap3.should == [["a", "a"], "a"]
+    cap4.should == [["oo", "oo"], "oo"]
+  end
+ end
 
   it 'supports \<n> (backreference to previous group match)' do
     /(foo.)\1/.match("foo1foo1").to_a.should == ["foo1foo1", "foo1"]

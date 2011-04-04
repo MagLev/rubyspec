@@ -14,8 +14,12 @@ describe "Thread#value" do
   ruby_version_is "" ... "1.9" do
     it "is false for a killed thread" do
       t = Thread.new { Thread.current.exit }
-      # t.value.should == false
+     not_compliant_on :maglev do 
+      t.value.should == false
+     end
+     deviates_on :maglev do 
       t.value.should == nil # Maglev bug
+     end
     end
   end
 
@@ -27,10 +31,16 @@ describe "Thread#value" do
   end
 
   ruby_version_is "" ... "1.9" do
-    not_compliant_on :rubinius , :maglev do    # Maglev throws ZeroDivide exception
+    not_compliant_on :rubinius, :maglev do 
       it "is false for an uncaught exception thrown from a dying thread" do
         t = ThreadSpecs.dying_thread_ensures { 1/0 }
         t.value.should == false
+      end
+    end
+    deviates_on :maglev do 
+      it "is false for an uncaught exception thrown from a dying thread" do
+        t = ThreadSpecs.dying_thread_ensures { 1/0 }
+        t.value.should == nil
       end
     end
   end

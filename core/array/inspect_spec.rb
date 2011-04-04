@@ -31,7 +31,7 @@ describe "Array#inspect" do
     lambda{ y.inspect }.should_not raise_error
   end
 
- not_compliant_on :maglev do # no tainting
+ not_supported_on :maglev do # no tainting
   it "taints the result String if the Array is tainted" do
     a = [1, 2].taint
     a.inspect.tainted?.should be_true

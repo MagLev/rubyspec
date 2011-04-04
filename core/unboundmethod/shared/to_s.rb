@@ -20,6 +20,8 @@ describe :unboundmethod_to_s, :shared => true do
   it "the String shows the method name, Module defined in and Module extracted from" do
     @from_module.send(@method).should =~ /\bfrom_mod\b/
     @from_module.send(@method).should =~ /\bUnboundMethodSpecs::Mod\b/
-    # @from_method.send(@method).should =~ /\bUnboundMethodSpecs::Methods\b/ # Maglev fails
+   not_compliant_on :maglev do 
+    @from_method.send(@method).should =~ /\bUnboundMethodSpecs::Methods\b/
+   end
   end
 end
