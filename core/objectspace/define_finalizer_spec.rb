@@ -14,13 +14,23 @@ describe "ObjectSpace.define_finalizer" do
 
   it "accepts an object and a proc" do
     handler = lambda { |obj| obj }
-    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace # was [0, handler]
+   not_compliant_on :maglev do
+    ObjectSpace.define_finalizer("garbage", handler).should == [0, handler]
+   end
+   deviates_on :maglev do
+    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace
+   end
   end
 
   it "accepts an object and a callable" do
     handler = mock("callable")
     def handler.call(obj) end
-    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace # was [0, handler]
+   not_compliant_on :maglev do
+    ObjectSpace.define_finalizer("garbage", handler).should == [0, handler]
+   end
+   deviates_on :maglev do
+    ObjectSpace.define_finalizer("garbage", handler).should == ObjectSpace
+   end
   end
 
   it "raises ArgumentError trying to define a finalizer on a non-reference" do

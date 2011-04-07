@@ -55,12 +55,13 @@ describe "File.open" do
     File.exist?(@file).should == true
   end
 
-# Maglev, File.new(fd_integer) not supported yet
-#  it "opens file when call with a block (basic case)" do
-#    File.open(@file){ |fh| @fd = fh.fileno }
-#    lambda { File.open(@fd) }.should raise_error(SystemCallError) # Should be closed by block
-#    File.exist?(@file).should == true
-#  end
+not_compliant_on :maglev do #  File.new(fd_integer) not supported yet
+  it "opens file when call with a block (basic case)" do
+    File.open(@file){ |fh| @fd = fh.fileno }
+    lambda { File.open(@fd) }.should raise_error(SystemCallError) # Should be closed by block
+    File.exist?(@file).should == true
+  end
+end
 
   it "opens with mode string" do
     @fh = File.open(@file, 'w')
@@ -68,12 +69,13 @@ describe "File.open" do
     File.exist?(@file).should == true
   end
 
-# Maglev, File.new(fd_integer) not supported yet
-#  it "opens a file with mode string and block" do
-#    File.open(@file, 'w'){ |fh| @fd = fh.fileno }
-#    lambda { File.open(@fd) }.should raise_error(SystemCallError)
-#    File.exist?(@file).should == true
-#  end
+not_compliant_on :maglev do #  File.new(fd_integer) not supported yet
+  it "opens a file with mode string and block" do
+    File.open(@file, 'w'){ |fh| @fd = fh.fileno }
+    lambda { File.open(@fd) }.should raise_error(SystemCallError)
+    File.exist?(@file).should == true
+  end
+end
 
   it "opens a file with mode num" do
     @fh = File.open(@file, @flags)
@@ -81,12 +83,13 @@ describe "File.open" do
     File.exist?(@file).should == true
   end
 
-# Maglev, File.new(fd_integer) not supported yet
-#  it "opens a file with mode num and block" do
-#    File.open(@file, 'w'){ |fh| @fd = fh.fileno }
-#    lambda { File.open(@fd) }.should raise_error(SystemCallError)
-#    File.exist?(@file).should == true
-#  end
+not_compliant_on :maglev do #  File.new(fd_integer) not supported yet
+  it "opens a file with mode num and block" do
+    File.open(@file, 'w'){ |fh| @fd = fh.fileno }
+    lambda { File.open(@fd) }.should raise_error(SystemCallError)
+    File.exist?(@file).should == true
+  end
+end
 
   # For this test we delete the file first to reset the perms
   it "opens the file when passed mode, num and permissions" do
@@ -105,7 +108,12 @@ describe "File.open" do
     rm_r @file
     File.umask(0022)
     File.open(@file, "w", 0755){ |fh| @fd = fh.fileno }
-    lambda { File.open(@fd) }.should raise_error(TypeError) # Maglev, was SystemCallError
+   not_compliant_on :maglev do
+    lambda { File.open(@fd) }.should raise_error(SystemCallError)
+   end
+   deviates_on  :maglev do
+    lambda { File.open(@fd) }.should raise_error(TypeError)
+   end
     platform_is_not :windows do
       File.stat(@file).mode.to_s(8).should == "100755"
     end
@@ -138,13 +146,15 @@ describe "File.open" do
     end
   end
 
-# it "opens the file when call with fd" do # maglev File.new(fd_integer) not supported yet
-#   # store in an ivar so it doesn't GC before we go to close it in 'after'
-#   @fh_orig = File.open(@file)
-#   @fh = File.open(@fh_orig.fileno)
-#   @fh.should be_kind_of(File)
-#   File.exist?(@file).should == true
-# end
+not_compliant_on :maglev do #  File.new(fd_integer) not supported yet
+  it "opens the file when call with fd" do
+    # store in an ivar so it doesn't GC before we go to close it in 'after'
+    @fh_orig = File.open(@file)
+    @fh = File.open(@fh_orig.fileno)
+    @fh.should be_kind_of(File)
+    File.exist?(@file).should == true
+  end
+end
 
   it "opens a file with a file descriptor d and a block" do
     @fh = File.open(@file)
@@ -191,6 +201,12 @@ describe "File.open" do
   end
 
   it "opens a file that no exists when use File::CREAT mode" do
+   not_compliant_on :maglev do
+    @fh = File.open(@nonexistent, File::CREAT) { |f| f }
+    @fh.should be_kind_of(File)
+    File.exist?(@file).should == true
+   end
+   deviates_on  :maglev do
     if (RUBY_PLATFORM.match('solaris'))
       @fh = File.open(@nonexistent, File::CREAT) { |f| f }
       @fh.should be_kind_of(File)
@@ -199,6 +215,7 @@ describe "File.open" do
       # linux
       lambda { File.open(@nonexistent, File::CREAT) { |f| f } } .should raise_error(Errno::EINVAL)
     end
+   end
   end
 
   it "opens a file that no exists when use 'a' mode" do
@@ -215,7 +232,12 @@ describe "File.open" do
 
   # Check the grants associated to the differents open modes combinations.
   it "raises an ArgumentError exception when call with an unknown mode" do
-    lambda { File.open(@file, "q") }.should raise_error(Errno::EINVAL) # Maglev, was ArgumentError
+   not_compliant_on :maglev do
+    lambda { File.open(@file, "q") }.should raise_error(ArgumentError)
+   end
+   deviates_on  :maglev do
+    lambda { File.open(@file, "q") }.should raise_error(Errno::EINVAL) 
+   end
   end
 
   it "can read in a block when call open with RDONLY mode" do
@@ -308,12 +330,21 @@ describe "File.open" do
 
   ruby_bug "#", "1.8.7.299" do
     it "raises an IOError when read in a block opened with File::RDONLY|File::APPEND mode" do
-      exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL 
-      lambda {
-        File.open(@file, File::RDONLY|File::APPEND ) do |f|
-          f.puts("writing")
-        end
-      }.should raise_error(exp_err)
+     not_compliant_on :maglev do
+       lambda {
+         File.open(@file, File::RDONLY|File::APPEND ) do |f|
+           f.puts("writing")
+         end
+       }.should raise_error(IOError)
+     end
+     deviates_on :maglev do
+       exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL 
+       lambda {
+         File.open(@file, File::RDONLY|File::APPEND ) do |f|
+           f.puts("writing")
+         end
+       }.should raise_error(exp_err)
+     end
     end
   end
 
@@ -327,24 +358,40 @@ describe "File.open" do
   end
 
   it "can't read in a block when call open with File::EXCL mode" do
-    exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
-    lambda {
-      File.open(@file, File::EXCL) do |f|
-        f.puts("writing").should == nil
-      end
-    }.should raise_error(exp_err)
+    not_compliant_on :maglev do
+      lambda {
+        File.open(@file, File::EXCL) do |f|
+         f.puts("writing").should == nil
+        end
+      }.should raise_error(IOError)
+    end
+    deviates_on :maglev do
+      exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
+      lambda {
+        File.open(@file, File::EXCL) do |f|
+          f.puts("writing").should == nil
+        end
+      }.should raise_error(exp_err)
+    end
   end
 
   it "can read in a block when call open with File::EXCL mode" do
-    if RUBY_PLATFORM.match('solaris')
+    not_compliant_on :maglev do
       File.open(@file, File::EXCL) do |f|
         f.gets.should == nil
       end
-    else
-      # linux
-      lambda { 
-        File.open(@file, File::EXCL)
-      } .should raise_error(Errno::EINVAL)
+    end
+    deviates_on :maglev do
+      if RUBY_PLATFORM.match('solaris')
+        File.open(@file, File::EXCL) do |f|
+          f.gets.should == nil
+        end
+      else
+        # linux
+        lambda { 
+          File.open(@file, File::EXCL)
+        } .should raise_error(Errno::EINVAL)
+      end
     end
   end
 
@@ -386,41 +433,60 @@ describe "File.open" do
 
   ruby_bug "#", "1.8.7.299" do
     it "raises an IOError if the file exists when open with File::RDONLY|File::APPEND" do
-      exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
-      lambda {
-        File.open(@file, File::RDONLY|File::APPEND) do |f|
-          f.puts("writing").should == nil
-        end
-      }.should raise_error(exp_err)
+     not_compliant_on :maglev do
+       lambda {
+         File.open(@file, File::RDONLY|File::APPEND) do |f|
+           f.puts("writing").should == nil
+         end
+       }.should raise_error(IOError)
+     end
+     deviates_on  :maglev do
+       exp_err = RUBY_PLATFORM.match('solaris') ? IOError : Errno::EINVAL
+       lambda {
+          File.open(@file, File::RDONLY|File::APPEND) do |f|
+            f.puts("writing").should == nil
+          end
+       }.should raise_error(exp_err)
+     end
     end
   end
 
   platform_is_not :openbsd do
 
     it "truncates the file when passed File::TRUNC mode" do
-      File.open(@file, File::RDWR) { |f| f.puts "hello file" }
-      if RUBY_PLATFORM.match('solaris')
-        @fh = File.open(@file, File::TRUNC)
-        @fh.gets.should == nil
-      else
-      # linux
-        lambda { File.open(@file, File::TRUNC)
-         } .should raise_error(Errno::EINVAL)
+      not_compliant_on :maglev do
+       File.open(@file, File::RDWR) { |f| f.puts "hello file" }
+       @fh = File.open(@file, File::TRUNC)
+       @fh.gets.should == nil
+      end
+      deviates_on  :maglev do
+        File.open(@file, File::RDWR) { |f| f.puts "hello file" }
+        if RUBY_PLATFORM.match('solaris')
+          @fh = File.open(@file, File::TRUNC)
+          @fh.gets.should == nil
+        else
+        # linux
+          lambda { File.open(@file, File::TRUNC)
+           } .should raise_error(Errno::EINVAL)
+        end
       end
     end
 
     it "can't read in a block when call open with File::TRUNC mode" do
-      if RUBY_PLATFORM.match('solaris')
-         File.open(@file, File::TRUNC) do |f|
-           f.gets.should == nil
-         end
-      else
+      not_compliant_on :maglev do
+        File.open(@file, File::TRUNC) do |f|
+          f.gets.should == nil
+        end
+      end
+      deviates_on  :maglev do
+       if RUBY_PLATFORM.match('solaris')
+         File.open(@file, File::TRUNC) { |f| f.gets.should == nil }
+       else
         # linux
-         lambda { File.open(@file, File::TRUNC)
-         } .should raise_error(Errno::EINVAL)
+        lambda { File.open(@file, File::TRUNC) } .should raise_error(Errno::EINVAL)
+       end
       end
     end
-
   end
 
   it "opens a file when use File::WRONLY|File::TRUNC mode" do
@@ -532,7 +598,12 @@ describe "File.open" do
   end
 
   it "raises a SystemCallError if passed an invalid Integer type" do
-    lambda { File.open(-1)    }.should raise_error(TypeError) # Maglev, was SystemCallError
+   not_compliant_on :maglev do
+    lambda { File.open(-1)    }.should raise_error(SystemCallError)
+   end
+   deviates_on  :maglev do
+    lambda { File.open(-1)    }.should raise_error(TypeError)
+   end
   end
 
   it "raises an ArgumentError if passed the wrong number of arguments" do
@@ -540,7 +611,12 @@ describe "File.open" do
   end
 
   it "raises an ArgumentError if passed an invalid string for mode" do
-    lambda { File.open(@file, 'fake') }.should raise_error(Errno::EINVAL) # Maglev, was ArgumentError
+   not_compliant_on :maglev do
+    lambda { File.open(@file, 'fake') }.should raise_error(ArgumentError)
+   end 
+   deviates_on  :maglev do
+    lambda { File.open(@file, 'fake') }.should raise_error(Errno::EINVAL)
+   end  
   end
 end
 

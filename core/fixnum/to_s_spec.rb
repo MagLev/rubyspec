@@ -6,8 +6,12 @@ describe "Fixnum#to_s when given a base" do
     12345.to_s(8).should == "30071"
     12345.to_s(10).should == "12345"
     12345.to_s(16).should == "3039"
-    # 12345.to_s(36).should == "9ix"
-    12345.to_s(36).should == "9IX" # Maglev
+    not_compliant_on :maglev do
+      12345.to_s(36).should == "9ix"
+    end
+    deviates_on :maglev do 
+      12345.to_s(36).should == "9IX" 
+    end
   end
   
   it "raises an ArgumentError if the base is less than 2 or higher than 36" do

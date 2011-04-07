@@ -11,6 +11,7 @@ describe "Numeric#div" do
       result = mock("Numeric#div result")
       result.should_receive(:to_f).and_return(13 - TOLERANCE)
       @obj.should_receive(:/).with(10).and_return(result)
+      
       @obj.div(10).should == 12
     end
   end

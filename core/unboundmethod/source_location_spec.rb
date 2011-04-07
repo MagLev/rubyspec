@@ -1,9 +1,13 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-  describe "UnboundMethod#source_location" do
+t_ver = "1.9"
+deviates_on :maglev do 
+  t_ver = "1.8.7"
+end
+describe "UnboundMethod#source_location" do
+  ruby_version_is t_ver do
     it "needs to be reviewed for spec completeness"
-    
-ruby_version_is "" ... "1.9" do  # maglev, source_location in 1.8.7
+
     it "works for define_method methods" do
       line = nil
       cls = Class.new do
@@ -13,11 +17,16 @@ ruby_version_is "" ... "1.9" do  # maglev, source_location in 1.8.7
       
       method = cls.instance_method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
-      method.source_location[1].should == 1 # maglev deviation # was == line
+     not_compliant_on :maglev do 
+      method.source_location[1].should == line
+     end
+     deviates_on :maglev do 
+      method.source_location[1].should == 1
+     end
     end
-end
+  end
     
-ruby_version_is "1.9" do
+  ruby_version_is "1.9" do
     it "works for define_singleton_method methods" do
       line = nil
       cls = Class.new do
@@ -27,8 +36,7 @@ ruby_version_is "1.9" do
       
       method = cls.method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
-      method.source_location[1].should == 1 # maglev deviation # was == line
+      method.source_location[1].should == line
     end
-end 
-  end
-#end
+  end 
+ end

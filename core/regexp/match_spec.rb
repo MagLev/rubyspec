@@ -13,17 +13,18 @@ describe "Regexp#match" do
     lambda { /foo/.match(f)[0] }.should raise_error(TypeError)
   end
 
-  ruby_version_is ""..."1.9" do
+  t_ver = "1.9"
+  deviates_on :maglev do
+    t_ver = "1.8.7" # maglev behaves like 1.9
+  end
+  ruby_version_is ""...t_ver do
     it "coerces Exceptions into strings" do
-      # f = Exception.new("foo")
-      # /foo/.match(f)[0].should == "foo"
-        # maglev has 1.9 behavior already
       f = Exception.new("foo")
-      lambda { /foo/.match(f)[0] }.should raise_error(TypeError)
+      /foo/.match(f)[0].should == "foo"
     end
   end
 
-  ruby_version_is "1.9" do
+  ruby_version_is t_ver do
     it "raises TypeError when the given argument is an Exception" do
       f = Exception.new("foo")
       lambda { /foo/.match(f)[0] }.should raise_error(TypeError)

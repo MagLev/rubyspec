@@ -23,9 +23,14 @@ describe "Regexp#to_s" do
      /(?ix:foo)bar/m.to_s.should == "(?m-ix:(?ix:foo)bar)"
    end
 
-# it "displays single group with same options as main regex as the main regex" do # Maglev fails
-#   /(?i:nothing outside this group)/.to_s.should == "(?i-mx:nothing outside this group)"
-# end
+  it "displays single group with same options as main regex as the main regex" do 
+   not_compliant_on :maglev do
+    /(?i:nothing outside this group)/.to_s.should == "(?i-mx:nothing outside this group)"
+   end
+   deviates_on :maglev do  # bug
+     /(?i:nothing outside this group)/.to_s.should == "(?-mix:(?i:nothing outside this group))"
+   end
+  end
 
   it "deals properly with uncaptured groups" do
     /whatever(?:0d)/ix.to_s.should == "(?ix-m:whatever(?:0d))"
@@ -39,12 +44,23 @@ describe "Regexp#to_s" do
   it "returns a string in (?xxx:yyy) notation" do
     /ab+c/ix.to_s.should == "(?ix-m:ab+c)"
     /jis/s.to_s.should == "(?-mix:jis)"
-#   /(?i:.)/.to_s.should == "(?i-mx:.)" # Maglev fails
-#   /(?:.)/.to_s.should == "(?-mix:.)"  # Maglev fails
+    not_compliant_on :maglev do 
+      /(?i:.)/.to_s.should == "(?i-mx:.)"
+      /(?:.)/.to_s.should == "(?-mix:.)"
+    end
+    deviates_on :maglev do 
+      /(?i:.)/.to_s.should == "(?-mix:(?i:.))"
+      /(?:.)/.to_s.should ==  "(?-mix:(?:.))" 
+    end
   end
 
-# it "handles abusive option groups" do # Maglev fails
-#   /(?mmmmix-miiiix:)/.to_s.should == '(?-mix:)'
-# end
+  it "handles abusive option groups" do # Maglev fails
+    not_compliant_on :maglev do
+      /(?mmmmix-miiiix:)/.to_s.should == '(?-mix:)'
+    end
+    deviates_on :maglev do 
+      /(?mmmmix-miiiix:)/.to_s.should == "(?-mix:(?mmmmix-miiiix:))"
+    end
+  end
 
 end

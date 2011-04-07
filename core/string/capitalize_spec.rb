@@ -12,18 +12,20 @@ describe "String#capitalize" do
     "123ABC".capitalize.should == "123abc"
   end
 
-# Maglev, no propagation of taint
-#  it "taints resulting string when self is tainted" do
-#    "".taint.capitalize.tainted?.should == true
-#    "hello".taint.capitalize.tainted?.should == true
-#  end
+  not_supported_on :maglev do # no taint propagation
+   it "taints resulting string when self is tainted" do
+     "".taint.capitalize.tainted?.should == true
+     "hello".taint.capitalize.tainted?.should == true
+   end
+  end
 
-# Maglev, smalltalk code does use locale
-#  it "is locale insensitive (only upcases a-z and only downcases A-Z)" do
-#    "ÄÖÜ".capitalize.should == "ÄÖÜ"
-#    "ärger".capitalize.should == "ärger"
-#    "BÄR".capitalize.should == "BÄr"
-#  end
+  not_compliant_on :maglev do # does not use locale yet
+   it "is locale insensitive (only upcases a-z and only downcases A-Z)" do
+     "ÄÖÜ".capitalize.should == "ÄÖÜ"
+     "ärger".capitalize.should == "ärger"
+     "BÄR".capitalize.should == "BÄr"
+   end
+  end
 
   it "returns subclass instances when called on a subclass" do
     StringSpecs::MyString.new("hello").capitalize.should be_kind_of(StringSpecs::MyString)

@@ -1,10 +1,9 @@
 require File.expand_path('../../../spec_helper', __FILE__)
  
-# Maglev, ENV.replace not supported, do not run this file
-
 describe "ENV.values" do
 
   it "returns an array of the values" do
+   not_compliant_on :maglev do   # can't use replace
     orig = ENV.to_hash
     begin
       ENV.replace "a" => "b", "c" => "d"
@@ -13,6 +12,12 @@ describe "ENV.values" do
     ensure
       ENV.replace orig
     end
+   end
+   deviates_on :maglev do
+     a = ENV.values
+     a.class.should == Array
+     a.size.should >= 1
+   end
   end
 
   ruby_version_is "1.9" do

@@ -2,10 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel.global_variables" do
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:global_variables)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:global_variables)
+  end
+ end
   
   ruby_version_is ""..."1.9" do
     it "finds subset starting with std" do

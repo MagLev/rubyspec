@@ -173,25 +173,22 @@ describe :kernel_require_basic, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-  not_compliant_on :maglev do # fails to raise error
-    it "does not resolve a ./ relative path against $LOAD_PATH entries" do #
+    it "does not resolve a ./ relative path against $LOAD_PATH entries" do
       $LOAD_PATH << CODE_LOADING_DIR
+      lx = $LOAD_PATH 
       lambda do
         @object.send(@method, "./load_fixture.rb")
       end.should raise_error(LoadError)
       ScratchPad.recorded.should == []
     end
-  end #
 
-  not_compliant_on :maglev do # fails to raise error
-    it "does not resolve a ../ relative path against $LOAD_PATH entries" do #
+    it "does not resolve a ../ relative path against $LOAD_PATH entries" do
       $LOAD_PATH << CODE_LOADING_DIR
       lambda do
         @object.send(@method, "../code/load_fixture.rb")
       end.should raise_error(LoadError)
       ScratchPad.recorded.should == []
     end
-  end #
 
     it "resolves a non-canonical path against $LOAD_PATH entries" do
       $LOAD_PATH << File.dirname(CODE_LOADING_DIR)
@@ -258,14 +255,14 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-   not_compliant_on :maglev do # no C-extension support
+   not_compliant_on :maglev do
     it "does not load a C-extension file if a .rb extensioned file is already loaded" do #
       $LOADED_FEATURES << File.expand_path("load_fixture.rb", CODE_LOADING_DIR)
       path = File.expand_path "load_fixture", CODE_LOADING_DIR
       @object.require(path).should be_false
       ScratchPad.recorded.should == []
     end
-  end #
+   end
 
     it "loads a .rb extensioned file when passed a non-.rb extensioned path" do
       path = File.expand_path "load_fixture.ext", CODE_LOADING_DIR
@@ -284,14 +281,14 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == [:loaded]
     end
 
-   not_compliant_on :maglev do # no C-extension support
+   not_compliant_on :maglev do
     it "does not load a C-extension file if a complex-extensioned .rb file is already loaded" do #
       $LOADED_FEATURES << File.expand_path("load_fixture.ext.rb", CODE_LOADING_DIR)
       path = File.expand_path "load_fixture.ext", CODE_LOADING_DIR
       @object.require(path).should be_false
       ScratchPad.recorded.should == []
     end
-   end #
+   end
   end
 
   describe "($LOAD_FEATURES)" do
@@ -324,15 +321,13 @@ describe :kernel_require, :shared => true do
       ScratchPad.recorded.should == []
     end
 
-   not_compliant_on :maglev do # raises RubyLoadError, empty loadPath
-    it "does not load a ../ relative path that is already stored" do #
+    it "does not load a ../ relative path that is already stored" do
       $LOADED_FEATURES << "../load_fixture.rb"
       Dir.chdir CODE_LOADING_DIR do
         @object.require("../load_fixture.rb").should be_false
       end
       ScratchPad.recorded.should == []
     end
-  end #
 
     it "does not load a non-canonical path that is already stored" do
       $LOADED_FEATURES << "code/../code/load_fixture.rb"
@@ -370,22 +365,30 @@ describe :kernel_require, :shared => true do
         ScratchPad.recorded.should == [:loaded]
       end
 
-     not_compliant_on :maglev do # Need fix
       it "returns false if the file is not found" do #
         Dir.chdir File.dirname(CODE_LOADING_DIR) do
+         not_compliant_on :maglev do
           @object.require("load_fixture").should be_false
           ScratchPad.recorded.should == []
+         end
+         deviates_on :maglev do
+           lambda { @object.require("load_fixture") }.should raise_error(LoadError)
+         end
         end
       end
 
       it "returns false when passed a path and the file is not found" do #
+       not_compliant_on :maglev do
         $LOADED_FEATURES << "code/load_fixture"
+       end
+       deviates_on :maglev do
+        $LOADED_FEATURES << "code/load_fixture.rb"
+       end
         Dir.chdir CODE_LOADING_DIR do
           @object.require("code/load_fixture").should be_false
           ScratchPad.recorded.should == []
         end
       end
-     end #
     end
 
     ruby_version_is "".."1.9" do

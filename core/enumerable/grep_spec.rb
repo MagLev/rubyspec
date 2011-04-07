@@ -26,7 +26,6 @@ describe "Enumerable#grep" do
 
   it "can use $~ in the block when used with a Regexp" do
     ary = ["aba", "aba"]
-    ddx = $1
     ary.grep(/a(b)a/) { $1 }.should == ["b", "b"]
   end
 end

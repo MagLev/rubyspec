@@ -12,7 +12,6 @@ describe "Matrix#minor" do
       @matrix.minor(1,2,1,1).should == Matrix[ [4], [6] ]
     end
 
-  if false # maglev at 186
     ruby_bug "redmine:1532", "1.8.7" do
       it "returns an empty Matrix if nrows or ncols is 0" do
         @matrix.minor(0,0,0,0).should == Matrix[]
@@ -21,6 +20,7 @@ describe "Matrix#minor" do
         @matrix.minor(1,1,1,0).should == Matrix[[]]
       end
 
+     not_compliant_on :maglev do
       it "returns nil for out-of-bounds start_row/col" do
         r = @matrix.row_size + 1
         c = @matrix.column_size + 1
@@ -34,13 +34,14 @@ describe "Matrix#minor" do
         @matrix.minor(0,1,0,-1).should == nil
         @matrix.minor(0,-1,0,1).should == nil
       end
+     end
 
       it "start counting backwards for start_row or start_col below zero" do
         @matrix.minor(0, 1, -1, 1).should == @matrix.minor(0, 1, 1, 1)
         @matrix.minor(-1, 1, 0, 1).should == @matrix.minor(2, 1, 0, 1)
       end
     end
-  end # maglev
+  # maglev
 
     it "returns empty matrices for extreme start_row/col" do
       @matrix.minor(3,10,1,10).should == Matrix.columns([[]])
@@ -61,7 +62,7 @@ describe "Matrix#minor" do
       @matrix.minor(1...3, 1...3).should == Matrix[ [4], [6] ]
     end
 
-   if false # maglev at 1.8.6
+   not_compliant_on :maglev do
     ruby_bug "redmine:1532", "1.8.7" do
       it "returns nil if col_range or row_range is out of range" do
         r = @matrix.row_size + 1
@@ -81,6 +82,6 @@ describe "Matrix#minor" do
         @matrix.minor(-2..2, 0..1).should == @matrix.minor(1..2, 0..1)
       end
     end
-   end # maglev
+   end
   end
 end

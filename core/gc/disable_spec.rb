@@ -7,11 +7,19 @@ describe "GC.disable" do
 
   it "returns true iff the garbage collection was previously disabled" do
     GC.disable.should == false
-    GC.disable.should == false # maglev gc is always enabled , was == true
-#   GC.disable.should == true
-    GC.enable
-    GC.disable.should == false
-#   GC.disable.should == true  # maglev
+    not_compliant_on :maglev do
+      GC.disable.should == true
+      GC.disable.should == true
+      GC.enable
+      GC.disable.should == false
+      GC.disable.should == true
+    end
+    deviates_on :maglev do
+      # GC cannot be turned off
+      GC.disable.should == false
+      GC.enable
+      GC.disable.should == false
+    end
   end
 
 end

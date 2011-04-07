@@ -24,8 +24,8 @@ describe "Array#product" do
     end
   end
   
- not_compliant_on :maglev do # OutOfMemory
-  it "does not attempt to produce an unreasonable number of products" do #
+ not_compliant_on :maglev do # gets OutOfMemory
+  it "does not attempt to produce an unreasonable number of products" do
     a = (0..100).to_a
     lambda do
       a.product(a, a, a, a, a, a, a, a, a, a)

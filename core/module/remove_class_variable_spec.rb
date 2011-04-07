@@ -2,9 +2,10 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Module#remove_class_variable" do
- not_compliant_on :maglev do  # cannot dup a Behavior
+ not_compliant_on :maglev do  # cannot dup a Module
   it "removes class variable" do
-    ma = ModuleSpecs::MVars.dup
+    m = ModuleSpecs::MVars.dup
+    m.class_variable_defined?(:@@mvar).should == true
     m.send(:remove_class_variable, :@@mvar)
     m.class_variable_defined?(:@@mvar).should == false
   end
@@ -13,7 +14,17 @@ describe "Module#remove_class_variable" do
     m = ModuleSpecs::MVars.dup
     m.send(:remove_class_variable, :@@mvar).should == :mvar
   end
- end # maglev
+ end
+
+ deviates_on :maglev do 
+  it "removes class variable" do
+    # assume running with fresh transient state for each spec file, don't use dup
+    m = ModuleSpecs::MVars  #   Module#dup not implemented  in maglev
+    m.class_variable_defined?(:@@mvar).should == true
+    m.send(:remove_class_variable, :@@mvar).should == :mvar
+    m.class_variable_defined?(:@@mvar).should == false
+  end
+ end
 
   it "removes a class variable defined in a metaclass" do
     obj = mock("metaclass class variable")
@@ -41,8 +52,10 @@ describe "Module#remove_class_variable" do
   end
 
   ruby_version_is "" ... "1.9" do
-   #it "is private" do
-   #  Module.should have_private_instance_method(:remove_class_variable)
-   #end
+   not_compliant_on :maglev do #  not private yet
+    it "is private" do
+      Module.should have_private_instance_method(:remove_class_variable)
+    end
+   end
   end
 end

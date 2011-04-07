@@ -2,10 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel.at_exit" do
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:at_exit)
-# end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:at_exit)
+  end
+ end
 
   it "runs after all other code" do
     ruby_exe("at_exit {print 5}; print 6").should == "65"

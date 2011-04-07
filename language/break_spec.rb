@@ -42,7 +42,7 @@ describe "The break statement in a captured block" do
       end
     end
 
-    not_compliant_on :rubinius , :maglev do
+    not_compliant_on :rubinius, :maglev do
       it "raises a LocalJumpError when invoking the block from the scope creating the block" do
         lambda { @program.break_in_method }.should raise_error(LocalJumpError)
         ScratchPad.recorded.should == [:a, :xa, :d, :b]
@@ -62,16 +62,16 @@ describe "The break statement in a captured block" do
 
   describe "from a scope that has returned" do
    not_compliant_on :maglev do
-    it "raises a LocalJumpError when calling the block from a method" do #
+    it "raises a LocalJumpError when calling the block from a method" do
       lambda { @program.break_in_method_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :zb]
     end
 
-    it "raises a LocalJumpError when yielding to the block" do #
+    it "raises a LocalJumpError when yielding to the block" do
       lambda { @program.break_in_yield_captured }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :za, :xa, :zd, :aa, :zb]
     end
-   end #
+   end # maglev
   end
 end
 
@@ -109,7 +109,7 @@ describe "The break statement in a lambda" do
       end
     end
 
-    not_compliant_on :rubinius , :maglev do
+    not_compliant_on :rubinius, :maglev do
       it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
         lambda { @program.break_in_nested_scope_yield }.should raise_error(LocalJumpError)
         ScratchPad.recorded.should == [:a, :d, :aaa, :b]
@@ -151,7 +151,7 @@ describe "The break statement in a lambda" do
     # is removing the lambda-ness of a lambda.
   
    not_compliant_on :maglev do
-    it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do #
+    it "raises a LocalJumpError when yielding to a lambda passed as a block argument" do
       lambda { @program.break_in_method_yield }.should raise_error(LocalJumpError)
       ScratchPad.recorded.should == [:a, :la, :ld, :aaa, :lb]
     end
@@ -401,8 +401,8 @@ describe "Breaking out of a loop with a value" do
     end
   end
 
- not_compliant_on :maglev do  
-  it "assigns splatted objects to a splatted reference from a splatted loop" do # Maglev fails
+#not_compliant_on :maglev do  
+  it "assigns splatted objects to a splatted reference from a splatted loop" do
     *a = *loop do break *1; end;        a.should == [1]
     *a = *loop do break *[1]; end;      a.should == [1]
     *a = *loop do break *[nil]; end;    a.should == [nil]
@@ -410,20 +410,20 @@ describe "Breaking out of a loop with a value" do
     *a = *loop do break *[*[1]]; end;   a.should == [1]
     *a = *loop do break *[*[1,2]]; end; a.should == [1,2]
   end
- end
+#end
 
   ruby_version_is "" ... "1.9" do
-   not_compliant_on :maglev do  
-    it "assigns arrays with a nil object to a splatted reference from a splatted loop" do # maglev fails
+#  not_compliant_on :maglev do  
+    it "assigns arrays with a nil object to a splatted reference from a splatted loop" do
       *a = *loop do break *nil; end;      a.should == [nil]
       *a = *loop do break *[]; end;       a.should == [nil]
       *a = *loop do break *[*[]]; end;    a.should == [nil]
     end
 
-    it "assigns an empty array to a splatted reference when the splatted array from a splatted loop contains an empty array" do # maglev fails
+    it "assigns an empty array to a splatted reference when the splatted array from a splatted loop contains an empty array" do
       *a = *loop do break *[[]]; end;     a.should == []
     end
-   end # maglev
+#  end # maglev
   end
 
   ruby_version_is "1.9" do
@@ -480,10 +480,10 @@ describe "Breaking out of a loop with a value" do
     i = 0; loop do break i if i == 2; i+=1; end.should == 2
     i = 0; loop do break if i == 3; i+=1; end; i.should == 3
     i = 0; while (i < 5) do break i if i == 2 ; i+=1; end.should == 2
-    i = 0; while (i < 5) do break if i == 3 ; i+=1; end; i.should == 3  # maglev deviation ?
+    i = 0; while (i < 5) do break if i == 3 ; i+=1; end; i.should == 3
 
     at = 0; 0.upto(5) {|i| at = i; break i if i == 2 }.should == 2
-    at = 0; 0.upto(5) {|i| at = i; break if i == 3 }; at.should == 3  # maglev deviation ?
+    at = 0; 0.upto(5) {|i| at = i; break if i == 3 }; at.should == 3
   end
 
   it "stops a yielded method at the correct spot" do

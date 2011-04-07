@@ -23,15 +23,13 @@ describe :array_pack_basic_non_float, :shared => true do
     @obj = ArraySpecs.universal_pack_object
   end
 
- not_compliant_on :maglev do # BUG, need to fix
   it "calls #to_str to coerce the directives string" do
     d = mock("pack directive")
     d.should_receive(:to_str).and_return("x"+pack_format)
     [@obj, @obj].pack(d).should be_an_instance_of(String)
   end
- end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "taints the output string if the format string is tainted" do
     [@obj, @obj].pack("x"+pack_format.taint).tainted?.should be_true
   end

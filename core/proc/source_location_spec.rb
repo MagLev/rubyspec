@@ -1,7 +1,14 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/source_location', __FILE__)
 
-ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
+t_ver = "1.9"
+bias = 0
+deviates_on :maglev do
+  t_ver = "1.8.7"  # maglev, source_location implemented in 1.8.7
+  bias = -1
+end
+
+ruby_version_is t_ver do
   describe "Proc#source_location" do
     before(:each) do
       @proc = ProcSpecs::SourceLocation.my_proc
@@ -32,15 +39,15 @@ ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
     it "sets the last value to a Fixnum representing the line on which the proc was defined" do
       line = @proc.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should == 4 + 5
+      line.should == 4 + bias
 
       line = @proc_new.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should == 12 + 5
+      line.should == 12 + bias
 
       line = @lambda.source_location.last
       line.should be_an_instance_of(Fixnum)
-      line.should ==  8 + 5
+      line.should ==  8 + bias
     end
 
     it "works even if the proc was created on the same line" do
@@ -51,15 +58,15 @@ ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
     end
 
     it "returns the first line of a multi-line proc (i.e. the line containing 'proc do')" do
-      ProcSpecs::SourceLocation.my_multiline_proc.source_location.last.should == 16 + 5
-      ProcSpecs::SourceLocation.my_multiline_proc_new.source_location.last.should == 30 + 5
-      ProcSpecs::SourceLocation.my_multiline_lambda.source_location.last.should == 23 + 5
+      ProcSpecs::SourceLocation.my_multiline_proc.source_location.last.should == 16 + bias
+      ProcSpecs::SourceLocation.my_multiline_proc_new.source_location.last.should == 30 + bias
+      ProcSpecs::SourceLocation.my_multiline_lambda.source_location.last.should == 23 + bias
     end
 
     it "returns the location of the proc's body; not necessarily the proc itself" do
-      ProcSpecs::SourceLocation.my_detached_proc.source_location.last.should == 37 + 5
-      ProcSpecs::SourceLocation.my_detached_proc_new.source_location.last.should == 47 + 5
-      ProcSpecs::SourceLocation.my_detached_lambda.source_location.last.should == 42 + 5
+      ProcSpecs::SourceLocation.my_detached_proc.source_location.last.should == 37 + bias
+      ProcSpecs::SourceLocation.my_detached_proc_new.source_location.last.should == 47 + bias
+      ProcSpecs::SourceLocation.my_detached_lambda.source_location.last.should == 42 + bias
     end
   end
 end

@@ -1,7 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-# Maglev, ENV.delete not supported, do not run this file
-
 describe "ENV.replace" do
 
   it "replaces ENV with a Hash" do

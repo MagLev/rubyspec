@@ -21,14 +21,21 @@ describe "Math.acos" do
   end  
   
   conflicts_with :Complex do
-# Maglev x86 solaris libs returning 0 instead of NaN
-#   it "raises an Errno::EDOM if the argument is greater than 1.0" do    
-#     lambda { Math.acos(1.0001) }.should raise_error(Errno::EDOM)
-#   end  
-# 
-#   it "raises an Errno::EDOM if the argument is less than -1.0" do    
-#     lambda { Math.acos(-1.0001) }.should raise_error(Errno::EDOM)
-#   end
+   do_test = true
+   deviates_on :maglev do
+    if RUBY_PLATFORM.match('solaris') 
+      do_test = false # x86 solaris libs returning 0 instead of NaN 
+    end
+   end
+   if do_test
+    it "raises an Errno::EDOM if the argument is greater than 1.0" do    
+      lambda { Math.acos(1.0001) }.should raise_error(Errno::EDOM)
+    end  
+  
+    it "raises an Errno::EDOM if the argument is less than -1.0" do    
+      lambda { Math.acos(-1.0001) }.should raise_error(Errno::EDOM)
+    end
+   end
   end
   
   ruby_version_is ""..."1.9" do
@@ -58,7 +65,9 @@ describe "Math.acos" do
   ruby_version_is ""..."1.9" do
     it "coerces string argument with Float() without calling to_f" do  
       s = MathSpecs::StringSubClass.new("0.5")
-      # s.should_not_receive(:to_f) # Maglev
+      not_compliant_on :maglev do
+        s.should_not_receive(:to_f) 
+      end
       Math.acos(s).should be_close(Math.acos(0.5), TOLERANCE)
     end  
   end

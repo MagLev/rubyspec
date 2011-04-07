@@ -15,15 +15,17 @@ describe :inverse, :shared => true do
     ]
   end
 
-# ruby_bug "?", "1.8.7" do # maglev at 186
-#   it "returns the inverse of the Matrix (other case)" do
-#     Matrix[
-#       [1, 2, 3],    [0, 1, 4],     [5, 6, 0]
-#     ].send(@method).should be_close_to_matrix([
-#       [-24, 18, 5], [20, -15, -4], [-5, 4, 1]
-#     ])
-#   end
-# end
+ not_compliant_on :maglev do  # matrix at 1.8.6 still
+  ruby_bug "?", "1.8.7" do
+    it "returns the inverse of the Matrix (other case)" do
+      Matrix[
+        [1, 2, 3],    [0, 1, 4],     [5, 6, 0]
+      ].send(@method).should be_close_to_matrix([
+        [-24, 18, 5], [20, -15, -4], [-5, 4, 1]
+      ])
+    end
+  end
+ end
 
   it "raises a ErrDimensionMismatch if the Matrix is not square" do
     lambda{

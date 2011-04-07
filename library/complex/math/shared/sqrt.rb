@@ -23,11 +23,20 @@ describe :complex_math_sqrt_bang, :shared => true do
     @object.send(:sqrt!, 19.36).should == 4.4
   end
 
-# maglev x86 solaris libs not returning NaN
-# it "raises Errno::EDOM when the passed argument is negative" do
-#   lambda { @object.send(:sqrt!, -4) }.should raise_error(Errno::EDOM)
-#   lambda { @object.send(:sqrt!, -19.36) }.should raise_error(Errno::EDOM)
-# end
+do_test = true
+deviates_on :maglev do
+  plat  = RUBY_PLATFORM
+  if plat.match('solaris') || plat.match('linux')
+    do_test = false # libs fail to return NaN
+  end
+end
+
+if do_test
+  it "raises Errno::EDOM when the passed argument is negative" do
+    lambda { @object.send(:sqrt!, -4) }.should raise_error(Errno::EDOM)
+    lambda { @object.send(:sqrt!, -19.36) }.should raise_error(Errno::EDOM)
+  end
+end
 
   it "raises a TypeError when passed a Complex number" do
     lambda { @object.send(:sqrt!, Complex(4, 5)) }.should raise_error(TypeError)

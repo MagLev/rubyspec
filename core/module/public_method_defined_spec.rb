@@ -15,12 +15,12 @@ describe "Module#public_method_defined?" do
 
   it "returns false if method is not a public method" do
     ModuleSpecs::CountsChild.public_method_defined?("private_3").should == false
-#   ModuleSpecs::CountsChild.public_method_defined?("private_2").should == false # Maglev fails
-#   ModuleSpecs::CountsChild.public_method_defined?("private_1").should == false # Maglev fails
+    ModuleSpecs::CountsChild.public_method_defined?("private_2").should == false
+    ModuleSpecs::CountsChild.public_method_defined?("private_1").should == false
 
     ModuleSpecs::CountsChild.public_method_defined?("protected_3").should == false
-#   ModuleSpecs::CountsChild.public_method_defined?("protected_2").should == false # Maglev fails
-#   ModuleSpecs::CountsChild.public_method_defined?("protected_1").should == false # Maglev fails
+    ModuleSpecs::CountsChild.public_method_defined?("protected_2").should == false
+    ModuleSpecs::CountsChild.public_method_defined?("protected_1").should == false
   end
 
   it "returns false if the named method is not defined by the module or its ancestors" do

@@ -128,7 +128,7 @@ describe "IO#readlines" do
       end
     end
   end
- end #
+ end 
 end
 
 describe "IO#readlines" do

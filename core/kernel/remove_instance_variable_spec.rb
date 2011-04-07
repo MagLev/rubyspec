@@ -2,11 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel#remove_instance_variable" do
-not_compliant_on :maglev do 
-  it "is a private method" do #
+ not_compliant_on :maglev do  # not private yet
+  it "is a private method" do
     Kernel.should have_private_instance_method(:remove_instance_variable)
   end
-end
+ end
 
   it "removes an ivar of a given name and return it's value" do
     val = KernelSpecs::Ivar.new.send :remove_instance_variable, :@greeting
@@ -37,5 +37,4 @@ end
       KernelSpecs::Ivar.new.send :remove_instance_variable, Object
     }.should raise_error(TypeError)
   end
-
 end

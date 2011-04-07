@@ -16,11 +16,12 @@ describe "Matrix#rank" do
     end
   end
 
-# Maglev at 1.8.6
-# ruby_bug "revision 24969", "1.8.7" do
-#   it "works for some easy rectangular matrices" do
-#     Matrix[[0,0],[0,0],[1,0]].rank.should == 1
-#     Matrix[[0,1],[0,0],[1,0]].rank.should == 2
-#   end
-# end
+ not_compliant_on :maglev do
+  ruby_bug "revision 24969", "1.8.7" do
+    it "works for some easy rectangular matrices" do
+      Matrix[[0,0],[0,0],[1,0]].rank.should == 1
+      Matrix[[0,1],[0,0],[1,0]].rank.should == 2
+    end
+  end
+  end
 end

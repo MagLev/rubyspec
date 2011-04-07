@@ -30,7 +30,7 @@ describe "Module#alias_method" do
     @class.make_alias :was_private_one, :private_one
     @object.was_private_one.should == 1
   end
- end #
+ end
   
   it "fails if origin method not found" do
     lambda { @class.make_alias :ni, :san }.should raise_error(NameError)
@@ -51,21 +51,21 @@ describe "Module#alias_method" do
     lambda { @class.make_alias mock('x'), :public_one }.should raise_error(TypeError)
   end
 
-# Maglev, not private yet
-# it "is a private method" do
-#   lambda { @class.alias_method :ichi, :public_one }.should raise_error(NoMethodError)
-# end
+ not_compliant_on :maglev do # not private yet
+  it "is a private method" do
+    lambda { @class.alias_method :ichi, :public_one }.should raise_error(NoMethodError)
+  end
+ end
 
   it "works in module" do
     ModuleSpecs::Allonym.new.publish.should == :report
   end
   
-# Maglev fails
-# it "works on private module methods in a module that has been reopened" do
-#   ModuleSpecs::ReopeningModule.foo.should == true
-#   lambda { ModuleSpecs::ReopeningModule.foo2 }.should_not raise_error(NoMethodError)
-# end
-  
+  it "works on private module methods in a module that has been reopened" do
+    ModuleSpecs::ReopeningModule.foo.should == true
+    lambda { ModuleSpecs::ReopeningModule.foo2 }.should_not raise_error(NoMethodError)
+  end
+
   it "accesses a method defined on Object from Kernel" do
     Kernel.should_not have_public_instance_method(:module_specs_public_method_on_object)
 

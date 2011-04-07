@@ -13,8 +13,13 @@ describe "TCPSocket#gethostbyname" do
 
   platform_is_not :windows do
     it "returns the canonical name as first value" do
-    (hx = @host_info)[0].should == '127.0.0.1' # (sx = SocketSpecs.hostname) 
-     # maglev deviation returning ipaddr instead of localhost
+      not_compliant_on :maglev do
+       @host_info[0].should == SocketSpecs.hostname
+      end
+      deviates_on :maglev do
+        # maglev deviation returning ipaddr instead of localhost
+        @host_info[0].should == '127.0.0.1
+      end
     end
 
     not_compliant_on :jruby do

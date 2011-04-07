@@ -23,7 +23,11 @@ describe "Regexp#inspect" do
   end
 
   it "does not over escape" do
-    # Regexp.new('\\\/').inspect.should == "/\\\\\\//" 
-    Regexp.new('\\\/').inspect.should == "/\\\\//" # Maglev bug/deviation
+   not_compliant_on :maglev do 
+    Regexp.new('\\\/').inspect.should == "/\\\\\\//"
+   end
+   deviates_on :maglev do 
+    Regexp.new('\\\/').inspect.should == "/\\\\//" # Maglev bug
+   end
   end
 end

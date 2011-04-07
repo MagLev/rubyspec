@@ -17,11 +17,12 @@ describe "Thread.new" do
     arr.should == [a,b,c]
   end
 
- not_compliant_on :maglev do #  fix needed
   it "raises an exception when not given a block" do
+    tx = Thread
     lambda { Thread.new }.should raise_error(ThreadError)
   end
 
+ not_compliant_on :maglev do
   it "creates a subclass of thread calls super with a block in initialize" do #
     arr = []
     t = ThreadSpecs::SubThread.new(arr)

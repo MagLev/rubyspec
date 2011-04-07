@@ -18,8 +18,9 @@ describe "File.lchmod" do
     
     it "changes the file mode of the link and not of the file" do
       File.chmod(0222, @lname).should  == 1
-      # File.lchmod(0755, @lname).should == 1 # Not implemented on Linux or Solaris
-      
+     not_compliant_on :maglev do  # lchmod not implemented on Linux nor Solaris
+      File.lchmod(0755, @lname).should == 1 
+     end 
       File.lstat(@lname).executable?.should == true
       File.lstat(@lname).readable?.should   == true
       File.lstat(@lname).writable?.should   == true

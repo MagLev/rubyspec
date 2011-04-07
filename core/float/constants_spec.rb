@@ -14,7 +14,12 @@ describe "Float#CONSTANTS" do
   end
 
   it "the MAX_10_EXP is 308" do
-    Float::MAX_10_EXP.should == 308
+    not_compliant_on :maglev do
+      Float::MAX_10_EXP.should == 307
+    end
+    deviates_on :maglev do 
+      Float::MAX_10_EXP.should == 308
+    end
   end
 
   it "the MIN_10_EXP is -308" do
@@ -26,7 +31,12 @@ describe "Float#CONSTANTS" do
   end
 
   it "the MIN_EXP is -1021" do
-    Float::MIN_EXP.should == -1022
+    not_compliant_on :maglev do
+      Float::MIN_EXP.should == -1021
+    end
+    deviates_on :maglev do
+      Float::MIN_EXP.should == -1022
+    end
   end
 
   it "the MAX is 1.79769313486232e+308" do

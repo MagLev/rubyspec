@@ -1,7 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-# Maglev, ENV.delete not supported, do not run this file
-
 describe "ENV.reject!" do
   it "rejects entries based on key" do
     ENV["foo"] = "bar"
@@ -22,22 +20,24 @@ describe "ENV.reject!" do
     ENV["foo"].should == nil
   end
 
-# ruby_version_is "" ... "1.8.7" do
-  ruby_version_is "" .. "1.8.7" do # maglev
-    it "raises on no block given" do #
+  ruby_version_is "" ... "1.8.7" do
+    it "raises on no block given" do
       lambda { ENV.reject! }.should raise_error(LocalJumpError)
     end
   end
 
- not_compliant_on :maglev do
   ruby_version_is "1.8.7" do
     it "returns an Enumerator if called without a block" do
-      ENV.reject!.should be_an_instance_of(enumerator_class)
+     not_compliant_on :maglev do
+       ENV.reject!.should be_an_instance_of(enumerator_class)
+     end
+     deviates_on :maglev do
+      lambda { ENV.reject! }.should raise_error(LocalJumpError)
+     end
     end
   end
- end
 
- not_compliant_on :maglev do  # ENV.clear not allowed
+ not_supported_on :maglev do  # ENV.clear not allowed
   it "doesn't raise if empty" do
     orig = ENV.to_hash
     begin
@@ -47,7 +47,7 @@ describe "ENV.reject!" do
       ENV.replace orig
     end
   end
- end #
+ end
 end
 
 describe "ENV.reject" do
@@ -83,7 +83,7 @@ describe "ENV.reject" do
     end
   end
 
- not_compliant_on :maglev do  # ENV.clear not allowed
+ not_supported_on :maglev do  # ENV.clear not allowed
   it "doesn't raise if empty" do
     orig = ENV.to_hash
     begin

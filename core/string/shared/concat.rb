@@ -22,9 +22,14 @@ describe :string_concat, :shared => true do
       a = "hello"
       a.freeze
 
-      b = a.send(@method, "") # Maglev deviation error only if modification would occur
+     not_compliant_on :maglev do 
+      lambda { a.send(@method, "")     }.should raise_error(TypeError)
+     end
+     deviates_on :maglev do
+      b = a.send(@method, "") # Maglev error only if modification would occur
       b.equal?(a).should == true 
-      lambda { a.send(@method, "a")     }.should raise_error(TypeError) # Maglev deviation
+      lambda { a.send(@method, "a")  }.should raise_error(TypeError)
+     end
       lambda { a.send(@method, "test") }.should raise_error(TypeError)
     end
   end
@@ -55,14 +60,15 @@ describe :string_concat, :shared => true do
     a.should == "hello world"
   end
 
-# Maglev taint not propagated
-#  it "taints self if other is tainted" do
-#    x = "x"
-#    x.send(@method, "".taint).tainted?.should == true
-#
-#    x = "x"
-#    x.send(@method, "y".taint).tainted?.should == true
-#  end
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if other is tainted" do
+    x = "x"
+    x.send(@method, "".taint).tainted?.should == true
+ 
+    x = "x"
+    x.send(@method, "y".taint).tainted?.should == true
+  end
+ end
 end
 
 describe :string_concat_fixnum, :shared => true do

@@ -44,11 +44,12 @@ describe "String#dump" do
     end
   end
 
-# Maglev, no taint propagation
-#  it "taints result when self is tainted" do
-#    "".taint.dump.tainted?.should == true
-#    "x".taint.dump.tainted?.should == true
-#  end
+  not_supported_on :maglev do # no taint propagation
+   it "taints result when self is tainted" do
+     "".taint.dump.tainted?.should == true
+     "x".taint.dump.tainted?.should == true
+   end
+  end
   
   it "returns a subclass instance for subclasses" do
     StringSpecs::MyString.new("hi!").dump.should be_kind_of(StringSpecs::MyString)

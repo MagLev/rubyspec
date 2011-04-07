@@ -17,18 +17,18 @@ describe "String#gsub with pattern and replacement" do
   end
 
  not_compliant_on :maglev do  # gsub not KCODE aware yet
-  it "respects $KCODE when the pattern collapses" do #
+  it "respects $KCODE when the pattern collapses" do
     str = "こにちわ"
     reg = %r!!
 
     $KCODE = "utf-8"
     str.gsub(reg, ".").should == ".こ.に.ち.わ."
   end
- end #
+ end
 
   it "doesn't freak out when replacing ^" do
     "Text\n".gsub(/^/, ' ').should == " Text\n"
-    (str = "Text\nFoo").gsub(/^/, ' ').should == " Text\n Foo"
+    "Text\nFoo".gsub(/^/, ' ').should == " Text\n Foo"
   end
 
   it "returns a copy of self with all occurrences of pattern replaced with replacement" do
@@ -158,26 +158,27 @@ describe "String#gsub with pattern and replacement" do
     "hello".gsub(/./, 'hah\\').should == 'hah\\' * 5
   end
   
-# Maglev, no taint propagation
-# it "taints the result if the original string or replacement is tainted" do
-#   hello = "hello"
-#   hello_t = "hello"
-#   a = "a"
-#   a_t = "a"
-#   empty = ""
-#   empty_t = ""
-#   
-#   hello_t.taint; a_t.taint; empty_t.taint
-#   
-#   hello_t.gsub(/./, a).tainted?.should == true
-#   hello_t.gsub(/./, empty).tainted?.should == true
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result if the original string or replacement is tainted" do
+    hello = "hello"
+    hello_t = "hello"
+    a = "a"
+    a_t = "a"
+    empty = ""
+    empty_t = ""
+    
+    hello_t.taint; a_t.taint; empty_t.taint
+    
+    hello_t.gsub(/./, a).tainted?.should == true
+    hello_t.gsub(/./, empty).tainted?.should == true
 
-#   hello.gsub(/./, a_t).tainted?.should == true
-#   hello.gsub(/./, empty_t).tainted?.should == true
-#   hello.gsub(//, empty_t).tainted?.should == true
-#   
-#   hello.gsub(//.taint, "foo").tainted?.should == false
-# end
+    hello.gsub(/./, a_t).tainted?.should == true
+    hello.gsub(/./, empty_t).tainted?.should == true
+    hello.gsub(//, empty_t).tainted?.should == true
+    
+    hello.gsub(//.taint, "foo").tainted?.should == false
+  end
+ end
 
   ruby_version_is "1.9" do
     it "untrusts the result if the original string or replacement is untrusted" do
@@ -400,12 +401,12 @@ describe "String#gsub with pattern and block" do
   end
 
   ruby_version_is ""..."1.9" do
-   not_compliant_on :maglev do 
-    it "raises a RuntimeError if the string is modified while substituting" do #
+   not_compliant_on :maglev do
+    it "raises a RuntimeError if the string is modified while substituting" do
       str = "hello"
       lambda { str.gsub(//) { str[0] = 'x' } }.should raise_error(RuntimeError)
     end
-   end #
+   end
   end
   
   it "doesn't interpolate special sequences like \\1 for the block's return value" do
@@ -455,12 +456,13 @@ describe "String#gsub! with pattern and replacement" do
     a.should == "h*ll*"
   end
 
-# Maglev, no taint propagation
-# it "taints self if replacement is tainted" do
-#   a = "hello"
-#   a.gsub!(/./.taint, "foo").tainted?.should == false
-#   a.gsub!(/./, "foo".taint).tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if replacement is tainted" do
+    a = "hello"
+    a.gsub!(/./.taint, "foo").tainted?.should == false
+    a.gsub!(/./, "foo".taint).tainted?.should == true
+  end
+ end
 
   ruby_version_is "1.9" do
     it "untrusts self if replacement is untrusted" do
@@ -489,7 +491,9 @@ describe "String#gsub! with pattern and replacement" do
       s = "hello"
       s.freeze
 
-      # lambda { s.gsub!(/e/, "e") }.should raise_error(TypeError) # Maglev no error if no change
+     not_compliant_on :maglev do  # error only on actual modification attempt
+      lambda { s.gsub!(/e/, "e") }.should raise_error(TypeError)
+     end
       lambda { s.gsub!(/[aeiou]/, '*') }.should raise_error(TypeError)
     end
   end
@@ -514,12 +518,13 @@ describe "String#gsub! with pattern and block" do
     a.should == "h*ll*"
   end
 
-# Maglev, no taint propagation
-# it "taints self if block's result is tainted" do
-#   a = "hello"
-#   a.gsub!(/./.taint) { "foo" }.tainted?.should == false
-#   a.gsub!(/./) { "foo".taint }.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints self if block's result is tainted" do
+    a = "hello"
+    a.gsub!(/./.taint) { "foo" }.tainted?.should == false
+    a.gsub!(/./) { "foo".taint }.tainted?.should == true
+  end
+ end
 
   ruby_version_is "1.9" do
     it "untrusts self if block's result is untrusted" do
@@ -553,6 +558,13 @@ describe "String#gsub! with pattern and block" do
         s.freeze
 
         lambda { s.gsub!(/e/)       { "e" } }.should raise_error(TypeError)
+        lambda { s.gsub!(/[aeiou]/) { '*' } }.should raise_error(TypeError)
+      end
+    end
+    deviates_on :maglev do 
+      it "raises a TypeError if the frozen string would actually be modified" do
+        s = "hello"
+        s.freeze
         lambda { s.gsub!(/[aeiou]/) { '*' } }.should raise_error(TypeError)
       end
     end

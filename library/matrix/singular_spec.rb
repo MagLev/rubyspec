@@ -16,8 +16,15 @@ describe "Matrix#singular?" do
     end
   end
 
-  # ruby_bug "", "1.8.7" do
-  not_compliant_on :maglev do #  MRI 1.8.7 does not have Matrix.empty
+ do_test = true
+ deviates_on :maglev do
+   do_test = false
+   ruby_version_is "1.8.8" do
+     do_test = false # 1.8.7 does not have Matrix.empty
+   end
+ end
+ if do_test
+  ruby_bug "", "1.8.7" do
     it "returns false for an empty 0x0 matrix" do
       Matrix.empty(0,0).singular?.should be_false
     end
@@ -32,5 +39,5 @@ describe "Matrix#singular?" do
        }.should raise_error(Matrix::ErrDimensionMismatch)
      end
   end
-
+ end
 end

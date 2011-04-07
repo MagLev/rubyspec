@@ -4,7 +4,7 @@ describe "Proc#to_s" do
   
   ruby_version_is ""..."1.9" do
     it "returns a description of self" do
-      (pp = Proc.new { "hello" }).to_s.should =~ /^#<Proc:(.*?)@(.*)\/to_s_spec\.rb:7>$/
+      Proc.new { "hello" }.to_s.should =~ /^#<Proc:(.*?)@(.*)\/to_s_spec\.rb:7>$/
       lambda { "hello" }.to_s.should =~ /^#<Proc:(.*?)@(.*)\/to_s_spec\.rb:8>$/
       proc { "hello" }.to_s.should =~ /^#<Proc:(.*?)@(.*)\/to_s_spec\.rb:9>$/
     end

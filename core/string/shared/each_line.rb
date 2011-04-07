@@ -1,4 +1,18 @@
 describe :string_each_line, :shared => true do
+  it "splits using default newline separator when none is specified" do
+    a = []
+    "one\ntwo\r\nthree".send(@method) { |s| a << s }
+    a.should == ["one\n", "two\r\n", "three"]
+
+    b = []
+    "hello\n\n\nworld".send(@method) { |s| b << s }
+    b.should == ["hello\n", "\n", "\n", "world"]
+    
+    c = []
+    "\n\n\n\n\n".send(@method) {|s| c << s}
+    c.should == ["\n", "\n", "\n", "\n", "\n"]
+  end
+    
   it "splits self using the supplied record separator and passes each substring to the block" do
     a = []
     "one\ntwo\r\nthree".send(@method, "\n") { |s| a << s }
@@ -13,12 +27,13 @@ describe :string_each_line, :shared => true do
     c.should == ["hello\n", "\n", "\n", "world"]
   end
 
-# Maglev, no taint propagation
-# it "taints substrings that are passed to the block if self is tainted" do
-#   "one\ntwo\r\nthree".taint.send(@method) { |s| s.tainted?.should == true }
-#
-#   "x.y.".send(@method, ".".taint) { |s| s.tainted?.should == false }
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints substrings that are passed to the block if self is tainted" do
+    "one\ntwo\r\nthree".taint.send(@method) { |s| s.tainted?.should == true }
+ 
+    "x.y.".send(@method, ".".taint) { |s| s.tainted?.should == false }
+  end
+ end
 
   it "passes self as a whole to the block if the separator is nil" do
     a = []
@@ -80,11 +95,12 @@ describe :string_each_line, :shared => true do
   end
 
   ruby_version_is ''...'1.9' do
-# Maglev fails
-#   it "raises a RuntimeError if the string is modified while substituting" do
-#     str = "hello\nworld"
-#     lambda { str.send(@method) { str[0] = 'x' } }.should raise_error(RuntimeError)
-#   end
+   not_compliant_on :maglev do  # no error raised
+    it "raises a RuntimeError if the string is modified while substituting" do
+      str = "hello\nworld"
+      lambda { str.send(@method) { str[0] = 'x' } }.should raise_error(RuntimeError)
+    end
+   end
   end
 
   ruby_version_is '1.9' do
@@ -102,11 +118,12 @@ describe :string_each_line, :shared => true do
   end
 
   ruby_version_is ''...'1.9' do
-# Maglev accepts char/symbol
-#   it "raises a TypeError when the separator is a character or a symbol" do
-#     lambda { "hello world".send(@method, ?o) {}        }.should raise_error(TypeError)
-#     lambda { "hello world".send(@method, :o) {}        }.should raise_error(TypeError)
-#   end
+   not_compliant_on :maglev do # Maglev accepts char/symbol
+    it "raises a TypeError when the separator is a character or a symbol" do
+      lambda { "hello world".send(@method, ?o) {}        }.should raise_error(TypeError)
+      lambda { "hello world".send(@method, :o) {}        }.should raise_error(TypeError)
+    end
+   end
   end
 
   ruby_version_is '1.9' do

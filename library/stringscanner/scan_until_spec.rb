@@ -16,11 +16,11 @@ describe "StringScanner#scan_until" do
     @s.scan_until(/\d/).should == nil
   end
 
-not_compliant_on :maglev do # bugs
+ not_compliant_on :maglev do # bug, need to compare to Rubinius
   it "can match anchors properly" do
     @s.scan(/T/)
     @s.scan_until(/^h/).should == "h"
   end
-end
+ end
 
 end

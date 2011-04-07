@@ -1,9 +1,9 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
-# Pickaxe book says  Module#append_features  superceded by  Module#included 
-# Maglev does not implement append_features . do not run this spec
-
+not_supported_on :maglev do
+  # Pickaxe book says  Module#append_features  superceded by  Module#included 
+  # Maglev does not implement append_features 
 describe "Module#append_features" do
   it "gets called when self is included in another module/class" do
     begin
@@ -33,4 +33,5 @@ describe "Module#append_features" do
     }.should raise_error(ArgumentError)
 
   end
+end
 end

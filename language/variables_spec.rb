@@ -100,7 +100,7 @@ describe "Basic assignment" do
 
   ruby_version_is "" ... "1.9" do
     it "allows the assignment of rhs to the lhs using the lhs and rhs splat operators simultaneously" do
-      *a = *nil;   a.should == [nil] 
+      *a = *nil;      a.should == [nil]
       *a = *1;        a.should == [1]
       *a = *[];       a.should == []
       *a = *[1];      a.should == [1]
@@ -153,26 +153,27 @@ describe "Basic assignment" do
   end
 
   it "calls to_a on the given argument when using a splat" do
-    rx = VariablesSpecs::ArrayLike.new([1,2]) 
-    a,b = *rx
-    [a,b].should == [1,2]
+    a,b = *VariablesSpecs::ArrayLike.new([1,2]); [a,b].should == [1,2]
   end
 
   it "supports the {|r,| } form of block assignment" do
     f = lambda {|r,| r.should == []}
-# Maglev deviation, requires you to pass enough args , see src/test/Trac570.rb
-    #f.call([], *[])
-    f.call([], 0)
-
+   not_compliant_on :maglev do
+    f.call([], *[])
     f = lambda{|x,| x}
-    # f.call(42).should == 42
-    # f.call([42]).should == [42]
-    # f.call([[42]]).should == [[42]]
-    # f.call([42,55]).should == [42,55]
-    f.call(42, 0).should == 42  # Maglev deviation
+    f.call(42).should == 42
+    f.call([42]).should == [42]
+    f.call([[42]]).should == [[42]]
+    f.call([42,55]).should == [42,55]
+   end
+   deviates_on :maglev do
+    f.call([], 0) # to avoid too-few-args error, see Trac 570
+    f = lambda{|x,| x}
+    f.call(42, 0).should == 42 
     f.call([42], 0).should == [42]
     f.call([[42]], 0).should == [[42]]
     f.call([42,55], 0).should == [42,55]
+   end
   end
 
   it "allows assignment through lambda" do
@@ -297,9 +298,9 @@ describe "Basic multiple assignment" do
       x = [1, 2]
       x.should_not_receive(:to_a)
 
-      ax, bx = *x
-      ax.should == 1
-      bx.should == 2
+      a, b = *x
+      a.should == 1
+      b.should == 2
     end
 
     it "does not call #to_ary on an Array subclass instance" do
@@ -483,7 +484,7 @@ describe "Assigning multiple values" do
       b.should == 1
       c.should == [2]
 
-      a,(b,(*c),(*d)) = 5,x  # showed up in sep15 submodule update
+      a,(b,(*c),(*d)) = 5,x
       a.should == 5
       b.should == 1
       c.should == [2]
@@ -515,12 +516,16 @@ describe "Assigning multiple values" do
 
       a,(*b),c = 5,x
       a.should == 5
-#     b.should == [x]  # Maglev fails
-      b.should == [1,2,3,4 ]  # Maglev result
-         # I think spec is wrong here
+     not_compliant_on :maglev do
+      b.should == [x]
+     end
+     deviates_on :maglev do
+      b.should == [1,2,3,4 ]
+         # I think spec may be wrong here
          #  [1,2,3,4] is what x.to_ary  returns
          # maybe spec reflects a bug in MRI ?
       c.should == nil
+     end
     end
   end
 
@@ -1192,7 +1197,19 @@ end
 # TODO: merge the following two describe blocks and partition the specs
 # into distinct cases.
 describe "Multiple assignment" do
-  not_compliant_on :rubinius do   
+  not_compliant_on :rubinius, :maglev do   
+    it "has the proper return value" do
+      (a,b,*c = *[5,6,7,8,9,10]).should == [5,6,7,8,9,10]
+      (d,e = VariablesSpecs.reverse_foo(4,3)).should == [3,4]
+      (f,g,h = VariablesSpecs.reverse_foo(6,7)).should == [7,6]
+      (i,*j = *[5,6,7]).should == [5,6,7]
+      (k,*l = [5,6,7]).should == [5,6,7]
+    end
+  end
+
+  # TODO: write Rubinius versions
+
+  deviates_on :maglev do
     it "has the proper return value" do
       a,b,*c = *[5,6,7,8,9,10]  # .should == [5,6,7,8,9,10]  # Maglev gets  [7, 8, 9, 10]
       d,e = VariablesSpecs.reverse_foo(4,3)  # .should == [3,4] # Maglev gets 4
@@ -1214,16 +1231,15 @@ describe "Multiple assignment" do
     end
   end
 
-  # TODO: write Rubinius versions
 end
 
 # For now, masgn is deliberately non-compliant with MRI wrt the return val from an masgn.
 # Rubinius returns true as the result of the assignment, but MRI returns an array
 # containing all the elements on the rhs. As this result is never used, the cost
 # of creating and then discarding this array is avoided
-#
+ 
 # Maglev IR generation phase omits generation of array result if it is never referenced,
-#  but still evaluates side effects of RHS 
+#  but still evaluates side effects of RHS , and passes following MRI spec
 
 describe "Multiple assignment, array-style" do
   not_compliant_on :rubinius do 

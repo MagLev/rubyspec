@@ -13,8 +13,8 @@ describe :io_tty, :shared => true do
   end
 
  not_compliant_on :maglev do 
-  it "raises IOError on closed stream" do #
+  it "raises IOError on closed stream" do
     lambda { IOSpecs.closed_io.send @method }.should raise_error(IOError)
   end
- end #
+ end
 end

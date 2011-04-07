@@ -18,7 +18,7 @@ describe "Array#compact" do
     a.compact.should_not equal(a)
   end
 
- not_compliant_on :maglev do  # no taint propagation
+ not_supported_on :maglev do  # no taint propagation
   ruby_version_is '' ... '1.9.3' do
     it "keeps tainted status even if all elements are removed" do
       a = [nil, nil]

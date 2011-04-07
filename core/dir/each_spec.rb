@@ -29,10 +29,8 @@ describe "Dir#each" do
   it "returns the directory which remains open" do
     # an FS does not necessarily impose order
     ls = Dir.entries(DirSpecs.mock_dir)
-    daa = @dir
-    (dxa = @dir.each {}).should == @dir
-    dxb = @dir.read
-    dxb.should == nil
+    @dir.each {}.should == @dir
+    @dir.read.should == nil
     @dir.rewind
     ls.should include(@dir.read)
   end

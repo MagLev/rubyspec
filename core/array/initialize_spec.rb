@@ -33,15 +33,16 @@ describe "Array#initialize" do
   end
 
   ruby_version_is '' ... '1.9' do
-# Maglev, TypeError on frozen objects only happen if actual modification attempted
-#    it "raises a TypeError on frozen arrays even if the array would not be modified" do
-#      lambda do
-#        ArraySpecs.frozen_array.send :initialize
-#      end.should raise_error(TypeError)
-#      lambda do
-#        ArraySpecs.frozen_array.send :initialize, ArraySpecs.frozen_array
-#      end.should raise_error(TypeError)
-#    end
+   not_compliant_on :maglev do  
+    it "raises a TypeError on frozen arrays even if the array would not be modified" do
+      lambda do
+        ArraySpecs.frozen_array.send :initialize
+      end.should raise_error(TypeError)
+      lambda do
+        ArraySpecs.frozen_array.send :initialize, ArraySpecs.frozen_array
+      end.should raise_error(TypeError)
+    end
+   end
   end
 
   ruby_version_is '1.9' do
@@ -58,9 +59,7 @@ end
 
 describe "Array#initialize with no arguments" do
   it "makes the array empty" do
-    a = [1, 2, 3]
-    a.send(:initialize)
-    a.should be_empty # Maglev changes for debugging 
+    [1, 2, 3].send(:initialize).should be_empty
   end
 
   it "does not use the given block" do
@@ -91,33 +90,34 @@ describe "Array#initialize with (array)" do
     [].send(:initialize, a).should == a
   end
 
-# Maglev deviation, does nothing and raises no error
-#  it "raises a TypeError if an Array type argument and a default object" do
-#    lambda { [].send(:initialize, [1, 2], 1) }.should raise_error(TypeError)
-#  end
+ not_compliant_on :maglev do
+  it "raises a TypeError if an Array type argument and a default object" do
+    lambda { [].send(:initialize, [1, 2], 1) }.should raise_error(TypeError)
+  end
+ end
 end
 
 describe "Array#initialize with (size, object=nil)" do
-# Maglev bug, does nothing
-#  it "sets the array to size and fills with the object" do
-#    a = []
-#    obj = [3]
-#    a.send(:initialize, 2, obj).should == [obj, obj]
-#    a[0].should equal(obj)
-#    a[1].should equal(obj)
-#  end
+ not_compliant_on :maglev do # new(size,obj) does it all
+  it "sets the array to size and fills with the object" do
+    a = []
+    obj = [3]
+    a.send(:initialize, 2, obj).should == [obj, obj]
+    a[0].should equal(obj)
+    a[1].should equal(obj)
+  end
+ end
 
   it "sets the array to size and fills with nil when object is omitted" do
-    a = []
-    a.send(:initialize, 3)
-    a.should == [nil, nil, nil]
+    [].send(:initialize, 3).should == [nil, nil, nil]
   end
 
-# Maglev, direct use of initialize without reimplementation of new and initialize not supported
-#  it "raises an ArgumentError if size is negative" do
-#    lambda { [].send(:initialize, -1, :a) }.should raise_error(ArgumentError)
-#    lambda { [].send(:initialize, -1) }.should raise_error(ArgumentError)
-#  end
+ not_compliant_on :maglev do # direct use of initialize not supported
+  it "raises an ArgumentError if size is negative" do
+    lambda { [].send(:initialize, -1, :a) }.should raise_error(ArgumentError)
+    lambda { [].send(:initialize, -1) }.should raise_error(ArgumentError)
+  end
+ end
 
   platform_is :wordsize => 32 do
     it "raises an ArgumentError if size is too large" do
@@ -133,46 +133,45 @@ describe "Array#initialize with (size, object=nil)" do
     end
   end
 
-# Maglev, direct use of initialize without reimplementation of new and initialize not supported
-#  it "calls #to_int to convert the size argument to an Integer when object is given" do
-#    obj = mock('1')
-#    obj.should_receive(:to_int).and_return(1)
-#    [].send(:initialize, obj, :a).should == [:a]
-#  end
+ not_compliant_on :maglev do # direct use of initialize on Array's not supported
+  it "calls #to_int to convert the size argument to an Integer when object is given" do
+    obj = mock('1')
+    obj.should_receive(:to_int).and_return(1)
+    [].send(:initialize, obj, :a).should == [:a]
+  end
 
-# Maglev, direct use of initialize without reimplementation of new and initialize not supported
-#  it "calls #to_int to convert the size argument to an Integer when object is not given" do
-#    obj = mock('1')
-#    obj.should_receive(:to_int).and_return(1)
-#    [].send(:initialize, obj).should == [nil]
-#  end
+  it "calls #to_int to convert the size argument to an Integer when object is not given" do
+    obj = mock('1')
+    obj.should_receive(:to_int).and_return(1)
+    [].send(:initialize, obj).should == [nil]
+  end
 
-# Maglev, direct use of initialize without reimplementation of new and initialize not supported
-#  it "raises a TypeError if the size argument is not an Integer type" do
-#    obj = mock('nonnumeric')
-#    obj.stub!(:to_ary).and_return([1, 2])
-#    lambda{ [].send(:initialize, obj, :a) }.should raise_error(TypeError)
-#  end
-#
-#  it "yields the index of the element and sets the element to the value of the block" do
-#    [].send(:initialize, 3) { |i| i.to_s }.should == ['0', '1', '2']
-#  end
-#
-#  it "uses the block value instead of using the default value" do
-#    [].send(:initialize, 3, :obj) { |i| i.to_s }.should == ['0', '1', '2']
-#  end
-#
-#  it "returns the value passed to break" do
-#    [].send(:initialize, 3) { break :a }.should == :a
-#  end
-#
-#  it "sets the array to the values returned by the block before break is executed" do
-#    a = [1, 2, 3]
-#    a.send(:initialize, 3) do |i|
-#      break if i == 2
-#      i.to_s
-#    end
-#
-#    a.should == ['0', '1']
-#  end
+  it "raises a TypeError if the size argument is not an Integer type" do
+    obj = mock('nonnumeric')
+    obj.stub!(:to_ary).and_return([1, 2])
+    lambda{ [].send(:initialize, obj, :a) }.should raise_error(TypeError)
+  end
+
+  it "yields the index of the element and sets the element to the value of the block" do
+    [].send(:initialize, 3) { |i| i.to_s }.should == ['0', '1', '2']
+  end
+
+  it "uses the block value instead of using the default value" do
+    [].send(:initialize, 3, :obj) { |i| i.to_s }.should == ['0', '1', '2']
+  end
+
+  it "returns the value passed to break" do
+    [].send(:initialize, 3) { break :a }.should == :a
+  end
+
+  it "sets the array to the values returned by the block before break is executed" do
+    a = [1, 2, 3]
+    a.send(:initialize, 3) do |i|
+      break if i == 2
+      i.to_s
+    end
+
+    a.should == ['0', '1']
+  end
+ end # maglev
 end

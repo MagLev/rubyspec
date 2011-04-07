@@ -22,12 +22,13 @@ describe "String#rstrip" do
     end
   end
 
- # Maglev no taint propagation
-# it "taints the result when self is tainted" do
-#   "".taint.rstrip.tainted?.should == true
-#   "ok".taint.rstrip.tainted?.should == true
-#   "ok    ".taint.rstrip.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result when self is tainted" do
+    "".taint.rstrip.tainted?.should == true
+    "ok".taint.rstrip.tainted?.should == true
+    "ok    ".taint.rstrip.tainted?.should == true
+  end
+ end
 
 end
 

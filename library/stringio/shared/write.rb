@@ -45,10 +45,12 @@ describe :stringio_write_string, :shared => true do
     @io.pos.should eql(4)
   end
 
-# it "taints self's String when the passed argument is tainted" do # Maglev, not taint propagate
-#   @io.send(@method, "test".taint)
-#   @io.string.tainted?.should be_true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints self's String when the passed argument is tainted" do
+    @io.send(@method, "test".taint)
+    @io.string.tainted?.should be_true
+  end
+ end
 
   it "does not taint self when the passed argument is tainted" do
     @io.send(@method, "test".taint)

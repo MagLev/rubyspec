@@ -71,8 +71,14 @@ describe "The super keyword" do
         end
       end
 
-      lambda {sub_normal.new.foo}.should raise_error(NoMethodError, /foo/) # , /super/) # maglev error message deviation
-      lambda {sub_zsuper.new.foo}.should raise_error(NoMethodError, /foo/) # , /super/) # maglev error message deviation
+     not_compliant_on :maglev do
+      lambda {sub_normal.new.foo}.should raise_error(NoMethodError, /super/)
+      lambda {sub_zsuper.new.foo}.should raise_error(NoMethodError, /super/)
+     end
+     deviates_on :maglev do
+      lambda {sub_normal.new.foo}.should raise_error(NoMethodError, /foo/)
+      lambda {sub_zsuper.new.foo}.should raise_error(NoMethodError, /foo/)
+     end
     end
   end
 
@@ -84,54 +90,14 @@ describe "The super keyword" do
     Super::S7.new.here.should == :good
   end
 
-# Maglev, not supported, SyntaxError during parse
-# Maglev AST failure, attempting to send super within RubyRootNode
-# it "supers up appropriate name even if used for multiple method names" do
-#   sup = Class.new do
-#     def a; "a"; end
-#     def b; "b"; end
-#   end
-
-#   sub = Class.new(sup) do
-#     [:a, :b].each do |name|
-#       define_method name do
-#         super()
-#       end
-#     end
-#   end
-
-#   sub.new.a.should == "a"
-#   sub.new.b.should == "b"
-#   sub.new.a.should == "a"
-# end 
-
-# Maglev, not supported, SyntaxError during parse
-# ruby_version_is ""..."1.9" do
-#   it "can be used with implicit arguments from a method defined with define_method" do
-#     sup = Class.new do
-#       def a; "a"; end
-#     end
-
-#     sub = Class.new(sup) do
-#       define_method :a do
-#         super
-#       end
-#     end
-
-#     sub.new.a.should == "a"
-#   end
-# end
-#
-
-# ruby_version_is "1.9" do
-#   it "can't be used with implicit arguments from a method defined with define_method" do
-#     Class.new do
-#       define_method :a do
-#         super
-#       end.should raise_error(RuntimeError) 
-#     end
-#   end
-# end
+ not_compliant_on :maglev do
+  require File.expand_path('../fixtures/super_in_define_method.rb', __FILE__)
+ end
+ deviates_on :maglev do
+  # maglev AST to IR failure in super_in_define_method.rb,  
+  #  because no compile time class
+  require File.expand_path('../fixtures/super_in_method.rb', __FILE__)
+ end
 
   # Rubinius ticket github#157
   it "calls method_missing when a superclass method is not found" do

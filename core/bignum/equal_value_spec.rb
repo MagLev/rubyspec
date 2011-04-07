@@ -24,11 +24,12 @@ describe "Bignum#==" do
     (@bignum == obj).should == true
   end
   
-# Bugs in mock , mock does not implement coerce  per Numeric API
-#  it "returns the result of 'other == self' as a boolean" do
-#    obj = mock('not integer')
-#    obj.should_receive(:==).exactly(2).times.and_return("woot", nil)
-#    (@bignum == obj).should == true
-#    (@bignum == obj).should == false
-#  end
+ not_compliant_on :maglev do  # mspec mock does not implement coerce  per Numeric API
+  it "returns the result of 'other == self' as a boolean" do
+    obj = mock('not integer')
+    obj.should_receive(:==).exactly(2).times.and_return("woot", nil)
+    (@bignum == obj).should == true
+    (@bignum == obj).should == false
+  end
+ end
 end

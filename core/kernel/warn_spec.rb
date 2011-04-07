@@ -2,11 +2,12 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel.warn" do
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:warn)
-# end
-  
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:warn)
+  end
+ end  
+
   it "calls #write on $stderr if $VERBOSE is true" do
     lambda {
       v = $VERBOSE

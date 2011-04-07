@@ -17,16 +17,18 @@ describe "String#upcase" do
       c.between?("a", "z") ? c.upcase : c
     end.join
 
-# Maglev , does use locale
-#   str.upcase.should == expected
+   not_compliant_on :maglev do # maglev  does use locale
+    str.upcase.should == expected
+   end
   end
 
-# Maglev, no taint propagation
-# it "taints result when self is tainted" do
-#   "".taint.upcase.tainted?.should == true
-#   "X".taint.upcase.tainted?.should == true
-#   "x".taint.upcase.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints result when self is tainted" do
+    "".taint.upcase.tainted?.should == true
+    "X".taint.upcase.tainted?.should == true
+    "x".taint.upcase.tainted?.should == true
+  end
+ end
 
   it "returns a subclass instance for subclasses" do
     StringSpecs::MyString.new("fooBAR").upcase.should be_kind_of(StringSpecs::MyString)
@@ -49,8 +51,12 @@ describe "String#upcase!" do
   ruby_version_is ""..."1.9" do 
     it "raises a TypeError when self is frozen" do
       lambda { "HeLlo".freeze.upcase! }.should raise_error(TypeError)
-      # lambda { "HELLO".freeze.upcase! }.should raise_error(TypeError)
+     not_compliant_on :maglev do 
+      lambda { "HELLO".freeze.upcase! }.should raise_error(TypeError)
+     end
+     deviates_on :maglev do 
       "HELLO".freeze.upcase .should == "HELLO" # Maglev only raise error if would modify
+     end
     end
   end
 

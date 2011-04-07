@@ -6,14 +6,15 @@ describe "String#initialize" do
     String.should have_private_instance_method(:initialize)
   end
 
-# Maglev fails (but initialize is really private)
-# it "replaces contents of self with the passed string" do
-#   s = "some string"
-#   id = s.object_id
-#   s.send :initialize, "another string"
-#   s.should == "another string"
-#   s.object_id.should == id
-# end
+ not_compliant_on :maglev do  # initialize sent to a String has no effect 
+  it "replaces contents of self with the passed string" do
+    s = "some string"
+    id = s.object_id
+    s.send :initialize, "another string"
+    s.should == "another string"
+    s.object_id.should == id
+  end
+ end
 
   it "does not change self when not passed a string" do
     s = "some string"
@@ -21,13 +22,14 @@ describe "String#initialize" do
     s.should == "some string"
   end
 
-# Maglev, no taint propagate
-# it "replaces the taint status of self with that of the passed string" do
-#   a = "an untainted string"
-#   b = "a tainted string".taint
-#   a.send :initialize, b
-#   a.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "replaces the taint status of self with that of the passed string" do
+    a = "an untainted string"
+    b = "a tainted string".taint
+    a.send :initialize, b
+    a.tainted?.should == true
+  end 
+ end
 
   it "returns an instance of a subclass" do
     a = StringSpecs::MyString.new("blah")
@@ -57,7 +59,7 @@ describe "String#initialize" do
     lambda { String.new nil }.should raise_error(TypeError)
   end
 
- not_compliant_on :maglev do # Maglev fails because initialize sent to a string has no effect
+ not_compliant_on :maglev do # Maglev fails, initialize sent to a string has no effect
   ruby_version_is ""..."1.9" do
     it "raises a TypeError on a frozen instance that is modified" do
       a = "hello".freeze
@@ -69,7 +71,7 @@ describe "String#initialize" do
       a.send(:initialize, a).should equal(a)
     end
   end
- end #
+ end
 
   ruby_version_is "1.9" do
     it "raises a RuntimeError on a frozen instance that is modified" do

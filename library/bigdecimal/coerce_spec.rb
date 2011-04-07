@@ -10,7 +10,7 @@ describe "BigDecimal#coerce" do
     some_value = 32434234234234234234
 
     BigDecimal("1.2").coerce(1).should == [one, BigDecimal("1.2")]
-    (nb = (na = five_point_28).coerce(1.0)).should == [one, BigDecimal("5.28")]
+    five_point_28.coerce(1.0).should == [one, BigDecimal("5.28")]
     one.coerce(one).should == [one, one]
     one.coerce(2.5).should == [2.5, one]
     BigDecimal("1").coerce(3.14).should == [3.14, one]

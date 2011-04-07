@@ -9,7 +9,12 @@ describe "BigDecimal.new" do
       BigDecimal.new("1#{i}").should == 10 + i
       BigDecimal.new("-1#{i}").should == -10 - i
       BigDecimal.new("1E#{i}").should == 10**i
-      BigDecimal.new("1000000E-#{i}").should be_close(10**(6-i), 1.0e-15) # Maglev
+     not_compliant_on :maglev do
+      BigDecimal.new("1000000E-#{i}").should == 10**(6-i)
+     end
+     deviates_on :maglev do
+      BigDecimal.new("1000000E-#{i}").should be_close(10**(6-i), 1.0e-15)
+     end
     }
     (1..9).each {|i|
       BigDecimal.new("100.#{i}").to_s.should == "0.100#{i}E3"
@@ -26,8 +31,13 @@ describe "BigDecimal.new" do
 
     platform_is :wordsize => 64 do
       it "doesn't segfault when using a very large string to build the number" do
-        # BigDecimal.new("1" + "0"*10000000)._dump.should == "10000017:0.1E10000001" # _dump is MRI specific
+       not_compliant_on :maglev do
+        BigDecimal.new("1" + "0"*10000000)._dump.should == "10000017:0.1E10000001"
+       end
+       deviates_on :maglev do
+        #   _dump is MRI specific
         BigDecimal.new("1" + "00000000000000000000"*500000).to_s.should == '0.1E10000001'
+       end
       end
     end
   end

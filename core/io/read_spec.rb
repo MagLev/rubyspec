@@ -66,8 +66,8 @@ describe "IO.read" do
   end
 end
 
-not_compliant_on :maglev do #
-describe "IO.read from a pipe" do #
+not_compliant_on :maglev do 
+ describe "IO.read from a pipe" do
   it "runs the rest as a subprocess and returns the standard output" do
     IO.read("|sh -c 'echo hello'").should == "hello\n"
   end
@@ -91,8 +91,8 @@ describe "IO.read from a pipe" do #
       IO.read("|sh -c 'echo hello'", 1, 1)
     }.should raise_error(Errno::ESPIPE)
   end
-end
-end #
+ end
+end 
 
 describe "IO.read on an empty file" do
   before :each do
@@ -133,6 +133,16 @@ describe "IO#read" do
     @io.read(2).should == '23'
     @io.read(3).should == '456'
     @io.read(4).should == '7890'
+  end
+
+  it "clears the output buffer if there is nothing to read" do
+    @io.pos = 10
+
+    buf = 'non-empty string'
+
+    @io.read(10, buf).should == nil
+
+    buf.should == ''
   end
 
   it "consumes zero bytes when reading zero bytes" do

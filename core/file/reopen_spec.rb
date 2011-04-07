@@ -1,6 +1,11 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-ruby_version_is "1.8.7" do # maglev, was  "1.9" do
+t_ver = "1.9"
+deviates_on :maglev do
+  t_ver = "1.8.7"
+end
+
+ruby_version_is t_ver do 
   describe "File#reopen" do
     before :each do
       @file = tmp('test.txt')

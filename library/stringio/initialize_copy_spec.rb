@@ -4,6 +4,7 @@ require 'stringio'
 # Maglev fails, do not run this file yet. Since our StringIO is pure ruby
 #  it does not need a reimplementation of initialize_copy 
 
+not_compliant_on :maglev do # our StringIO is pure ruby, inherits initialize_copy
 describe "StringIO#initialize_copy" do
   before(:each) do
     @io      = StringIO.new("StringIO example")
@@ -97,3 +98,4 @@ describe "StringIO#initialize_copy" do
     @orig_io.eof?.should == true
   end
 end
+end # maglev

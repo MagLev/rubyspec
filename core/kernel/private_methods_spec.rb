@@ -11,24 +11,22 @@ describe "Kernel#private_methods" do
       m = KernelSpecs::Methods.new.private_methods(false)
       m.should include("juu_shi")
     end
-    
+
     it "returns a list of the names of privately accessible methods in the object and its ancestors and mixed-in modules" do
       m = (KernelSpecs::Methods.private_methods(false) & KernelSpecs::Methods.private_methods)
-      
+
       m.should include("shichi")
       m = KernelSpecs::Methods.new.private_methods
       m.should include('juu_shi')
     end
 
-   not_compliant_on :maglev do # Need fix
-    it "respects the class hierarchy when decided what is private" do #
+    it "respects the class hierarchy when decided what is private" do
       m = KernelSpecs::PrivateSup.new
       m.private_methods.should include("public_in_sub")
 
       m = KernelSpecs::PublicSub.new
       m.private_methods.should_not include("public_in_sub")
     end
-   end #
 
     it "returns private methods mixed in to the metaclass" do
       m = KernelSpecs::Methods.new
@@ -44,10 +42,10 @@ describe "Kernel#private_methods" do
       m = KernelSpecs::Methods.new.private_methods(false)
       m.should include(:juu_shi)
     end
-    
+
     it "returns a list of the names of privately accessible methods in the object and its ancestors and mixed-in modules" do
       m = (KernelSpecs::Methods.private_methods(false) & KernelSpecs::Methods.private_methods)
-      
+
       m.should include(:shichi)
       m = KernelSpecs::Methods.new.private_methods
       m.should include(:juu_shi)

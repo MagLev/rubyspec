@@ -15,7 +15,6 @@ describe "Module#class_variable_defined?" do
     ModuleSpecs::CVars.class_variable_defined?("@@meta").should == true
   end
 
-  # maglev ??
   it "returns true if the class variable is defined in a metaclass" do
     obj = mock("metaclass class variable")
     meta = obj.singleton_class
@@ -29,10 +28,14 @@ describe "Module#class_variable_defined?" do
     meta.class_variable_defined?(:@@var).should be_false
   end
 
-  # maglev ??
   it "returns true if a class variables with the given name is defined in an included module" do
     c = Class.new { include ModuleSpecs::MVars }
-    c.class_variable_defined?("@@mvar").should == false # Maglev fails, should get true
+   not_compliant_on :maglev do
+    c.class_variable_defined?("@@mvar").should == true
+   end
+   deviates_on :maglev do
+    c.class_variable_defined?("@@mvar").should == false # maglev bug
+   end
   end
 
   it "returns false if a class variables with the given name is defined in an extended module" do
@@ -42,13 +45,13 @@ describe "Module#class_variable_defined?" do
   end
 
   ruby_version_is ""..."1.9" do
-#   not_compliant_on :rubinius do     # Maglev not compliant also
-#     it "accepts Fixnums for class variables" do
-#       c = Class.new { class_variable_set :@@class_var, "test" }
-#       c.class_variable_defined?(:@@class_var.to_i).should == true
-#       c.class_variable_defined?(:@@no_class_var.to_i).should == false
-#     end
-#   end
+    not_compliant_on :rubinius, :maglev do
+      it "accepts Fixnums for class variables" do
+        c = Class.new { class_variable_set :@@class_var, "test" }
+        c.class_variable_defined?(:@@class_var.to_i).should == true
+        c.class_variable_defined?(:@@no_class_var.to_i).should == false
+      end
+    end
   end
 
   it "raises a NameError when the given name is not allowed" do
@@ -64,13 +67,13 @@ describe "Module#class_variable_defined?" do
   end
 
   it "converts a non string/symbol/fixnum name to string using to_str" do
-    c = Class.new { class_variable_set :@@class_var, "test" } 
+    c = Class.new { class_variable_set :@@class_var, "test" }
     (o = mock('@@class_var')).should_receive(:to_str).and_return("@@class_var")
     c.class_variable_defined?(o).should == true
   end
 
   it "raises a TypeError when the given names can't be converted to strings using to_str" do
-    c = Class.new { class_variable_set :@@class_var, "test" } 
+    c = Class.new { class_variable_set :@@class_var, "test" }
     o = mock('123')
     lambda {
       c.class_variable_defined?(o)

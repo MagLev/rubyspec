@@ -9,10 +9,10 @@ ruby_version_is ""..."1.9" do
       methods.should_not include("undefed_method")
     end
 
-#   it "does not return methods undefined in a subclass" do # Maglev, undef not working
-#     methods = ModuleSpecs::Grandchild.instance_methods
-#     methods.should_not include("parent_method", "another_parent_method")
-#   end
+    it "does not return methods undefined in a subclass" do
+      methods = ModuleSpecs::Grandchild.instance_methods
+      methods.should_not include("parent_method", "another_parent_method")
+    end
 
     it "does not return methods undefined in the current class" do
       ModuleSpecs::Child.send(:undef_method, 'undefed_child')
@@ -20,10 +20,9 @@ ruby_version_is ""..."1.9" do
       methods.should_not include("undefed_method", "undefed_child")
     end
 
-# Maglev , undef problems
-#   it "does not return methods from an included module that are undefined in the class" do 
-#     ModuleSpecs::Grandchild.instance_methods.should_not include("super_included_method")
-#   end
+    it "does not return methods from an included module that are undefined in the class" do
+      ModuleSpecs::Grandchild.instance_methods.should_not include("super_included_method")
+    end
 
     it "returns the public and protected methods of self if include_super is false" do
       methods = ModuleSpecs::Parent.instance_methods(false)

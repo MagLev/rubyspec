@@ -10,14 +10,26 @@ describe :determinant, :shared => true do
   # this properly.
   ruby_bug "#1516", "1.8.7" do
     it "returns the determinant of a square Matrix" do
+     not_compliant_on :maglev do
       m = Matrix[ [7,6], [3,9] ]
-      m.send(@method).should == 63 # Maglev without mathn, was == 45
+      m.send(@method).should == 45
 
       m = Matrix[ [9, 8], [6,5] ]
-      m.send(@method).should == 45 # Maglev without mathn, was == -3
+      m.send(@method).should == -3
 
       m = Matrix[ [9,8,3], [4,20,5], [1,1,1] ]
-      m.send(@method).should == 180 # Maglev without mathn, was == 95
+      m.send(@method).should == 95
+     end
+     deviates_on :maglev do  # without mathn
+      m = Matrix[ [7,6], [3,9] ]
+      m.send(@method).should == 63
+
+      m = Matrix[ [9, 8], [6,5] ]
+      m.send(@method).should == 45
+
+      m = Matrix[ [9,8,3], [4,20,5], [1,1,1] ]
+      m.send(@method).should == 180
+     end
     end
   end
 
@@ -29,7 +41,7 @@ describe :determinant, :shared => true do
   ruby_bug "redmine:1532", "1.8.7" do
     it "returns 1 for an empty Matrix" do
       m = Matrix[ ]
-      m.send((sel = @method)).should == 1
+      m.send(@method).should == 1
     end
   end
 
@@ -45,10 +57,12 @@ describe :determinant, :shared => true do
         Matrix[[1], [2], [3]].send(@method)
       }.should raise_error(Matrix::ErrDimensionMismatch)
 
-      lambda {
-        Matrix.empty(3,0).send(@method)
-      }.should raise_error(NoMethodError) # Matrix::ErrDimensionMismatch) 
-      # Maglev , Matrix.empty not implem
+     not_compliant_on :maglev do
+      lambda { Matrix.empty(3,0).send(@method) }.should raise_error(Matrix::ErrDimensionMismatch) 
+     end
+     deviates_on :maglev do  #  Matrix#empty not implem
+      lambda { Matrix.empty(3,0).send(@method) }.should raise_error(NoMethodError) 
+     end
     end
   end
 end

@@ -53,7 +53,7 @@ describe :kernel_singleton_methods_supers, :shared => true do
   end
  end
 
- not_compliant_on :maglev do # method protection deviations
+  not_compliant_on :maglev do # method protection deviations
   it "returns a unique list for an object extended with a module" do
     m = ReflectSpecs.oed.singleton_methods(*@object)
     r = m.select { |x| x == stasy(:pub) or x == stasy(:pro) }.sort
@@ -184,11 +184,11 @@ describe "Kernel#singleton_methods" do
       ReflectSpecs.oei.singleton_methods(false).should == []
     end
 
- not_compliant_on :maglev do # method protection deviations
+   not_compliant_on :maglev do # method protection deviations
     it "returns the names of singleton methods of the subclass" do
       ReflectSpecs::B.singleton_methods(false).should include(*stasy(:bs_pro, :bs_pub))
     end
- end
+   end
   
     it "does not return names of inherited singleton methods for a subclass" do
       ReflectSpecs::B.singleton_methods(false).should_not include(*stasy(:as_pro, :as_pub))

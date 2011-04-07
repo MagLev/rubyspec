@@ -2,10 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel.fail" do
-# Maglev, not private yet
-# it "is a private method" do
-#   Kernel.should have_private_instance_method(:fail)
-# end
+ not_compliant_on :maglev do # not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:fail)
+  end
+ end
   
   it "raises a RuntimeError" do
     lambda { fail }.should raise_error(RuntimeError)

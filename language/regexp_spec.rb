@@ -53,11 +53,7 @@ describe "Literal Regexps" do
   
   it "disallows first part of paired delimiters to be used as non-paired delimiters" do    
     LanguageSpecs.paired_delimiters.each do |p0, p1|
-      $a0 = p0  # maglev, avoid copying block args not handled by eval
-      lambda { 
-         a0 = $a0 
-         eval("%r#{a0} foo #{a0}") 
-      }.should raise_error(SyntaxError)
+      lambda { eval("%r#{p0} foo #{p0}") }.should raise_error(SyntaxError)
     end
   end
   
@@ -71,16 +67,15 @@ describe "Literal Regexps" do
     lambda { eval('%ra foo a') }.should raise_error(SyntaxError)
   end
   
-# Maglev failing to raise SyntaxError 
-#  it "disallows spaces after %r and delimiter" do    
-#    lambda { eval('%r !foo!') }.should raise_error(SyntaxError)
-#  end
+  it "disallows spaces after %r and delimiter" do    
+    lambda { eval('%r !foo!') }.should raise_error(SyntaxError)
+  end
   
   it "allows unescaped / to be used with %r" do
     %r[/].to_s.should == /\//.to_s
   end
   
-
+  
   #############################################################################
   # Specs for the matching semantics
   #############################################################################

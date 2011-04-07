@@ -20,19 +20,25 @@ describe "Module#class_variable_set" do
   end
 
   it "sets the value of a class variable with the given name defined in an included module" do
-    c = Class.new { include ModuleSpecs::MVars }
+   c = nil
+   not_compliant_on :maglev do
+    c = Class.new { include ModuleSpecs::MVars.dup }
+   end
+   deviates_on :maglev do
+    c = Class.new { include ModuleSpecs::MVars  }
+   end
     c.send(:class_variable_set, "@@mvar", :new_mvar).should == :new_mvar
     c.send(:class_variable_get, "@@mvar").should == :new_mvar
   end
 
   ruby_version_is ""..."1.9" do
-#   not_compliant_on :rubinius do  # Maglev not compliant either
-#     it "accepts Fixnums for class variables" do
-#       c = Class.new
-#       c.send(:class_variable_set, :@@test2.to_i, "test2")
-#       c.send(:class_variable_get, :@@test2).should == "test2"
-#     end
-#   end
+    not_compliant_on :rubinius, :maglev do
+      it "accepts Fixnums for class variables" do
+        c = Class.new
+        c.send(:class_variable_set, :@@test2.to_i, "test2")
+        c.send(:class_variable_get, :@@test2).should == "test2"
+      end
+    end
   end
 
   ruby_version_is ""..."1.9" do

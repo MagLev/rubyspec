@@ -18,8 +18,12 @@ ruby_version_is '1.8.7' do
       enum = @io.chars
       enum.should be_an_instance_of(enumerator_class)
       @io.readline.should == "Voici la ligne une.\n"
-      #(ax = enum.first(5)).should == (bx = ["Q", "u", "i", " ", "è"])
-      (ax = enum.first(4)).should == (bx = ["Q", "u", "i", " "]) # maglev not KCODE aware yet
+      not_compliant_on :maglev do
+        enum.first(5).should == ["Q", "u", "i", " ", "è"]
+      end
+      deviates_on :maglev do # not KCODE aware yet
+        enum.first(4).should == ["Q", "u", "i", " "]
+      end
     end
 
     ruby_version_is '1.9' do

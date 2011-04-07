@@ -59,6 +59,11 @@ describe "Signal.list" do
   end
 
   it "includes the EXIT key with a value of zero" do
-    Signal.list["EXIT"].should == nil # Maglev deviation,  was == 0
+   not_compliant_on :maglev do 
+    Signal.list["EXIT"].should == 0 
+   end
+   deviates_on :maglev do 
+    Signal.list["EXIT"].should == nil
+   end
   end
 end

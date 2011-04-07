@@ -34,9 +34,8 @@ describe "String#%" do
     begin
       old_debug, $DEBUG = $DEBUG, false
 
-# Maglev fails, check would interfere with use of \n in sprintf format string
-#      lambda { "%.\n3f" % 1.2 }.should raise_error(ArgumentError)
-#      lambda { "%.3\nf" % 1.2 }.should raise_error(ArgumentError)
+      lambda { "%.\n3f" % 1.2 }.should raise_error(ArgumentError)
+      lambda { "%.3\nf" % 1.2 }.should raise_error(ArgumentError)
       lambda { "%.\03f" % 1.2 }.should raise_error(ArgumentError)
       lambda { "%.3\0f" % 1.2 }.should raise_error(ArgumentError)
     ensure
@@ -56,9 +55,8 @@ describe "String#%" do
     end
   end
 
-  # Maglev, DEBUG mode not implemented for this method
  not_compliant_on :maglev do
-  it "raises an ArgumentError for unused arguments when $DEBUG is true" do #
+  it "raises an ArgumentError for unused arguments when $DEBUG is true" do
     begin
       old_debug = $DEBUG
       $DEBUG = true
@@ -72,7 +70,7 @@ describe "String#%" do
       $stderr = s
     end
   end
- end #
+ end
 
   it "always allows unused arguments when positional argument style is used" do
     begin
@@ -87,12 +85,14 @@ describe "String#%" do
     end
   end
 
-# Maglev gives error
- not_compliant_on :maglev do
   it "replaces trailing absolute argument specifier without type with percent sign" do #
+   not_compliant_on :maglev do
     ("hello %1$" % "foo").should == "hello %"
+   end
+   deviates_on :maglev do 
+    lambda { "hello %1$" % "foo" }.should raise_error(ArgumentError)
+   end
   end
- end #
 
   it "raises an ArgumentError when given invalid argument specifiers" do
     lambda { "%1" % [] }.should raise_error(ArgumentError)
@@ -120,11 +120,15 @@ describe "String#%" do
     ("%2$.2f" % [0, 1]).should == "1.00"
   end
 
- not_compliant_on :maglev do #  fix needed
   it "allows more than one digit of position" do
+   not_compliant_on :maglev do 
     ("%50$d" % (0..100).to_a).should == "49"
+    end
+   deviates_on :maglev do  # bug
+     lambda { "%50$d" % (0..100).to_a }.should raise_error(ArgumentError)
+   end
   end
- end
+#end
 
   it "raises an ArgumentError when multiple width star tokens are given for one format specifier" do
     lambda { "%**s" % [5, 5, 5] }.should raise_error(ArgumentError)
@@ -151,9 +155,10 @@ describe "String#%" do
     lambda { "%1$s %s" % "foo" }.should raise_error(ArgumentError)
 
     lambda { "%s %2$s" % ["foo", "bar"] }.should raise_error(ArgumentError)
-# Maglev fails to raise error
-#    lambda { "%2$s %s" % ["foo", "bar"] }.should raise_error(ArgumentError)
-#   lambda { "%*2$s" % [5, 5, 5]     }.should raise_error(ArgumentError)
+   not_compliant_on :maglev do  # no error
+    lambda { "%2$s %s" % ["foo", "bar"] }.should raise_error(ArgumentError)
+   end
+    lambda { "%*2$s" % [5, 5, 5]     }.should raise_error(ArgumentError)
     lambda { "%*.*2$s" % [5, 5, 5]   }.should raise_error(ArgumentError)
     lambda { "%*2$.*2$s" % [5, 5, 5] }.should raise_error(ArgumentError)
     lambda { "%*.*2$s" % [5, 5, 5]   }.should raise_error(ArgumentError)
@@ -176,9 +181,8 @@ describe "String#%" do
     ("%p %p" % StringSpecs::MyArray[1, 2]).should == "1 2"
   end
 
-# Maglev, not supported yet
- not_compliant_on :maglev do
-  it "allows positional arguments for width star and precision star arguments" do #
+ not_compliant_on :maglev do  # positional arguments not supported yet
+  it "allows positional arguments for width star and precision star arguments" do
     ("%*1$.*2$3$d" % [10, 5, 1]).should == "     00001"
   end
 
@@ -215,9 +219,8 @@ describe "String#%" do
 
     ("%*.*d" % [w, p, 1]).should == "     00001"
   end
- end #
+ end
 
-# Maglev, not supported yet
  not_compliant_on :maglev do
   ruby_bug "#", "1.8.6.228" do
     it "tries to convert the argument to Array by calling #to_ary" do #
@@ -228,7 +231,7 @@ describe "String#%" do
       ("%s" % obj).should == "1"
     end
   end
- end #
+ end
 
   it "doesn't return subclass instances when called on a subclass" do
     universal = mock('0')
@@ -246,8 +249,7 @@ describe "String#%" do
     end
   end
 
-# Maglev taint not propagated
- not_compliant_on :maglev do
+ not_supported_on :maglev do  # no  taint propagation
   it "always taints the result when the format string is tainted" do #
     universal = mock('0')
     def universal.to_int() 0 end
@@ -268,7 +270,7 @@ describe "String#%" do
       (subcls_format % universal).tainted?.should == true
     end
   end
- end #
+ end
 
   it "supports binary formats using %b for positive numbers" do
     ("%b" % 10).should == "1010"
@@ -289,11 +291,13 @@ describe "String#%" do
       ("%0b" % -5).should == "1011"
       ("%.4b" % 2).should == "0010"
        ("%.1b" % -5).should == "1011" 
-#      ("%.7b" % -5).should == "1111011" # maglev fails , always uses .. prefix
-#       ("%.10b" % -5).should == "1111111011"
-#       ("% b" % -5).should == "-101"
-#       ("%+b" % -5).should == "-101"
-#       ("%b" % -(2 ** 64 + 5)).should == "..101111111111111111111111111111111111111111111111111111111111111011"
+     not_compliant_on :maglev do 
+       ("%.7b" % -5).should == "1111011"
+        ("%.10b" % -5).should == "1111111011"
+        ("% b" % -5).should == "-101"
+        ("%+b" % -5).should == "-101"
+        ("%b" % -(2 ** 64 + 5)).should == "..101111111111111111111111111111111111111111111111111111111111111011"
+     end
     end
   end
 
@@ -367,10 +371,9 @@ describe "String#%" do
     it "calls #to_ary on argument for %c formats" do #
       obj = mock('65')
       obj.should_receive(:to_ary).and_return([65])
-nil.pause
       ("%c" % obj).should == ("%c" % [65])
     end
-  end #
+  end
 
     it "calls #to_int on argument for %c formats, if the argument does not respond to #to_ary" do
       obj = mock('65')
@@ -452,25 +455,30 @@ nil.pause
   # can guard the behaviour of capitalising Inf and NaN as a bug, and
   # removed the compliance guards.
 
-  deviates_on :rubinius, :jruby , :maglev do  # execute this for Maglev
+  is_solaris = false
+  deviates_on :maglev do 
+    is_solaris = RUBY_PLATFORM.match('solaris')
+  end
+
+  deviates_on :rubinius, :jruby, :maglev do
     it "supports float formats using %e, but Inf, -Inf, and NaN are not floats" do
+
       sol = RUBY_PLATFORM.match('solaris')
-      ("%e" % 1e1020).should ==  (sol ? "Inf" : "inf")
-      ("%e" % -1e1020).should ==  (sol ? "-Inf" : "-inf")
-      ("%e" % (-0e0/0)).should ==  (sol ? "-NaN" : "-nan" )# Maglev has signed nan,  was "Nan"
-      ("%e" % (0.0/0)).should ==  (sol ? "-NaN" : "-nan" )
+      ("%e" % 1e1020).should ==  (is_solaris ? "Inf" : "inf")
+      ("%e" % -1e1020).should ==  (is_solaris ? "-Inf" : "-inf")
+      ("%e" % (-0e0/0)).should ==  (is_solaris ? "-NaN" : "-nan")
+      ("%e" % (0.0/0)).should ==  (is_solaris ? "-NaN" : "-nan" )
     end
 
     it "supports float formats using %E, but Inf, -Inf, and NaN are not floats" do
-      sol = RUBY_PLATFORM.match('solaris')
-      ("%E" % 1e1020).should == (sol ? "Inf" : "INF")
-      ("%E" % -1e1020).should == (sol ? "-Inf" : "-INF")
-      ("%-10E" % 1e1020).should == (sol ? "Inf       " : "INF       ")
-      ("%10E" % 1e1020).should == (sol ? "       Inf" : "       INF")
-      ("%+E" % 1e1020).should == (sol ? "+Inf" : "+INF")
-      ("% E" % 1e1020).should == (sol ? " Inf" : " INF")
-      ("%E" % (0.0/0)).should == (sol ? "-NaN"  : "-NAN")
-      ("%E" % (-0e0/0)).should == (sol ? "-NaN"  : "-NAN")
+      ("%E" % 1e1020).should == (is_solaris ? "Inf" : "INF")
+      ("%E" % -1e1020).should == (is_solaris ? "-Inf" : "-INF")
+      ("%-10E" % 1e1020).should == (is_solaris ? "Inf       " : "INF       ")
+      ("%10E" % 1e1020).should == (is_solaris ? "       Inf" : "       INF")
+      ("%+E" % 1e1020).should == (is_solaris ? "+Inf" : "+INF")
+      ("% E" % 1e1020).should == (is_solaris ? " Inf" : " INF")
+      ("%E" % (0.0/0)).should == (is_solaris ? "-NaN"  : "-NAN")
+      ("%E" % (-0e0/0)).should == (is_solaris ? "-NaN"  : "-NAN")
     end
   end
 
@@ -626,8 +634,7 @@ nil.pause
     # ("%p" % obj).should == "obj"
   end
 
-# Maglev taint not propagated
- not_compliant_on :maglev do
+ not_supported_on :maglev do #  taint not propagated
   it "taints result for %p when argument.inspect is tainted" do #
     obj = mock('x')
     def obj.inspect() "x".taint end
@@ -639,7 +646,7 @@ nil.pause
 
     ("%p" % obj).tainted?.should == false
   end
- end #
+ end
 
   it "supports string formats using %s" do
     ("%s" % "hello").should == "hello"
@@ -664,24 +671,22 @@ nil.pause
     # ("%s" % obj).should == "obj"
   end
 
-# Maglev taint not propagated
- not_compliant_on :maglev do
+ not_supported_on :maglev do # taint not propagated
   it "taints result for %s when argument is tainted" do #
     ("%s" % "x".taint).tainted?.should == true
     ("%s" % mock('x').taint).tainted?.should == true
     ("%s" % 5.0.taint).tainted?.should == true
   end
-end #
+ end
 
   # MRI crashes on this one.
   # See http://groups.google.com/group/ruby-core-google/t/c285c18cd94c216d
-# Maglev, no error, but no crash
- not_compliant_on :maglev do
+ not_compliant_on :maglev do  # no error, but no crash
   it "raises an ArgumentError for huge precisions for %s" do #
     block = lambda { "%.25555555555555555555555555555555555555s" % "hello world" }
     block.should raise_error(ArgumentError)
   end
- end #
+ end
 
   # Note: %u has been changed to an alias for %d in MRI 1.9 trunk.
   # Let's wait a bit for it to cool down and see if it will
@@ -884,12 +889,11 @@ end #
       end   
     end
 
-  # Maglev, no taint propagation
-   not_compliant_on :maglev do #
-    it "doesn't taint the result for #{format} when argument is tainted" do #
+   not_supported_on :maglev do #   no taint propagation
+    it "doesn't taint the result for #{format} when argument is tainted" do
      (format % "5".taint).tainted?.should == false
     end
-   end #
+   end
   end
 
   %w(e E f g G).each do |f|
@@ -897,12 +901,12 @@ end #
 
     ruby_version_is "1.8.6.278" do
      not_compliant_on :maglev do
-      it "tries to convert the passed argument to an Array using #to_ary" do #
+      it "tries to convert the passed argument to an Array using #to_ary" do
         obj = mock('3.14')
         obj.should_receive(:to_ary).and_return([3.14])
         (format % obj).should == (format % [3.14])
       end
-     end #
+     end
     end
 
     it "behaves as if calling Kernel#Float for #{format} arguments, when the passed argument does not respond to #to_ary" do
@@ -912,14 +916,18 @@ end #
       (format % "-.5").should == (format % -0.5)
       # Something's strange with this spec:
       # it works just fine in individual mode, but not when run as part of a group
-#     (format % "10_1_0.5_5_5").should == (format % 1010.555) # Maglev gets NaN on lhs
+     not_compliant_on :maglev do # NaN on lhs
+      (format % "10_1_0.5_5_5").should == (format % 1010.555)
+     end
 
       (format % "0777").should == (format % 777)
 
       lambda { format % "" }.should raise_error(ArgumentError)
       lambda { format % "x" }.should raise_error(ArgumentError)
       lambda { format % "." }.should raise_error(ArgumentError)
-#      lambda { format % "10." }.should raise_error(ArgumentError) # Maglev succeeds
+     not_compliant_on :maglev do # no error
+      lambda { format % "10." }.should raise_error(ArgumentError) 
+     end
       lambda { format % "5x" }.should raise_error(ArgumentError)
       lambda { format % "0b1" }.should raise_error(ArgumentError)
       lambda { format % "10e10.5" }.should raise_error(ArgumentError)
@@ -932,7 +940,7 @@ end #
     end
     ruby_version_is ""..."1.9.2" do
       it "behaves as if calling Kernel#Float for #{format} arguments, when the passed argument is hexadecimal string" do
-        if RUBY_PLATFORM.match('solaris') # maglev deviations
+        if is_solaris
           lambda { format % "0xA" }.should raise_error(ArgumentError)
         else
           hx = { "e"=>'1.000000e+01',  'E'=>'1.000000E+01',

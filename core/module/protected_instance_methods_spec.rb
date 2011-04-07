@@ -11,19 +11,18 @@ describe "Module#protected_instance_methods" do
     
       methods = ModuleSpecs::CountsParent.protected_instance_methods
       methods.should include('protected_3')
-#     methods.should include('protected_2') # Maglev fails
-#
-#     methods = ModuleSpecs::CountsChild.protected_instance_methods
-#     methods.should include('protected_3')
-#     methods.should include('protected_2')
-#     methods.should include('protected_1')
+      methods.should include('protected_2')
+
+      methods = ModuleSpecs::CountsChild.protected_instance_methods
+      methods.should include('protected_3')
+      methods.should include('protected_2')
+      methods.should include('protected_1')
     end
 
     it "when passed false as a parameter, should return only methods defined in that module" do
       ModuleSpecs::CountsMixin.protected_instance_methods(false).should == ['protected_3']
-# Maglev fails
-#      ModuleSpecs::CountsParent.protected_instance_methods(false).should == ['protected_2']
-#      ModuleSpecs::CountsChild.protected_instance_methods(false).should == ['protected_1']
+      ModuleSpecs::CountsParent.protected_instance_methods(false).should == ['protected_2']
+      ModuleSpecs::CountsChild.protected_instance_methods(false).should == ['protected_1']
     end
   end
 

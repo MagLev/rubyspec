@@ -119,6 +119,7 @@ describe "Literal (A::X) constant resolution" do
           CS_CONST108 = :const108_2
         end
       end
+
       lambda { ConstantSpecs::CS_CONST108 }.should raise_error(NameError)
     end
 

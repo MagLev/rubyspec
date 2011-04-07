@@ -3,7 +3,12 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "IO#stat" do
   before :each do
-    @io = IO.popen 'uptime', "r+"  # was 'cat',  maglev needs a command that finishes
+    not_compliant_on :maglev do
+      @io = IO.popen 'cat', "r+"
+    end
+    deviates_on :maglev do
+      @io = IO.popen 'uptime', "r+"  # maglev needs a command that finishes
+    end
   end
 
   after :each do

@@ -103,19 +103,20 @@ describe "Array#* with an integer" do
     end
   end
 
-# Maglev, no taint propagation
-# it "copies the taint status of the original array even if the array is empty" do
-#   ary = []
-#   ary.taint
-#   (ary * 3).tainted?.should == true
-# end
-#
-# it "copies the taint status of the original array if the passed count is not 0" do
-#   ary = [1, 2, 3]
-#   ary.taint
-#   (ary * 1).tainted?.should == true
-#   (ary * 2).tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "copies the taint status of the original array even if the array is empty" do
+    ary = []
+    ary.taint
+    (ary * 3).tainted?.should == true
+  end
+
+  it "copies the taint status of the original array if the passed count is not 0" do
+    ary = [1, 2, 3]
+    ary.taint
+    (ary * 1).tainted?.should == true
+    (ary * 2).tainted?.should == true
+  end
+ end
 
   ruby_version_is '1.9' do
     it "copies the untrusted status of the original array even if the passed count is 0" do

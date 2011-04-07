@@ -23,8 +23,8 @@ describe :string_chars, :shared => true do
   end
 
 
- not_compliant_on :maglev do 
-  it "is unicode aware" do  #  maglev not KCODE aware yet
+ not_compliant_on :maglev do  # no KCODE support yet
+  it "is unicode aware" do
     before = $KCODE
     $KCODE = "UTF-8"
     "\303\207\342\210\202\303\251\306\222g".send(@method).to_a.should == ["\303\207", "\342\210\202", "\303\251", "\306\222", "g"]

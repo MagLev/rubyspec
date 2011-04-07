@@ -40,12 +40,10 @@ describe "Dir.glob" do
     DirSpecs.delete_mock_dirs
   end
 
- not_compliant_on :maglev do  # need to fix
-  it "can take an array of patterns" do  #
-    Dir.glob(["file_o*", "file_t*"]).should ==  #
+  it "can take an array of patterns" do
+    Dir.glob(["file_o*", "file_t*"]).should ==
                %w!file_one.ext file_two.ext!
   end
- end
 
   it "matches both dot and non-dotfiles with '*' and option File::FNM_DOTMATCH" do
     Dir.glob('*', File::FNM_DOTMATCH).sort.should == DirSpecs.expected_paths
@@ -76,14 +74,12 @@ describe "Dir.glob" do
     Dir.glob('**/', File::FNM_DOTMATCH).sort.should == expected
   end
 
- not_compliant_on :maglev do  # need to fix
-  it "accepts a block and yields it with each elements" do #
+  it "accepts a block and yields it with each elements" do
     ary = []
-    ret = Dir.glob(["file_o*", "file_t*"]) { |t| ary << t } #
+    ret = Dir.glob(["file_o*", "file_t*"]) { |t| ary << t }
     ret.should be_nil
     ary.should == %w!file_one.ext file_two.ext!
   end
- end #
 
   platform_is_not(:windows) do
     it "matches the literal character '\\' with option File::FNM_NOESCAPE" do
@@ -105,16 +101,15 @@ describe "Dir.glob" do
       end
     end
 
-# Maglev bug, raises EACCES error
-#   it "returns nil for directories current user has no permission to read" do
-#     Dir.mkdir('no_permission')
-#     File.chmod(0, 'no_permission')
+    it "returns nil for directories current user has no permission to read" do
+      Dir.mkdir('no_permission')
+      File.chmod(0, 'no_permission')
 
-#     begin
-#       Dir.glob('no_permission/*').should == []
-#     ensure
-#       Dir.rmdir('no_permission')
-#     end
-#   end
+      begin
+        Dir.glob('no_permission/*').should == []
+      ensure
+        Dir.rmdir('no_permission')
+      end
+    end
   end
 end

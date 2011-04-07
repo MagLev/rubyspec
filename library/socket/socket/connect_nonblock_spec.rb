@@ -14,13 +14,13 @@ describe "Socket#connect_nonblock" do
     @socket.close
   end
 
-not_compliant_on :maglev do # bugs
+ not_compliant_on :maglev do # bugs
   it "takes an encoded socket address and starts the connection to it" do
     lambda {
       @socket.connect_nonblock(@addr)
     }.should raise_error(Errno::EINPROGRESS)
   end
-end
+ end
 
   it "connects the socket to the remote side" do
     ready = false
@@ -35,11 +35,15 @@ end
 
     Thread.pass while (thread.status and thread.status != 'sleep') or !ready
 
-    e_a = RUBY_PLATFORM.match('solaris') ? Errno::EINPROGRESS : Errno::EAGAIN
+    e_a = Errno::EINPROGRESS
+    deviates_on :maglev do
+      if RUBY_PLATFORM.match('linux') 
+        e_a = Errno::EAGAIN
+      end
+    end
     begin
         @socket.connect_nonblock(@addr)
     rescue e_a
-       #
     end
 
     IO.select nil, [@socket]

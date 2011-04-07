@@ -131,7 +131,7 @@ describe "String#split with String" do
   end
 
  not_compliant_on :maglev do  # Maglev does call constructor
-  it "does not call constructor on created subclass instances" do #
+  it "does not call constructor on created subclass instances" do
     # can't call should_not_receive on an object that doesn't yet exist
     # so failure here is signalled by exception, not expectation failure
 
@@ -140,8 +140,8 @@ describe "String#split with String" do
   end
  end
 
- not_compliant_on :maglev do  # Maglev, no taint propagation
-  it "taints the resulting strings if self is tainted" do #
+ not_supported_on :maglev do # no taint propagation
+  it "taints the resulting strings if self is tainted" do
     ["", "x.y.z.", "  x  y  "].each do |str|
       ["", ".", " "].each do |pat|
         [-1, 0, 1, 2].each do |limit|
@@ -244,7 +244,7 @@ describe "String#split with Regexp" do
   end
 
  not_compliant_on :maglev do  # not KCODE aware yet
-  it "respects $KCODE when splitting between characters" do #
+  it "respects $KCODE when splitting between characters" do
     str = "こにちわ"
     reg = %r!!
 
@@ -254,7 +254,7 @@ describe "String#split with Regexp" do
     ary.should == ["こ", "に", "ち", "わ"]
   end
 
-  it "respects the encoding of the regexp when splitting between characters" do #
+  it "respects the encoding of the regexp when splitting between characters" do
     str = "\303\202"
 
     $KCODE = "a"
@@ -263,13 +263,17 @@ describe "String#split with Regexp" do
     ary.size.should == 1
     ary.should == ["\303\202"]
   end
- end #
+ end
 
   it "includes all captures in the result array" do
     "hello".split(/(el)/).should == ["h", "el", "lo"]
     "hi!".split(/()/).should == ["h", "", "i", "", "!"]
-  # "hi!".split(/()/, -1).should == ["h", "", "i", "", "!", "", ""]
-    "hi!".split(/()/, -1).should == ["h", "", "i", "", "!", "" ] # Maglev missing last empty match
+   not_compliant_on :maglev do 
+    "hi!".split(/()/, -1).should == ["h", "", "i", "", "!", "", ""]
+   end
+   deviates_on :maglev do 
+    "hi!".split(/()/, -1).should == ["h", "", "i", "", "!", "" ] # bug, Maglev missing last empty match
+   end
     "hello".split(/((el))()/).should == ["h", "el", "el", "", "lo"]
     "AabB".split(/([a-z])+/).should == ["A", "b", "B"]
   end
@@ -322,7 +326,7 @@ describe "String#split with Regexp" do
   end
  end
 
- not_compliant_on :maglev do  # Maglev, no taint propagation
+ not_supported_on :maglev do  # no taint propagation
   it "taints the resulting strings if self is tainted" do
     ["", "x:y:z:", "  x  y  "].each do |str|
       [//, /:/, /\s+/].each do |pat|

@@ -60,38 +60,67 @@ describe :hash_eql, :shared => true do
 
       c = {}
       c.merge! :other => c, :self => c
-      # c.send(@method, a).should be_true # subtle, but they both have the same structure! # Maglev raises error , recursion too complex
+     not_compliant_on :maglev do
+      c.send(@method, a).should be_true # subtle, but they both have the same structure!
       a[:delta] = c[:delta] = a
-      # c.send(@method, a).should be_false # not quite the same structure, as a[:other][:delta] = nil # Maglev too complex
+      c.send(@method, a).should be_false # not quite the same structure, as a[:other][:delta] = nil
       c[:delta] = 42
-      # c.send(@method, a).should be_false  # Maglev too complex
+      c.send(@method, a).should be_false
       a[:delta] = 42
-      # c.send(@method, a).should be_false  # Maglev too complex
+      c.send(@method, a).should be_false
       b[:delta] = 42
-      # c.send(@method, a).should be_true     # Maglev too complex
+      c.send(@method, a).should be_true   
+     end
+     deviates_on :maglev do
+      lambda { c.send(@method, a) }.should raise_error(ArgumentError) # recursion too complex
+      a[:delta] = c[:delta] = a
+      lambda { c.send(@method, a) }.should raise_error(ArgumentError) # recursion too complex
+      c[:delta] = 42
+      lambda { c.send(@method, a) }.should raise_error(ArgumentError) # recursion too complex
+      a[:delta] = 42
+      lambda { c.send(@method, a) }.should raise_error(ArgumentError) # recursion too complex
+      b[:delta] = 42
+      lambda { c.send(@method, a) }.should raise_error(ArgumentError) # recursion too complex
+     end
     end
 
-# Maglev, error too complex
-#   it "computes equality for recursive hashes & arrays" do
-#     x, y, z = [], [], []
-#     a, b, c = {:foo => x, :bar => 42}, {:foo => y, :bar => 42}, {:foo => z, :bar => 42}
-#     x << a
-#     y << c
-#     z << b
-#     b.send(@method, c).should be_true # they clearly have the same structure!
-#     y.send(@method, z).should be_true
-#     a.send(@method, b).should be_true # subtle, but they both have the same structure!
-#     x.send(@method, y).should be_true
-#     y << x
-#     y.send(@method, z).should be_false
-#     z << x
-#     y.send(@method, z).should be_true
+    it "computes equality for recursive hashes & arrays" do
+      x, y, z = [], [], []
+      a, b, c = {:foo => x, :bar => 42}, {:foo => y, :bar => 42}, {:foo => z, :bar => 42}
+      x << a
+      y << c
+      z << b
+     not_compliant_on :maglev do
+      b.send(@method, c).should be_true # they clearly have the same structure!
+      y.send(@method, z).should be_true
+      a.send(@method, b).should be_true # subtle, but they both have the same structure!
+      x.send(@method, y).should be_true
+      y << x
+      y.send(@method, z).should be_false
+      z << x
+      y.send(@method, z).should be_true
 
-#     a[:foo], a[:bar] = a[:bar], a[:foo]
-#     a.send(@method, b).should be_false
-#     b[:bar] = b[:foo]
-#     b.send(@method, c).should be_false
-#   end
+      a[:foo], a[:bar] = a[:bar], a[:foo]
+      a.send(@method, b).should be_false
+      b[:bar] = b[:foo]
+      b.send(@method, c).should be_false
+     end
+     deviates_on :maglev do
+      lambda { b.send(@method, c) }.should raise_error(ArgumentError)
+      lambda { y.send(@method, z) }.should raise_error(ArgumentError)
+      lambda { a.send(@method, b) }.should raise_error(ArgumentError)
+      lambda { x.send(@method, y) }.should raise_error(ArgumentError)
+      y << x
+      y.send(@method, z).should be_false
+      z << x
+      lambda { y.send(@method, z)  }.should raise_error(ArgumentError)
+
+      a[:foo], a[:bar] = a[:bar], a[:foo]
+      a.send(@method, b).should be_false
+      b[:bar] = b[:foo]
+      lambda { b.send(@method, c) }.should raise_error(ArgumentError)
+     end
+    end
   end # ruby_bug
 end
 

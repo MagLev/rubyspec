@@ -30,14 +30,15 @@ describe "String#ljust with length, padding" do
     "radiology".ljust(8, '-').should == "radiology"
   end
 
-# Maglev, no propagation of taint
-# it "taints result when self or padstr is tainted" do
-#   "x".taint.ljust(4).tainted?.should == true
-#   "x".taint.ljust(0).tainted?.should == true
-#   "".taint.ljust(0).tainted?.should == true
-#   "x".taint.ljust(4, "*").tainted?.should == true
-#   "x".ljust(4, "*".taint).tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints result when self or padstr is tainted" do
+    "x".taint.ljust(4).tainted?.should == true
+    "x".taint.ljust(0).tainted?.should == true
+    "".taint.ljust(0).tainted?.should == true
+    "x".taint.ljust(4, "*").tainted?.should == true
+    "x".ljust(4, "*".taint).tainted?.should == true
+  end
+ end
 
   it "tries to convert length to an integer using to_int" do
     "^".ljust(3.8, "_^").should == "^_^"
@@ -81,7 +82,7 @@ describe "String#ljust with length, padding" do
     "foo".ljust(10, StringSpecs::MyString.new("x")).should be_kind_of(String)
   end
 
- not_compliant_on :maglev do # no taint prop
+ not_supported_on :maglev do # no taint propagation
   it "when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self" do
     "hello".ljust(4, 'X'.taint).tainted?.should be_false
     "hello".ljust(5, 'X'.taint).tainted?.should be_false

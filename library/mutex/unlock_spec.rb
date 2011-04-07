@@ -11,17 +11,30 @@ describe "Mutex#unlock" do
     mutex = Mutex.new
     wait = Mutex.new
     wait.lock
+
+    th = nil
+   not_compliant_on :maglev do
+    th = Thread.new do
+      mutex.lock
+      wait.lock
+    end
+    # avoid race on mutex.lock
+    Thread.pass while th.status and th.status != "sleep"
+    lambda { mutex.unlock }.should raise_error(ThreadError)
+   end
+ 
+   deviates_on :maglev do
     th = Thread.new do
       # mutex.lock  # maglev does not auto-release on thread exit
       mutex.synchronize { 
         wait.lock
       }
     end
-
     # avoid race on mutex.lock
     Thread.pass # while th.status and th.status != "sleep"
-
     lambda { mutex.unlock }.should raise_error(ThreadError)
+   end
+
     wait.unlock
     th.join
   end

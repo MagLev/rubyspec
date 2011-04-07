@@ -25,26 +25,35 @@ describe "Kernel#eval" do
   end
 
   it "finds a local in an enclosing scope" do
-    a = 199	# maglev debugging
+    a = 199	# maglev use values that debugging easier
     eval("a").should == 199
   end
 
   it "updates a local in an enclosing scope" do
     a = 19
     eval("a = 29")
-    a.should == 29 # maglev debugging
+    a.should == 29 
   end
 
   it "updates a local in a surrounding block scope" do
     EvalSpecs.new.f do
       a = 18
       eval("a = 28")
-      a.should == 28  # maglev debugging
+      a.should == 28 
     end
   end
 
   it "updates a local in a scope above a surrounding block scope" do
-    azw = 134 # maglev debugging
+  not_compliant_on :maglev do
+    a = 1
+    EvalSpecs.new.f do
+      eval("a = 2")
+      a.should == 2
+    end
+    a.should == 2
+  end
+  deviates_on :maglev do
+    azw = 134 
     EvalSpecs.new.f do
       azw = 556 # need to force an assign here, else azw is a copying block arg
  		 #   which is not handled yet by RubyBinding(C)>>_bindingInfo:
@@ -52,6 +61,7 @@ describe "Kernel#eval" do
       azw.should == 235
     end
     azw.should == 235
+  end
   end
 
   it "updates a local in a scope above when modified in a nested block scope" do
@@ -62,13 +72,13 @@ describe "Kernel#eval" do
   end
 
   ruby_version_is ""..."1.9" do
-not_compliant_on :maglev do
-    it "updates a local at script scope" do #
+   not_compliant_on :maglev do
+    it "updates a local at script scope" do
       code = fixture __FILE__, "eval_locals.rb"
       ruby_exe(code).chomp.should == "2"
     end
 
-    it "accepts a Proc object as a binding" do #
+    it "accepts a Proc object as a binding" do
       x = 1
       bind = proc {}
 
@@ -79,7 +89,7 @@ not_compliant_on :maglev do
       eval("z = 3")
       eval("z", bind).should == 3
     end
-end
+   end
   end
 
   ruby_version_is "1.9" do
@@ -98,11 +108,16 @@ end
 
   it "does not make Proc locals visible to evaluated code" do
     bind = proc { inner = 4 }
-    lambda { eval("inner", bind.binding) }.should raise_error(NotImplementedError) # maglev, was NameError
+    not_compliant_on :maglev do
+      lambda { eval("inner", bind.binding) }.should raise_error(NameError)
+    end
+    deviates_on :maglev do
+      lambda { eval("inner", bind.binding) }.should raise_error(NotImplementedError)
+    end
   end
 
   ruby_version_is ""..."1.9" do
-not_compliant_on :maglev do
+   not_compliant_on :maglev do
     it "stores all locals of nested eval bindings in the first non-eval binding" do
       non_eval = binding
       eval1 = eval("binding", non_eval)
@@ -121,7 +136,7 @@ not_compliant_on :maglev do
       eval("y").should == 3
       eval("z").should == 4
     end
-end
+   end
   end
 
   ruby_version_is "1.9" do
@@ -161,8 +176,8 @@ end
   end
 
   ruby_version_is ""..."1.9" do
-not_compliant_on :maglev do   
-    it "allows a Proc invocation to terminate the eval binding chain on local creation" do #
+   not_compliant_on :maglev do   
+    it "allows a Proc invocation to terminate the eval binding chain on local creation" do
       outer_binding = binding
       proc_binding = eval("proc {binding}.call", outer_binding)
       inner_binding = eval("proc {binding}.call", proc_binding)
@@ -186,7 +201,7 @@ not_compliant_on :maglev do
       eval("yy", inner_binding).should == 3
     end
 
-    it "can access normal locals in nested closures" do #
+    it "can access normal locals in nested closures" do
       outer_binding = binding
       proc_binding = eval("proc {l = 5; binding}.call", outer_binding)
       inner_binding = eval("proc {k = 6; binding}.call", proc_binding)
@@ -201,34 +216,31 @@ not_compliant_on :maglev do
       lambda { eval("k", proc_binding)  }.should raise_error(NameError)
       eval("k", inner_binding).should == 6
     end
-end 
+   end 
   end
 
   ruby_version_is ""..."1.9" do
- not_compliant_on :maglev do
-    it "allows creating a new class in a binding" do #
+   not_supported_on :maglev do # Proc#binding not supported
+    it "allows creating a new class in a binding" do
       bind = proc {}
-      eval "class A; end", bind.binding  # RubyNotImplementedError Proc#binding not supported
+      eval "class A; end", bind.binding
       eval("A.name", bind.binding).should == "A"
- end
     end
+   end
 
-# not_compliant_on :maglev do
-    it "allows creating a new class in a binding created by #eval" do #
-# maglev confusion in generated code for eval,
-#    $~ = __vc.at(7)  #  vc.at(7) not a MatchData
-#
+    it "allows creating a new class in a binding created by #eval" do
       bind = eval "binding"
       eval "class A; end", bind
       eval("A.name").should == "A"
     end
 
-    it "allows creating a new class in a binding returned by a method defined with #eval" do
+   deviates_on :maglev do
+    it "allows creating a new class in a binding returned by a method defined" do 
       bind = eval "def spec_binding; binding; end; spec_binding"
       eval "class A; end", bind
       eval("A.name").should == "A"
     end
-# end
+   end
   end
 
   ruby_version_is "1.9" do
@@ -245,12 +257,18 @@ end
 
   it "includes file and line information in syntax error" do
     expected = 'speccing.rb'
-    lambda {
-      eval('if true',TOPLEVEL_BINDING,expected)
-    }.should raise_error(SyntaxError)
-      #should raise_error(SyntaxError) { |e|  # maglev, message differs
-      # e.message.should =~ /^#{expected}:1:.+/  
-      # }
+    not_compliant_on :maglev do
+      lambda {
+        eval('if true',TOPLEVEL_BINDING,expected)
+      }.should raise_error(SyntaxError) { |e|
+        e.message.should =~ /^#{expected}:1:.+/
+      }
+    end
+    deviates_on :maglev do
+      lambda {
+        eval('if true',TOPLEVEL_BINDING,expected)
+      }.should raise_error(SyntaxError)
+    end
   end
 
   it "should perform top level evaluations from inside a block" do
@@ -263,12 +281,20 @@ end
   end
 
   it "uses the filename of the binding if none is provided" do
-    eval("__FILE__").index( '(eval)' ).should  == 0 # maglev
+   not_compliant_on :maglev do
+    eval("__FILE__").should == "(eval)"
+    eval("__FILE__", binding).should == __FILE__
+    eval("__FILE__", binding, "success").should == "success"
+    eval("eval '__FILE__', binding").should == "(eval)"
+    eval("eval '__FILE__', binding", binding).should == __FILE__
+    eval("eval '__FILE__', binding", binding, 'success').should == 'success'
+   end
+   deviates_on :maglev do
+    eval("__FILE__").index( '(eval)' ).should  == 0
     eval("__FILE__", binding).index( '(eval)' ).should  == 0 
     eval("__FILE__", binding, "success").should == "success"
     eval("eval '__FILE__', binding").index( '(eval)' ).should  == 0
- #   eval("eval '__FILE__', binding", binding).should == __FILE__
- #   eval("eval '__FILE__', binding", binding, 'success').should == 'success'
+   end
   end
 
   # Found via Rubinius bug github:#149

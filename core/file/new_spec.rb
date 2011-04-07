@@ -67,8 +67,7 @@ describe "File.new" do
     File.read(@file).should == "test\n"
   end
 
-# Maglev does not support File.new(fd_integer) yet
-not_compliant_on :maglev do  
+not_compliant_on :maglev do    # File.new(fd_integer) not supported
   it "returns a new File with modus fd " do
     begin
       @fh_orig = File.new(@file)
@@ -85,6 +84,12 @@ not_compliant_on :maglev do
 end
 
   it "creates a new file when use File::EXCL mode " do
+   not_compliant_on :maglev do
+    @fh = File.new(@file, File::EXCL)
+    @fh.should be_kind_of(File)
+    File.exists?(@file).should == true
+   end
+   deviates_on :maglev do
     if (RUBY_PLATFORM.match('solaris'))
       @fh = File.new(@file, File::EXCL)
       @fh.should be_kind_of(File)
@@ -93,6 +98,7 @@ end
       # linux
       lambda { File.new(@file, File::EXCL) } .should raise_error(Errno::EINVAL)
     end
+   end
   end
 
   it "raises an Errorno::EEXIST if the file exists when create a new file with File::CREAT|File::EXCL" do
@@ -107,6 +113,12 @@ end
 
   ruby_bug "[ruby-dev:40397]", "1.8.8" do 
     it "returns a new File when use File::APPEND mode" do
+     not_compliant_on :maglev do
+      @fh = File.new(@file, File::APPEND)
+      @fh.should be_kind_of(File)
+      File.exists?(@file).should == true
+     end
+     deviates_on :maglev do
       if (RUBY_PLATFORM.match('solaris'))
         @fh = File.new(@file, File::APPEND)
         @fh.should be_kind_of(File)
@@ -115,6 +127,7 @@ end
         # linux
         lambda { File.new(@file, File::APPEND) } .should raise_error(Errno::EINVAL)
       end
+     end
     end
 
     it "returns a new File when use File::RDONLY|File::APPEND mode" do

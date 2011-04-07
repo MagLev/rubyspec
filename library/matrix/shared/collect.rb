@@ -11,11 +11,11 @@ describe :collect, :shared => true do
     @m.send(@method) { |n| n * 2 }.should == Matrix[ [2, 4], [2, 4] ]
   end
 
- not_compliant_on :maglev do
-  ruby_bug "#1531", "1.8.7" do # not fixed in MRI 187p249
+ not_compliant_on :maglev do # # not fixed in MRI 187p249
+  ruby_bug "#1531", "1.8.7" do
     it "returns an enumerator if no block is given" do  #
       @m.send(@method).should be_an_instance_of(enumerator_class)
     end
   end
- end #
+ end 
 end

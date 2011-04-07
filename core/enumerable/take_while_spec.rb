@@ -12,7 +12,7 @@ describe "Enumerable#take_while" do
     end
 
     it "returns no/all elements for {true/false} block" do
-      (ax = @enum.take_while{true}).should == (bx = @enum.to_a)
+      @enum.take_while{true}.should == @enum.to_a
       @enum.take_while{false}.should == []
     end
 
@@ -30,9 +30,7 @@ describe "Enumerable#take_while" do
     it "will only go through what's needed" do
       enum = EnumerableSpecs::EachCounter.new(4, 3, 2, 1, :stop)
       enum.take_while { |x|
-        if x == 3
-          break 42
-        end
+        break 42 if x == 3
         true
       }.should == 42
       enum.times_yielded.should == 2

@@ -1,6 +1,6 @@
 describe :file_exist, :shared => true do
   it "return true if the file exist" do
-    @object.send((sel = @method), (fx = __FILE__)).should == true
+    @object.send(@method, __FILE__).should == true
     @object.send(@method, 'a_fake_file').should == false
   end
 

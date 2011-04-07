@@ -8,14 +8,12 @@ describe "Fixnum#coerce when given a Fixnum" do
 end
 
 describe "Fixnum#coerce when given a String" do
- # Maglev_new_failure, no exception raised
- # it "raises an ArgumentError when trying to coerce with a non-number String" do
- #   # lambda { 1.coerce(":)") }.should raise_error(ArgumentError)
- #   lambda { 1.coerce(":)") }.should raise_error(TypeError) # Maglev 
- # end
+  it "raises an ArgumentError when trying to coerce with a non-number String" do
+    lambda { 1.coerce(":)") }.should raise_error(ArgumentError)
+  end
 
   it "returns  an array containing two Floats" do
-    1.coerce("2").should == [2.0, 1.0] 
+    1.coerce("2").should == [2.0, 1.0]
     1.coerce("-2").should == [-2.0, 1.0]
   end
 end
@@ -26,12 +24,10 @@ describe "Fixnum#coerce" do
   end
 
   it "tries to convert the given Object into a Float by using #to_f" do
-    # Maglev , receives to_f twice, once during tracking operations
-    (obj = mock('1.0')).should_receive(:to_f).any_number_of_times.and_return(1.0)
+    (obj = mock('1.0')).should_receive(:to_f).and_return(1.0)
     2.coerce(obj).should == [1.0, 2.0]
     
-    # Maglev , receives to_f twice, once during tracking operations
-    (obj = mock('0')).should_receive(:to_f).any_number_of_times.and_return('0')
+    (obj = mock('0')).should_receive(:to_f).and_return('0')
     lambda { 2.coerce(obj).should == [1.0, 2.0] }.should raise_error(TypeError)
   end
 

@@ -33,10 +33,10 @@ describe "StringScanner#pre_match" do
   it "is not changed when the scanner's position changes" do
     @s.scan_until(/\s+/)
     @s.pre_match.should == "This"
-not_compliant_on :maglev do # bugs
+   not_compliant_on :maglev do # bugs
     @s.pos -= 1
     @s.pre_match.should == "This"
-end
+   end
   end
 
   it_behaves_like :extract_range_matched, :pre_match

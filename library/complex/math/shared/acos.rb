@@ -31,12 +31,21 @@ describe :complex_math_acos_bang, :shared => true do
     lambda { @object.send(:acos!, Complex(4, 5)) }.should raise_error(TypeError)
   end
 
-# maglev x86 solaris libs not returning NaN
-# it "raises an Errno::EDOM for numbers greater than 1.0" do
-#   lambda { @object.send(:acos!, 1.0001) }.should raise_error(Errno::EDOM)
-# end
+do_test = true
+deviates_on :maglev do
+  if RUBY_PLATFORM.match('solaris')
+    do_test = false # x86 solaris libs fail to return NaN
+  end
+end
 
-# it "raises an Errno::EDOM for numbers less than -1.0" do
-#   lambda { @object.send(:acos!, -1.0001) }.should raise_error(Errno::EDOM)
-# end
+if do_test
+  it "raises an Errno::EDOM for numbers greater than 1.0" do
+    lambda { @object.send(:acos!, 1.0001) }.should raise_error(Errno::EDOM)
+  end
+
+  it "raises an Errno::EDOM for numbers less than -1.0" do
+    lambda { @object.send(:acos!, -1.0001) }.should raise_error(Errno::EDOM)
+  end
+end
+
 end

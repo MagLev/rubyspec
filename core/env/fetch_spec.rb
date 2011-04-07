@@ -5,8 +5,7 @@ describe "ENV.fetch" do
   it "returns a value" do
     ENV["foo"] = "bar"
     ENV.fetch("foo").should == "bar"
-    # ENV.delete "foo"
-    ENV["foo"] = "" # Maglev
+    ENV.delete "foo"
   end
 
   it "raises IndexError for an invalid key" do

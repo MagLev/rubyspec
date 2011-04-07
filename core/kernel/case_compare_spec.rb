@@ -15,9 +15,9 @@ module Specs
     end
 
     class HasEqual
-#     def equal?(other)
-#       false
-#     end
+      def equal?(other)
+        false
+      end
     end
 
     class HasOppoOpEqual
@@ -25,9 +25,9 @@ module Specs
         false
       end
 
-#     def equal?(other)
-#       false
-#     end
+      def equal?(other)
+        false
+      end
     end
 
     class RandomID
@@ -35,9 +35,9 @@ module Specs
         true
       end
 
-#     def equal?(other)
-#       true
-#     end
+      def equal?(other)
+        true
+      end
 
       def object_id()
         @ids ||= []
@@ -116,7 +116,7 @@ describe "Kernel#=== for a class with #equal? overridden to always be false" do
     (@o1 == @o).should == false
     (@o1 === @o).should == false
   end
- end # maglev
+ end 
 end
 
 describe "Kernel#=== for a class with #== and #equal? overridden to always be false" do

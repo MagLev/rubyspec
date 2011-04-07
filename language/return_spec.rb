@@ -24,10 +24,11 @@ describe "The return keyword" do
 
   describe "in a Thread" do
     ruby_version_is "" ... "1.9" do
-# Maglev fails to raise an error
-#     it "raises a ThreadError if used to exit a thread" do
-#       lambda { Thread.new { return }.join }.should raise_error(ThreadError)
-#     end
+     not_compliant_on :maglev do
+      it "raises a ThreadError if used to exit a thread" do
+        lambda { Thread.new { return }.join }.should raise_error(ThreadError)
+      end
+     end
     end
 
     ruby_version_is "1.9" do
@@ -210,7 +211,7 @@ describe "The return keyword" do
         ensure
           ScratchPad.recorded << :ensure
         end
-      end.call.should == 55 # Maglev check return value
+      end.call.should == 55 # added check of check return value
       ScratchPad.recorded.should == [:ensure]
     end
   end
@@ -225,13 +226,15 @@ describe "The return keyword" do
         def f   	# Maglev debugging edits
           yield
         end
-#       lambda { f { puts "A1" 
-#                    return 5 } }.should raise_error(LocalJumpError)
-        lambda { f { puts "A1" 
-                     return 5 } }.call.should == 5 # Maglev deviation, no error
-# Maglev, in current design, can't fix this spec 
-# without breaking above spec 'executes the ensure clause when begin/ensure are inside a lambda'
-        puts "A2" 	# Maglev debugging
+       not_compliant_on :maglev do
+        lambda { f { return 5 } }.should raise_error(LocalJumpError)
+       end
+       deviates_on :maglev do
+         # Maglev, in current design, can't fix this spec 
+         # without breaking the above spec 
+         #  'executes the ensure clause when begin/ensure are inside a lambda'
+        lambda { f { return 5 } }.call.should == 5 
+       end
       end
     end
 
@@ -248,8 +251,7 @@ describe "The return keyword" do
     end
 
     it "causes the method that lexically encloses the block to return" do
-      rv = ReturnSpecs::Blocks.new.enclosing_method
-      rv.should == :return_value
+      ReturnSpecs::Blocks.new.enclosing_method.should == :return_value
       ScratchPad.recorded.should == :before_return
     end
 
@@ -271,17 +273,11 @@ describe "The return keyword" do
   end
 
   describe "within two blocks" do
-    # Maglev debugging edits
-    it "causes the method that lexically encloses the block (within two) to return" do
+    it "causes the method that lexically encloses the block to return" do
       def f
-        1.times { 1.times { 
-           puts "F1"
-           return true
-        }; false}; false
+        1.times { 1.times {return true}; false}; false
       end
-      res = f
-      res.should be_true
-      puts "F2"
+      f.should be_true
     end
   end
 

@@ -5,8 +5,7 @@ describe "Matrix.[]" do
 
   ruby_bug "redmine:1532", "1.8.7" do
     it "requires arrays as parameters" do
-      mx = nil
-      lambda { mx = Matrix[5] }.should raise_error(TypeError)
+      lambda { Matrix[5] }.should raise_error(TypeError)
       lambda { Matrix[nil] }.should raise_error(TypeError)
       lambda { Matrix[1..2] }.should raise_error(TypeError)
       lambda { Matrix[[1, 2], 3] }.should raise_error(TypeError)

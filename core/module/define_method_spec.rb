@@ -57,6 +57,7 @@ describe "Module#define_method" do
 
   it "calls #method_added after the method is added to the Module" do
     DefineMethodSpecClass.should_receive(:method_added).with(:test_ma)
+
     class DefineMethodSpecClass
       define_method(:test_ma) { true }
     end
@@ -134,20 +135,22 @@ describe "Module#define_method" do
     klass.new.string_test.should == "string_test result"
   end
 
- not_compliant_on :maglev do #
+ not_compliant_on :maglev do #   not private yet
   it "is private" do 
     Module.should have_private_instance_method(:define_method)
   end
- end #
+ end
   
   it "returns a Proc" do
     class DefineMethodSpecClass
       method = define_method("return_test") { || true }
       method.is_a?(Proc).should be_true
-    # # check if it is a lambda:  # no error on maglev 
-    # lambda {
-    #   method.call :too_many_arguments
-    # }.should raise_error(ArgumentError)
+      not_compliant_on :maglev do  # no error in maglev
+        # check if it is a lambda:
+        lambda {
+          method.call :too_many_arguments
+        }.should raise_error(ArgumentError)
+      end
     end
   end
 end
@@ -197,13 +200,21 @@ describe "Module#define_method" do
     end
 
     it "raises an ArgumentError when passed one argument" do
-      # lambda { @klass.new.m 1 }.should raise_error(ArgumentError)
-      @klass.new.m(1).should == :called # maglev deviation
+      not_compliant_on :maglev do
+        lambda { @klass.new.m 1 }.should raise_error(ArgumentError)
+      end
+      deviates_on :maglev do
+        @klass.new.m(1).should == :called 
+      end
     end
 
     it "raises an ArgumentError when passed two arguments" do
-      #lambda { @klass.new.m 1, 2 }.should raise_error(ArgumentError)
-      @klass.new.m(1,2).should == :called # maglev deviation
+      not_compliant_on :maglev do
+        lambda { @klass.new.m 1, 2 }.should raise_error(ArgumentError)
+      end
+      deviates_on :maglev do
+        @klass.new.m(1,2).should == :called
+      end
     end
   end
 
@@ -224,8 +235,12 @@ describe "Module#define_method" do
       end
 
       it "returns the value computed by the block when passed two arguments" do
-        # @klass.new.m(1, 2).should == [1, 2]
-        @klass.new.m(1, 2).should == 1 # maglev deviation
+        not_compliant_on :maglev do
+          @klass.new.m(1, 2).should == [1, 2]
+        end
+        deviates_on :maglev do
+          @klass.new.m(1, 2).should == 1 
+        end
       end
     end
 

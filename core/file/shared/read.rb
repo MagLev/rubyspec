@@ -6,7 +6,7 @@ describe :file_read_directory, :shared => true do
     it 'raises a Errno::EISDIR when passed a path that is a directory' do
       lambda { @object.send(@method, ".") }.should raise_error(Errno::EISDIR)
     end
-   end #
+   end
   end
 
   platform_is :bsd do

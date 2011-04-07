@@ -28,6 +28,7 @@ describe "Integer#upto [stop] when self and stop are Fixnums" do
 
   it "raises an ArgumentError for non-numeric endpoints" do
     lambda { 1.upto("A") {|x| p x} }.should raise_error(ArgumentError) 
+    lambda { 1.upto(nil) {|x| p x} }.should raise_error(ArgumentError)
   end
 
   ruby_version_is "" ... "1.8.7" do

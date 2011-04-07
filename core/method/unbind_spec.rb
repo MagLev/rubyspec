@@ -26,10 +26,11 @@ describe "Method#unbind" do
     @string.should =~ /MethodSpecs::MyMod/
   end
 
-# Maglev fails
-# it "returns a String containing the Module the method is referenced from" do
-#   @string.should =~ /MethodSpecs::MySub/
-# end
+ not_compliant_on :maglev do
+  it "returns a String containing the Module the method is referenced from" do
+    @string.should =~ /MethodSpecs::MySub/
+  end
+ end
 
   specify "rebinding UnboundMethod to Method's obj produces exactly equivalent Methods" do
     @normal_um.bind(@normal).should == @normal_m

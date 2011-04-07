@@ -53,7 +53,7 @@ describe "String#delete" do
     'Non-Authoritative Information'.delete(' \-\'').should ==
       'NonAuthoritativeInformation'
   end
- end #
+ end
 
   ruby_version_is ""..."1.9" do
     it "regards invalid ranges as nothing" do
@@ -69,14 +69,14 @@ describe "String#delete" do
     end
   end
 
- not_compliant_on :maglev do # no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "taints result when self is tainted" do
     "hello".taint.delete("e").tainted?.should == true
     "hello".taint.delete("a-z").tainted?.should == true
 
     "hello".delete("e".taint).tainted?.should == false
   end
- end #
+ end
 
   it "tries to convert each set arg to a string using to_str" do
     other_string = mock('lo')
@@ -117,7 +117,9 @@ describe "String#delete!" do
       a = "hello"
       a.freeze
 
-      # lambda { a.delete!("")            }.should raise_error(TypeError) # Maglev error only on actual modify
+     not_compliant_on :maglev do  # maglev error only on actual modification attempt
+      lambda { a.delete!("")            }.should raise_error(TypeError)
+     end
       lambda { a.delete!("aeiou", "^e") }.should raise_error(TypeError)
     end
   end

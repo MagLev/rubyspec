@@ -24,12 +24,13 @@ describe "File.setgid?" do
     File.setgid?(@name).should == false
   end
   
-# Maglev failing on Solaris x86
-# platform_is_not :windows do
-#   it "should return true when the gid bit is set" do
-#     system "chmod g+s #{@name}"
-#     
-#     File.setgid?(@name).should == true
-#   end
-# end
+ not_compliant_on :maglev do
+  platform_is_not :windows do
+    it "should return true when the gid bit is set" do
+      system "chmod g+s #{@name}"
+      
+      File.setgid?(@name).should == true
+    end
+  end
+ end
 end

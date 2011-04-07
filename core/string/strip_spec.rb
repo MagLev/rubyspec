@@ -21,12 +21,13 @@ describe "String#strip" do
     end
   end
 
-# Maglev, no taint propagation
-# it "taints the result when self is tainted" do
-#   "".taint.strip.tainted?.should == true
-#   "ok".taint.strip.tainted?.should == true
-#   "  ok  ".taint.strip.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result when self is tainted" do
+    "".taint.strip.tainted?.should == true
+    "ok".taint.strip.tainted?.should == true
+    "  ok  ".taint.strip.tainted?.should == true
+  end
+ end
 end
 
 describe "String#strip!" do
@@ -54,7 +55,6 @@ describe "String#strip!" do
   ruby_version_is ""..."1.9" do
     it "modifies self removing trailing NULL bytes and whitespace after a NULL byte" do
       a = " \x00 goodbye \x00 "
-      b = a.dup
       a.strip!
       a.should == "\x00 goodbye \x00"
     end

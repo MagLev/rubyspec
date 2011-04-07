@@ -65,7 +65,7 @@ describe "Module#module_function with specific method names" do
     o.respond_to?(:test).should == false
     m.should have_private_instance_method(:test)
     o.send(:test).should == "hello"
-    # lambda { o.test }.should raise_error(NoMethodError) # Maglev does not raise anything
+    lambda { o.test }.should raise_error(NoMethodError)
   end
 
   it "makes the new Module methods public" do
@@ -100,12 +100,14 @@ describe "Module#module_function with specific method names" do
     lambda { Module.new { module_function(o) } }.should raise_error(TypeError)
   end
 
-# it "can make accessible private methods" do # JRUBY-4214 # maglev fails, no  such method :require
-#   m = Module.new do
-#     module_function :require
-#   end
-#   m.respond_to?(:require).should be_true 
-# end
+ not_compliant_on :maglev do
+  it "can make accessible private methods" do # JRUBY-4214
+    m = Module.new do
+      module_function :require
+    end
+    m.respond_to?(:require).should be_true 
+  end
+ end
 end
 
 describe "Module#module_function as a toggle (no arguments) in a Module body" do

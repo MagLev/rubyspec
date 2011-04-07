@@ -20,7 +20,6 @@ describe "Range#each" do
 
     y = mock('y')
     x = mock('x')
-    z = mock('z') # Maglev
     x.should_receive(:<=>).with(y).any_number_of_times.and_return(-1)
     x.should_receive(:<=>).with(x).any_number_of_times.and_return(0)
     x.should_receive(:succ).any_number_of_times.and_return(y)
@@ -36,8 +35,9 @@ describe "Range#each" do
     lambda { (0.5..2.4).each { |i| i } }.should raise_error(TypeError)
 
     b = mock('x')
-# Maglev, checks for   respond to #succ before iterating
-#   (a = mock('1')).should_receive(:<=>).with(b).and_return(1)
+   not_compliant_on :maglev do  # maglev checks respond_to?(:succ) before iterating
+    (a = mock('1')).should_receive(:<=>).with(b).and_return(1)
+   end
     a = mock('1')
 
     lambda { (a..b).each { |i| i } }.should raise_error(TypeError)

@@ -1,5 +1,10 @@
 require File.expand_path('../../../spec_helper', __FILE__)
-require File.expand_path('../shared/multiply_maglev', __FILE__)   # maglev deviations
+not_compliant_on :maglev do
+  require File.expand_path('../shared/mult', __FILE__)
+end
+deviates_on :maglev do
+  require File.expand_path('../shared/multiply_maglev', __FILE__)
+end
 require 'bigdecimal'
 
 describe "BigDecimal#*" do

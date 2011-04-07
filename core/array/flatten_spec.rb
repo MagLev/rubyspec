@@ -109,7 +109,7 @@ describe "Array#flatten" do
     end
    end
 
-    it "raises a TypeError if the return value of #to_ary is not an Array" do 
+    it "raises a TypeError if the return value of #to_ary is not an Array" do
       @obj.should_receive(:to_ary).and_return(1)
       lambda { [@obj].flatten }.should raise_error(TypeError)
     end

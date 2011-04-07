@@ -442,16 +442,24 @@ describe :array_slice, :shared => true do
       array = [1, 2, 3, 4, 5, 6]
       obj = mock('large value')
       obj.should_receive(:to_int).and_return(0x8000_0000_0000_0000_0000)
-      lambda { array.send(@method, obj) }.should raise_error(TypeError) # Maglev, was RangeError
+     not_compliant_on :maglev do
+      lambda { array.send(@method, obj) }.should raise_error(RangeError)
 
       obj = 8e19
-      lambda { array.send(@method, obj) }.should raise_error(TypeError) # Maglev, was RangeError
+      lambda { array.send(@method, obj) }.should raise_error(RangeError)
+     end
+     deviates_on :maglev do
+      lambda { array.send(@method, obj) }.should raise_error(TypeError)
+
+      obj = 8e19
+      lambda { array.send(@method, obj) }.should raise_error(TypeError)
+     end
     end
 
     it "raises a RangeError when the length is out of range of Fixnum" do
       array = [1, 2, 3, 4, 5, 6]
       obj = mock('large value')
-      obj.should_receive(:to_int).any_number_of_times.and_return(0x8000_0000_0000_0000_0000)
+      obj.should_receive(:to_int).and_return(0x8000_0000_0000_0000_0000)
       lambda { array.send(@method, 1, obj) }.should raise_error(RangeError)
 
       obj = 8e19

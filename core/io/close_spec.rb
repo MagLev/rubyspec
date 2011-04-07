@@ -18,7 +18,7 @@ describe "IO#close" do
   end
 
   it "returns nil" do
-    (xx = (ix = @io).close).should == nil
+    @io.close.should == nil
   end
 
   it "raises an IOError reading from a closed IO" do
@@ -31,7 +31,7 @@ describe "IO#close" do
     lambda { @io.write "data" }.should raise_error(IOError)
   end
 
-  it "raises an IOError if closed" do #
+  it "raises an IOError if closed" do
     @io.close
     lambda { @io.close }.should raise_error(IOError)
   end
@@ -55,22 +55,31 @@ describe "IO#close on an IO.popen stream" do
     io = IO.popen 'true', 'r'
     io.close
 
-    bx = $?
-    bx.exitstatus.should == 0
+    $?.exitstatus.should == 0
 
     io = IO.popen 'false', 'r'
     io.close
 
-    ax = $?
-    ax.exitstatus.should == 0 # maglev bug, was == 1
+    not_compliant_on :maglev do
+      $?.exitstatus.should == 1
+    end
+    deviates_on :maglev do  # maglev bug , limitations in current popen implemementation
+      ax = $?
+      ax.exitstatus.should == 0 # maglev bug, was == 1
+    end
   end
 
   it "waits for the child to exit" do
-    io = IO.popen 'uptime', 'r'
-    io.close
-
-    #$?.exitstatus.should_not == 0 # SIGPIPE/EPIPE
-    $?.exitstatus.should == 0 # maglev
+    not_compliant_on :maglev do
+      io = IO.popen 'yes', 'r'
+      io.close
+      $?.exitstatus.should_not == 0 # SIGPIPE/EPIPE
+    end
+    deviates_on :maglev do
+      io = IO.popen 'uptime', 'r'
+      io.close
+      $?.exitstatus.should == 0 
+    end
   end
 
 end

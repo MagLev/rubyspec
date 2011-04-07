@@ -48,17 +48,18 @@ describe "String#tr_s" do
     StringSpecs::MyString.new("hello").tr_s("e", "a").should be_kind_of(StringSpecs::MyString)
   end
 
-# Maglev taint not propagated
-#  it "taints the result when self is tainted" do
-#    ["h", "hello"].each do |str|
-#      tainted_str = str.dup.taint
-#
-#      tainted_str.tr_s("e", "a").tainted?.should == true
-#
-#      str.tr_s("e".taint, "a").tainted?.should == false
-#      str.tr_s("e", "a".taint).tainted?.should == false
-#    end
-#  end
+ not_supported_on :maglev do # no taint propagation
+  it "taints the result when self is tainted" do
+    ["h", "hello"].each do |str|
+      tainted_str = str.dup.taint
+
+      tainted_str.tr_s("e", "a").tainted?.should == true
+
+      str.tr_s("e".taint, "a").tainted?.should == false
+      str.tr_s("e", "a".taint).tainted?.should == false
+    end
+  end
+ end
 end
 
 describe "String#tr_s!" do
@@ -88,7 +89,9 @@ describe "String#tr_s!" do
       s = "hello".freeze
       lambda { s.tr_s!("el", "ar") }.should raise_error(TypeError)
       lambda { s.tr_s!("l", "r")   }.should raise_error(TypeError)
-      # lambda { s.tr_s!("", "")     }.should raise_error(TypeError) # Maglev error only on actual modify
+     not_compliant_on :maglev do  # error only on actual modification attempt
+      lambda { s.tr_s!("", "")     }.should raise_error(TypeError)
+     end
     end
   end
 

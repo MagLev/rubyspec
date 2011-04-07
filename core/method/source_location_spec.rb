@@ -1,24 +1,32 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
-ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
+t_ver = "1.9"
+deviates_on :maglev do
+  t_ver = "1.8.7"  # maglev, source_location implemented in 1.8.7
+end
+
+ruby_version_is t_ver do
   describe "Method#source_location" do
     before(:each) do
       @method = MethodSpecs::SourceLocation.method(:location)
     end
 
     it "returns nil for built-in methods" do
-      # File.method(:size).source_location.should be_nil
-      # maglev deviation  , location available for any non-primitive method 
+     not_compliant_on :maglev do
+      File.method(:size).source_location.should be_nil
+     end
+     deviates_on :maglev do
+      # location available for any non-primitive method 
       loc = File.method(:size).source_location
       loc[0].should == ENV['MAGLEV_HOME'] + '/src/kernel/bootstrap/File.rb'
       loc[1].should be_close(550, 50)
       File.method(:stdin).source_location.should be_nil # a ruby primitive 
+     end
     end
 
     it "returns an Array" do
-      modx = MethodSpecs::SourceLocation
-      (sx = (mx = @method).source_location).should be_an_instance_of(Array)
+      @method.source_location.should be_an_instance_of(Array)
     end
 
     it "sets the first value to the path of the file in which the method was defined" do
@@ -50,7 +58,12 @@ ruby_version_is "1.8.7" do # "1.9" do  # maglev, source_location in 1.8.7
       
       method = cls.new.method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
-      # method.source_location[1].should == line  # maglev gets line 1 always
+       not_compliant_on :maglev do
+         method.source_location[1].should == line
+       end
+       deviates_on :maglev do
+         method.source_location[1].should == 1
+       end
     end
   end
 end

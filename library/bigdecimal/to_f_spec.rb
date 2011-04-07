@@ -49,7 +49,7 @@ describe "BigDecimal#to_f" do
 
   it "remembers negative zero when converted to float" do
     @zero_neg.to_f.should == 0
-    (na = @zero_neg).to_f.to_s.should == "-0.0"
+    @zero_neg.to_f.to_s.should == "-0.0"
   end
 end
 

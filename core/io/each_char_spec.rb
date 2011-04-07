@@ -21,15 +21,23 @@ ruby_version_is '1.8.7' do
 
     it "yields each character" do
       @io.readline.should == "Voici la ligne une.\n"
-
-      count = 0
-      @io.each_char do |c|
-        ScratchPad << c
-        #break if 4 < count += 1  #  maglev each_char not KCODE aware
-        break if 3 < count += 1
+      not_compliant_on :maglev do
+        count = 0
+        @io.each_char do |c|
+          ScratchPad << c
+          break if 4 < count += 1  
+        end
+        ScratchPad.recorded.should == ["Q", "u", "i", " ", "è"]
       end
-      # ScratchPad.recorded.should == ["Q", "u", "i", " ", "è"]
-      ScratchPad.recorded.should == ["Q", "u", "i", " "] # maglev 
+      deviates_on :maglev do  # not KCODE aware yet
+        count = 0
+        @io.each_char do |c|
+          ScratchPad << c
+          break if 3 < count += 1  
+        end
+        ScratchPad.recorded.should == ["Q", "u", "i", " "] 
+      end
+
     end
 
     it "returns an Enumerator when passed no block" do

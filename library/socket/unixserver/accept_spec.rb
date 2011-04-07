@@ -37,6 +37,18 @@ platform_is_not :windows do
 
       # kill thread, ensure it dies in a reasonable amount of time
       t.kill
+     not_compliant_on :maglev do
+      a = 1
+      while a < 2000
+        break unless t.alive?
+        Thread.pass
+        sleep 0.2
+        a += 1
+      end
+      a.should < 2000
+     end
+
+     deviates_on :maglev do
       a = 1
       while a < 1000
         break unless t.alive?
@@ -44,6 +56,8 @@ platform_is_not :windows do
         a += 1
       end
       a.should < 1000
+     end
+
       server.close
     end
 

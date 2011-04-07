@@ -41,9 +41,13 @@ describe :stringio_each_separator, :shared => true do
       seen = []
       io = StringIO.new("para1\n\npara2\n\n\npara3")
       io.send(@method, "") {|s| seen << s}
+     not_compliant_on :maglev do
+      seen.should == ["para1\n\n", "para2\n\n", "para3"]
+     end
+     deviates_on :maglev do
       #   MRI StringIO#each inconsistent with String#each here
-      # seen.should == ["para1\n\n", "para2\n\n", "para3"]
       seen.should == ["para1\n\n", "para2\n\n\n", "para3"] # Maglev same result as String#each
+     end
     end
   end
 end
@@ -96,9 +100,13 @@ describe :stringio_each_no_arguments, :shared => true do
   ruby_version_is "1.8.7" do
     it "returns an Enumerator when passed no block" do
       enum = @io.send(@method)
-      #enum.instance_of?(enumerator_class).should be_true
-      enum.kind_of?(enumerator_class).should be_true # maglev
+     not_compliant_on :maglev do
+      enum.instance_of?(enumerator_class).should be_true
+     end
 
+     deviates_on :maglev do
+      enum.kind_of?(enumerator_class).should be_true
+     end
       seen = []
       enum.each { |b| seen << b }
       seen.should == ["a b c d e\n", "1 2 3 4 5"]

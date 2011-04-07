@@ -26,12 +26,10 @@ describe :dir_glob, :shared => true do
     end
   end
 
- not_compliant_on :maglev do 
   it "splits the string on \\0 if there is only one string given" do
     Dir.send(@method, "file_o*\0file_t*").should ==
              %w!file_one.ext file_two.ext!
   end
- end #
 
   it "matches non-dotfiles with '*'" do
     expected = %w[
@@ -124,11 +122,9 @@ describe :dir_glob, :shared => true do
     Dir.send(@method, 'sub*_one').sort.should == %w|subdir_one|.sort
   end
 
-not_compliant_on :maglev do
-  it "handles directories with globs" do #
+  it "handles directories with globs" do
     Dir.send(@method, 'sub*/*').sort.should == %w!subdir_one/nondotfile subdir_two/nondotfile subdir_two/nondotfile.ext!
   end
-end
 
   it "matches files with multiple '*' special characters" do
     Dir.send(@method, '*fi*e*').sort.should == %w|dir_filename_ordering nondotfile file_one.ext file_two.ext|.sort
@@ -255,7 +251,6 @@ end
          subdir_two/nondotfile.ext]
   end
 
- not_compliant_on :maglev do
   it "preserves the separator between directory components" do
     Dir.send(@method, "deeply/nested//directory/structure/*.ext").should ==
       %w!deeply/nested//directory/structure/file_one.ext!
@@ -263,7 +258,6 @@ end
     Dir.send(@method, "deeply/nested/directory/structure//**/*.ext").should ==
       %w!deeply/nested/directory/structure//file_one.ext!
   end
- end #
 end
 
 describe :dir_glob_recursive, :shared => true do
@@ -288,13 +282,12 @@ describe :dir_glob_recursive, :shared => true do
     rm_r @mock_dir
   end
 
-# Maglev fails, with RuntimeError, continuous RECURSIVEs from glob_helper()
-# it "matches multiple recursives" do
-#   expected = %w[
-#     a/x/b/y/b/z/e
-#     a/x/b/y/e
-#   ]
+  it "matches multiple recursives" do
+    expected = %w[
+      a/x/b/y/b/z/e
+      a/x/b/y/e
+    ]
 
-#   Dir.send(@method, 'a/**/b/**/e').uniq.sort.should == expected
-# end
+    Dir.send(@method, 'a/**/b/**/e').uniq.sort.should == expected
+  end
 end

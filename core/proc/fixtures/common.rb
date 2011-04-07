@@ -1,14 +1,30 @@
 module ProcSpecs
+
+ not_compliant_on :maglev do
   def self.new_proc_in_method
     Proc.new
   end
+ end
+
+ deviates_on :maglev do
+  def self.new_proc_in_method(&block)
+    Proc.new(&block)  # must pass block explicitly
+  end
+ end
 
   class ProcSubclass < Proc
   end
 
+ not_compliant_on :maglev do
   def self.new_proc_subclass_in_method
     ProcSubclass.new
   end
+ end
+ deviates_on :maglev do
+  def self.new_proc_subclass_in_method(&block)
+    ProcSubclass.new(&block) # must pass block explicitly
+  end
+ end
 
   class MyProc < Proc
   end

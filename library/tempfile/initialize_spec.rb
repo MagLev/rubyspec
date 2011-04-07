@@ -2,8 +2,8 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/common', __FILE__)
 require 'tempfile'
 
-# maglev does not support direct use of Tempfile#initialize
-# do not run this file.
+not_compliant_on :maglev do
+  # maglev does not support direct use of Tempfile#initialize
 
 describe "Tempfile#initialize" do
   before :each do
@@ -38,3 +38,4 @@ describe "Tempfile#initialize" do
     end
   end
 end
+end # maglev

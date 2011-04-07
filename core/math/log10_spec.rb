@@ -15,16 +15,28 @@ describe "Math.log10" do
     Math.log10(10e15).should be_close(16.0, TOLERANCE)
   end
   
-# Maglev, Solarix x86 fails to raise EDOM
-#  conflicts_with :Complex do
-#    it "raises an Errno::EDOM if the argument is less than 0" do
-#      lambda { Math.log10(-1e-15) }.should raise_error( Errno::EDOM)
-#    end
-#  end
+   conflicts_with :Complex do
+     do_test = true
+     deviates_on :maglev do
+      if RUBY_PLATFORM.match('solaris') 
+        do_test = false # x86 solaris libs fails to raise EDOM
+      end
+     end
+     if do_test
+       it "raises an Errno::EDOM if the argument is less than 0" do
+         lambda { Math.log10(-1e-15) }.should raise_error( Errno::EDOM)
+       end
+     end
+   end
   
   ruby_version_is ""..."1.9" do
     it "raises an ArgumentError if the argument cannot be coerced with Float()" do
-      lambda { Math.log10("test") }.should raise_error(TypeError) # Maglev , was ArgumentError
+      not_compliant_on :maglev do
+        lambda { Math.log10("test") }.should raise_error(ArgumentError)
+      end
+      deviates_on :maglev do
+        lambda { Math.log10("test") }.should raise_error(TypeError)
+      end
     end
   end
 

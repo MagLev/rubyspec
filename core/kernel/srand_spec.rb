@@ -2,10 +2,11 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Kernel.srand" do
-# Maglev not private yet
-#  it "is a private method" do
-#    Kernel.should have_private_instance_method(:srand)
-#  end
+ not_compliant_on :maglev do #  not private yet
+  it "is a private method" do
+    Kernel.should have_private_instance_method(:srand)
+  end
+ end
 
   it "returns the previous seed value" do
     srand(10)
@@ -25,29 +26,38 @@ describe "Kernel.srand" do
   end
 
   it "accepts and uses a seed of 0" do
-    #srand(0) 
-    #srand.should == 0
-    lambda { srand(0)}.should raise_error  # maglev  deviation
+   not_compliant_on :maglev do
+    srand(0) 
+    srand.should == 0
+   end
+   deviates_on :maglev do
+    lambda { srand(0)}.should raise_error 
+   end
   end
 
+ not_compliant_on :maglev do
   it "accepts a negative seed" do
-    #srand(-17)
-    #srand.should == -17
-    lambda { srand(-17)}.should raise_error  # maglev  deviation
+    srand(-17)
+    srand.should == -17
   end
 
   it "accepts a Bignum as a seed" do
-    #srand(0x12345678901234567890)
-    #srand.should == 0x12345678901234567890
-    lambda { srand(0x12345678901234567890) }.should raise_error  # maglev  deviation
+    srand(0x12345678901234567890)
+    srand.should == 0x12345678901234567890
   end
+ end
 
   it "calls #to_int on seed" do
     srand(3.8)
     srand.should == 3
 
     s = mock('seed')
+   not_compliant_on :maglev do
+    s.should_receive(:to_int).and_return 0
+   end
+   deviates_on :maglev do
     s.should_receive(:to_int).and_return 17
+   end
     srand(s)
   end
 

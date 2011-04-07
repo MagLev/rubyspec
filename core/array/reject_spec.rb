@@ -36,7 +36,8 @@ describe "Array#reject" do
       end
     end
 
-    # maglev, MyArray#initialize not compatible with Array#reject implementation
+    # maglev not included in this deviates_on because
+    #  MyArray#initialize not compatible with Array#reject implementation .
     deviates_on :ironruby do
       it "does not return subclass instance on Array subclasses" do
         ArraySpecs::MyArray[1, 2, 3].reject { |x| x % 2 == 0 }.should be_kind_of(Array)
@@ -111,16 +112,16 @@ describe "Array#reject!" do
     a.reject! { true }.should == nil
   end
 
-unless defined?( Maglev::System )  # Maglev
+ not_compliant_on :maglev do  # does not freeze during reject!
   ruby_version_is "" ... "1.9" do
-    it "raises a TypeError on a frozen array" do  # Maglev does not freeze during reject!
+    it "raises a TypeError on a frozen array" do
       lambda { ArraySpecs.frozen_array.reject! {} }.should raise_error(TypeError)
     end
     it "raises a TypeError on an empty frozen array" do
       lambda { ArraySpecs.empty_frozen_array.reject! {} }.should raise_error(TypeError)
     end
   end
-end
+ end
 
   ruby_version_is "1.9" do
     it "raises a RuntimeError on a frozen array" do

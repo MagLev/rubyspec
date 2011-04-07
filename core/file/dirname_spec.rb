@@ -52,11 +52,16 @@ describe "File.dirname" do
   platform_is_not :windows do
     it "returns all the components of filename except the last one (edge cases on non-windows)" do
       File.dirname('/////').should == '/'
+     not_compliant_on :maglev do
+      File.dirname("//foo//").should == "/"
+     end
+     deviates_on :maglev do
       if RUBY_PLATFORM.match('solaris')
         File.dirname("//foo//").should == "/"
       else
         File.dirname("//foo//").should == "//"
       end
+     end
     end
   end
 

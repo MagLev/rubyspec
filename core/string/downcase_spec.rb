@@ -8,25 +8,27 @@ describe "String#downcase" do
     "hello".downcase.should == "hello"
   end
 
-# Maglev fails , stprims are using locale
-# it "is locale insensitive (only replaces A-Z)" do
-#   "ÄÖÜ".downcase.should == "ÄÖÜ"
-#
-#   str = Array.new(256) { |c| c.chr }.join
-#   expected = Array.new(256) do |i|
-#     c = i.chr
-#     c.between?("A", "Z") ? c.downcase : c
-#   end.join
-#
-#   str.downcase.should == expected
-# end
+ not_compliant_on :maglev do # Smalltalk prims are locale sensitive
+  it "is locale insensitive (only replaces A-Z)" do
+    "ÄÖÜ".downcase.should == "ÄÖÜ"
+ 
+    str = Array.new(256) { |c| c.chr }.join
+    expected = Array.new(256) do |i|
+      c = i.chr
+      c.between?("A", "Z") ? c.downcase : c
+    end.join
+ 
+    str.downcase.should == expected
+  end
+ end
 
-# Maglev, no taint propagation
-# it "taints result when self is tainted" do
-#   "".taint.downcase.tainted?.should == true
-#   "x".taint.downcase.tainted?.should == true
-#   "X".taint.downcase.tainted?.should == true
-# end
+ not_supported_on :maglev do # no taint propagation
+  it "taints result when self is tainted" do
+    "".taint.downcase.tainted?.should == true
+    "x".taint.downcase.tainted?.should == true
+    "X".taint.downcase.tainted?.should == true
+  end
+ end
 
   it "returns a subclass instance for subclasses" do
     StringSpecs::MyString.new("FOObar").downcase.should be_kind_of(StringSpecs::MyString)

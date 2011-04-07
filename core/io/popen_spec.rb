@@ -2,6 +2,16 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "IO.popen" do
+
+  before :each do
+    not_compliant_on :maglev do
+      @popen_command = "yes"
+    end
+    deviates_on :maglev do
+      @popen_command = "uptime"
+    end
+  end
+
   it "reads from a read-only pipe" do
     IO.popen("echo foo", "r") do |io|
       io.read.should == "foo\n"
@@ -13,7 +23,7 @@ describe "IO.popen" do
   end
 
   platform_is_not :windows do
-not_compliant_on :maglev do  # it hangs
+   not_compliant_on :maglev do  # it hangs
     it "reads and writes to a read/write pipe" do
       data = IO.popen("cat", "r+") do |io|
         io.write("bar")
@@ -41,40 +51,43 @@ not_compliant_on :maglev do  # it hangs
         File.unlink tmp_file if File.exist? tmp_file
       end
     end
-end #
+   end # maglev
   end
 
-  # maglev hangs with infinite looping /usr/bin/yes , change to 'uptime'
   it "returns the value of the block when passed a block" do
-    val = IO.popen("uptime", "r") do |i|
+    val = IO.popen(@popen_command, "r") do |i|
       :hello
     end
-
     val.should == :hello
   end
 
   it "closes the IO when used with a block" do
-    io = IO.popen("uptime", "r") do |i|
+    io = IO.popen(@popen_command, "r") do |i|
       i
     end
 
     io.closed?.should be_true
   end
 
+ not_compliant_on :maglev do
   it "allows the IO to be closed inside the block" do
-    io = IO.popen('uptime', 'r') do |i|
-      # i.close # maglev second close raises
-      i
+    io = IO.popen(@popen_command, 'r') do |i|
+      i.close 
     end
-
     io.closed?.should be_true
   end
+ end
 
   it "returns the IO if no block given" do
-    io = IO.popen("uptime", "r")
+    io = IO.popen(@popen_command, "r")
     io.closed?.should be_false
-
-    io.read.should =~ /load average/ # maglev
+  
+    not_compliant_on :maglev do
+      io.read(1).should == "y"
+    end
+    deviates_on :maglev do
+      io.read.should =~ /load average/ 
+    end
     io.close
   end
 
@@ -110,7 +123,7 @@ end #
     platform_is_not :windows do # not sure what commands to use on Windows
       describe "with a leading Array parameter" do
         it "uses the Array as command plus args for the child process" do
-          io = IO.popen(["uptime", "hello"]) do |i|
+          io = IO.popen(["yes", "hello"]) do |i|
             i.read(5).should == 'hello'
           end
         end

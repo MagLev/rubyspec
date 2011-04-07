@@ -3,9 +3,7 @@ describe :uri_eql, :shared => true do
     URISpec::NORMALIZED_FORMS.each do |form|
       normal_uri = URI(form[:normalized])
       form[:different].each do |other|
-        sel = @method
-        ou = URI(other)	# maglev debugging
-        ou.send(@method, normal_uri).should be_false
+        URI(other).send(@method, normal_uri).should be_false
       end
     end
   end

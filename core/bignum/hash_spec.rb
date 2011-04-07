@@ -6,9 +6,12 @@ describe "Bignum#hash" do
   end
 
   it "is stable" do
-    aa = bignum_value
-    aa.hash.should == aa.hash
-    bb = bignum_value(1000000)  # Maglev varitions on hash function
-    aa.hash.should_not == bb.hash
+    bignum_value.hash.should == bignum_value.hash
+    not_compliant_on :maglev do
+      bignum_value.hash.should_not == bignum_value(1).hash
+    end
+    deviates_on :maglev do  # different implementation of hash function
+      bignum_value.hash.should_not == bignum_value(1000000).hash
+    end
   end
 end

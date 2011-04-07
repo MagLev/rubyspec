@@ -48,11 +48,11 @@ describe "Socket::Constants" do
   end
 
   it "defines multicast options" do
-#   consts = ["IP_ADD_MEMBERSHIP", "IP_DEFAULT_MULTICAST_LOOP", "IP_DEFAULT_MULTICAST_TTL", 
-#             "IP_MAX_MEMBERSHIPS", "IP_MULTICAST_LOOP", "IP_MULTICAST_TTL"]
-# Maglev, IP_MAX_MEMBERSHIPS not available on Solaris
     consts = ["IP_ADD_MEMBERSHIP", "IP_DEFAULT_MULTICAST_LOOP", "IP_DEFAULT_MULTICAST_TTL", 
               "IP_MULTICAST_LOOP", "IP_MULTICAST_TTL"]
+    unless RUBY_PLATFORM.match('solaris)
+      consts << 'IP_MAX_MEMBERSHIPS'  # IP_MAX_MEMBERSHIPS not available on Solaris
+    end
     consts.each do |c|
       Socket::Constants.should have_constant(c)
     end

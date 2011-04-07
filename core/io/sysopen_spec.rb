@@ -10,9 +10,11 @@ describe "IO.sysopen" do
     @fd = nil
   end
 
-# after :each do 	# maglev for_fd not implem
-#   IO.for_fd(@fd).close if @fd
-# end
+  after :each do 	
+   not_compliant_on :maglev do  # maglev for_fd not implem
+    IO.for_fd(@fd).close if @fd
+   end
+  end
 
   after :all do
     File.unlink @filename

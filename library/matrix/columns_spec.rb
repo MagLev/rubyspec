@@ -21,8 +21,8 @@ describe "Matrix.columns" do
     m.column(1).to_a.should == @b
   end
 
- if false # maglev at 186
-  ruby_bug "redmine:1532", "1.8.7" do # maglev 1.8.6
+ not_compliant_on :maglev do # matrix at 1.8.6 still
+  ruby_bug "redmine:1532", "1.8.7" do
     it "handles empty matrices" do
       e = Matrix.columns([])
       e.row_size.should == 0
@@ -35,5 +35,5 @@ describe "Matrix.columns" do
       v.should == Matrix[[], [], []].transpose
     end
   end
- end  # maglev
+ end
 end

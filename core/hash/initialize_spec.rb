@@ -26,11 +26,14 @@ describe "Hash#initialize" do
 
   ruby_version_is ""..."1.9" do
     it "raises a TypeError if called on a frozen instance" do
-      # block = lambda { HashSpecs.frozen_hash.instance_eval { initialize() }}
-      # block.should raise_error(TypeError) 	
-      # maglev zero arg initialize has no effect so no error 
-      HashSpecs.frozen_hash.instance_eval { initialize() }
-
+      not_compliant_on :maglev do
+        block = lambda { HashSpecs.frozen_hash.instance_eval { initialize() }}
+        block.should raise_error(TypeError)
+      end
+      deviates_on :maglev do
+        # maglev zero arg initialize has no effect so no error 
+        HashSpecs.frozen_hash.instance_eval { initialize() }
+      end
       block = lambda { HashSpecs.frozen_hash.instance_eval { initialize(nil) }  }
       block.should raise_error(TypeError)
 

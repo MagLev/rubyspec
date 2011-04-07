@@ -12,16 +12,20 @@ describe "BigDecimal#<" do
     @pos_frac = BigDecimal("2E-9999")
     @neg_frac = BigDecimal("-2E-9999")
 
-    @int_mock = BigDecimal('123')
-#   @int_mock = mock('123')  # mock is not a kind of Numeric
-#   class << @int_mock
-#     def coerce(other)
-#       return [other, BigDecimal('123')]
-#     end
-#     def < (other)
-#       BigDecimal('123') < other
-#     end
-#   end
+not_compliant_on :maglev do
+    @int_mock = mock('123')  # mock is not a kind of Numeric
+    class << @int_mock
+      def coerce(other)
+        return [other, BigDecimal('123')]
+      end
+      def < (other)
+        BigDecimal('123') < other
+      end
+    end
+end
+deviates_on :maglev do
+    @int_mock = BigDecimal('123')  # must be a kind of Numeric
+end
 
     @values = [@mixed, @pos_int, @neg_int, @pos_frac, @neg_frac,
       -2**32, -2**31, -2**30, -2**16, -2**8, -100, -10, -1,

@@ -39,10 +39,11 @@ describe "Module#extended" do
   end
 
   ruby_version_is ""..."1.9" do
-# Maglev , not private
-#    it "is private in its default implementation" do
-#      Module.new.private_methods.should include("extended")
-#    end
+    not_compliant_on :maglev do #  not private yet
+     it "is private in its default implementation" do
+       Module.new.private_methods.should include("extended")
+     end
+    end
   end
 
   ruby_version_is "1.9" do

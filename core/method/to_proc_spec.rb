@@ -25,14 +25,12 @@ describe "Method#to_proc" do
       :zero_with_splat_and_block, :one_req_with_splat_and_block, :two_req_with_splat_and_block,
       :one_req_one_opt_with_splat_and_block, :one_req_two_opt_with_splat_and_block, :two_req_one_opt_with_splat_and_block
     ].each do |m|
-      (px = @m.method(m).to_proc).arity.should == (mx = @m.method(m)).arity
+      @m.method(m).to_proc.arity.should == @m.method(m).arity
     end
   end
 
-not_compliant_on :maglev do
-  it "returns a proc that can be used by define_method" do #
-    # would need a new instVar in Proc holding the original method
-    #  and then must use __define_method_meth instead of __define_method_block 
+ not_compliant_on :maglev do
+  it "returns a proc that can be used by define_method" do 
     x = 'test'
     to_s = class << x
       define_method( :foo, ($mx = method(:to_s).to_proc))
@@ -41,7 +39,11 @@ not_compliant_on :maglev do
     mx = $mx
     x.foo.should == to_s # maglev gets MNU of call
   end
-end
+ end
+ deviates_on :maglev do
+    # maglev would need a new instVar in Proc holding the original method
+    #  and then must use __define_method_meth instead of __define_method_block 
+ end
 
   it "returns a proc that can be yielded to" do
     x = Object.new
@@ -49,7 +51,7 @@ end
     def x.bar; yield; end
     def x.baz(*a); yield(*a); end
 
-    m = x.method( :foo )
+    m = x.method :foo
     x.bar(&m).should == []
     x.baz(1,2,3,&m).should == [1,2,3]
   end
@@ -69,5 +71,4 @@ end
     obj = MethodSpecs::ToProcBeta.new
     obj.to_proc.call([1]).should == [1]
   end
-
 end

@@ -9,11 +9,7 @@ describe "File.readlink" do
     touch @file
 
     rm_r @link
-   begin                # Maglev
-    File.symlink(@file1, @file3) 
-   rescue SystemCallError # Maglev
-                         # ignore , Maglev more strict error checking
-   end
+    File.symlink(@file, @link)
   end
 
   after :each do

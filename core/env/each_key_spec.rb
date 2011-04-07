@@ -3,22 +3,37 @@ require File.expand_path('../../../spec_helper', __FILE__)
 describe "ENV.each_key" do
 
   it "returns each key" do
-    e = []
-    orig = ENV.to_hash
-    orig.should_not include("1") # maglev
-    orig.should_not include("2")
-    begin
-      # ENV.clear # Maglev, ENV.clear not supported
-      ENV["1"] = "3"
-      ENV["2"] = "4"
-      ENV.each_key { |k| e << k }
-      e.should include("1")
-      e.should include("2")
-    ensure
-      # ENV.replace orig # Maglev, not supported
-      ENV["1"] = "" 
-      ENV["2"] = "" 
-    end
+   not_compliant_on :maglev do
+     e = []
+     orig = ENV.to_hash
+     begin
+       ENV.clear
+       ENV["1"] = "3"
+       ENV["2"] = "4"
+       ENV.each_key { |k| e << k }
+       e.should include("1")
+       e.should include("2")
+     ensure
+       ENV.replace orig
+     end
+   end
+   deviates_on :maglev do
+     e = []
+     orig = ENV.to_hash
+     orig.should_not include("1")
+     orig.should_not include("2")
+     begin
+       #  ENV.clear 
+       ENV["1"] = "3"
+       ENV["2"] = "4"
+       ENV.each_key { |k| e << k }
+       e.should include("1")
+       e.should include("2")
+     ensure
+       ENV.delete("1")
+       ENV.delete("2")
+     end
+   end
   end
 
   ruby_version_is "" ... "1.8.7" do
