@@ -8,13 +8,16 @@ describe "URI#==" do
     URI("http://exAMPLE.cOm").should == URI("http://example.com")
   end
 
- not_compliant_on :maglev do # passes through the hTTp exactly
   ruby_bug "redmine:2525", "1.8.7" do
-    it "ignores capitalization of scheme" do #
+    it "ignores capitalization of scheme" do
+     not_compliant_on :maglev do
       URI("hTTp://example.com").should == URI("http://example.com")
+     end
+     deviates_on :maglev do
+      URI("hTTp://example.com").should == URI("hTTp://example.com")
+     end
     end
   end
- end #
   
   it "treats a blank path and a path of '/' as the same" do
     URI("http://example.com").should == URI("http://example.com/")

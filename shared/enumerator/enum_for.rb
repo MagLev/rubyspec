@@ -1,8 +1,12 @@
 
 describe :enum_for, :shared => true do
   it "is defined in Kernel" do
-   #Kernel.method_defined?(@method).should be_true
+   not_compliant_on :maglev do
+    Kernel.method_defined?(@method).should be_true
+   end
+   deviates_on :maglev do
     Object.method_defined?(@method).should be_true  # maglev deviation
+   end
   end
 
   it "returns a new enumerator" do

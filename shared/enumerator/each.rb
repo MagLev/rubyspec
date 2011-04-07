@@ -40,6 +40,6 @@ describe :enum_each, :shared => true do
   end
 
   it "returns an Enumerator if no block is given" do
-    (bx = (ax = enumerator_class.new([1])).each).should be_an_instance_of(cx = enumerator_class)
+    enumerator_class.new([1]).each.should be_an_instance_of(enumerator_class)
   end
 end

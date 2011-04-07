@@ -3,8 +3,12 @@ require File.expand_path('../../../spec_helper', __FILE__)
 describe :enum_rewind, :shared => true do
 
   before(:each) do
-    #@enum = enumerator_class.new(1, :upto, 3) # maglev, new is subclass responsibility
-    @enum = 1.upto(3)	# maglev, use a NumericEnumerator
+   not_compliant_on :maglev do
+    @enum = enumerator_class.new(1, :upto, 3)
+   end
+   deviates_on :maglev do
+    @enum = 1.upto(3)	# new is subclass responsibility, use a NumericEnumerator
+   end
   end  
 
   it "resets the enumerator to its initial state" do

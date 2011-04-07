@@ -34,12 +34,10 @@ describe "StringScanner#scan" do
     @s.scan(/./).should be_nil
   end
 
- not_compliant_on :maglev do # bugs
   it "raises a TypeError if pattern isn't a Regexp" do
     lambda { @s.scan("aoeu")    }.should raise_error(TypeError)
     lambda { @s.scan(5)         }.should raise_error(TypeError)
     lambda { @s.scan(:test)     }.should raise_error(TypeError)
     lambda { @s.scan(mock('x')) }.should raise_error(TypeError)
   end
- end
 end

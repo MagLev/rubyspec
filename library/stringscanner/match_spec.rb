@@ -22,9 +22,12 @@ describe "StringScanner#match?" do
     @s.scan(/\s/)
 
     @s.pre_match.should == "This"
-   not_compliant_on :maglev do # bugs
     @s.match?(/\w+/)
+   not_compliant_on :maglev do
     @s.pre_match.should == "This "
+   end
+   deviates_on :maglev do # bug  # need to compare to Rubinius
+    @s.pre_match.should == "Thi"
    end
   end
 end

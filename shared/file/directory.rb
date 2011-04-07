@@ -28,12 +28,7 @@ describe :file_directory, :shared => true do
 
   it "raises an ArgumentError if not passed one argument" do
     lambda { @object.send(@method)              }.should raise_error(ArgumentError)
-    sel = @method
-    obj = @object
-    a1 = @dir
-    a2 = @file  
-    rx = 99
-    lambda { rx = @object.send(@method, @dir, @file) }.should raise_error(ArgumentError)
+    lambda { @object.send(@method, @dir, @file) }.should raise_error(ArgumentError)
   end
 
   it "raises a TypeError if not passed a String type" do

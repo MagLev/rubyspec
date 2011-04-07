@@ -15,8 +15,12 @@ describe "YAML.dump" do
   end
   
   it "returns a string containing dumped YAML when no io provided" do
-    # YAML.dump( :locked )).should == "--- :locked\n"
-    YAML.dump( :locked ).should == "--- :locked\n...\n" # maglev deviation
+   not_compliant_on :maglev do
+    YAML.dump( :locked ).should == "--- :locked\n"
+   end
+   deviates_on :maglev do
+    YAML.dump( :locked ).should == "--- :locked\n...\n"
+   end
   end  
   
   it "returns the same string that #to_yaml on objects" do
@@ -24,17 +28,29 @@ describe "YAML.dump" do
   end
 
   it "dumps strings into YAML strings" do
-    # YAML.dump("str").should == "--- str\n"
+   not_compliant_on :maglev do
+    YAML.dump("str").should == "--- str\n"
+   end
+   deviates_on :maglev do
     YAML.dump("str").should == "--- str\n...\n"
+   end
   end
 
   it "dumps hashes into YAML key-values" do
-    #YAML.dump({ "a" => "b" }).should ==  "--- \na: b\n"
+   not_compliant_on :maglev do
+    YAML.dump({ "a" => "b" }).should ==  "--- \na: b\n"
+   end
+   deviates_on :maglev do
     YAML.dump({ "a" => "b" }).should ==   "---\na: b\n"
+   end
   end
 
   it "dumps Arrays into YAML collection" do
-    #YAML.dump(["a", "b", "c"]).should == "--- \n- a\n- b\n- c\n"
+   not_compliant_on :maglev do
+    YAML.dump(["a", "b", "c"]).should == "--- \n- a\n- b\n- c\n"
+   end
+   deviates_on :maglev do
     YAML.dump(["a", "b", "c"]).should ==  "---\n- a\n- b\n- c\n"
+   end
   end
 end
