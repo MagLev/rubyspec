@@ -33,7 +33,7 @@ describe "Function with variadic arguments" do
       (fx = buf.get_float64(0)).should == v
     end
   end
- end #
+ end
 
   def self.verify(p, off, v)
     if v.kind_of?(Float)

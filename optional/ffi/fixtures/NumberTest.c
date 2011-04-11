@@ -48,9 +48,9 @@ typedef signed long sL;
 typedef unsigned long uL;
 typedef float f32;
 typedef double f64;
-/* typedef unsigned long ulong; */
+/* typedef unsigned long ulong; */ /* assume defined by system headers*/
 
-void cHalt() { return ; }
+void cHalt() { return ; }  /* a place to set C breakpoints */
 
 #define ADD(T) T add_##T(T arg1, T arg2) { return arg1 + arg2; }
 #define SUB(T) T sub_##T(T arg1, T arg2) { return arg1 - arg2; }

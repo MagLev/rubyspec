@@ -28,12 +28,15 @@ VALUE string_spec_rb_str2cstr(VALUE self, VALUE str, VALUE return_length) {
   }
 }
 
+#if defined(MAGLEV)
 //    result of rb_str2cstr is a const char* in maglev
-// VALUE string_spec_rb_str2cstr_replace(VALUE self, VALUE str) {
-//   const char* ptr = rb_str2cstr(str, NULL);
-//   ptr[0] = 'f'; ptr[1] = 'o'; ptr[2] = 'o'; ptr[3] = 0;
-//   return Qnil;
-// }
+#else
+VALUE string_spec_rb_str2cstr_replace(VALUE self, VALUE str) {
+  char* ptr = rb_str2cstr(str, NULL);
+  ptr[0] = 'f'; ptr[1] = 'o'; ptr[2] = 'o'; ptr[3] = 0;
+  return Qnil;
+}
+#endif
 #endif
 
 #ifdef HAVE_RB_STR2INUM
@@ -67,12 +70,14 @@ VALUE string_spec_rb_str_set_len_RSTRING_LEN(VALUE self, VALUE str, VALUE len) {
 VALUE string_spec_rb_str_buf_new(VALUE self, VALUE len, VALUE str) {
   VALUE buf;
 
-  buf = rb_str_buf_new(NUM2LONG(len));
+  buf = rb_str_buf_new(NUM2LONG(len));  // length arg ignored by Maglev
 
+#if ! defined(MAGLEV)
   if(RTEST(str)) {
-    // snprintf(RSTRING_PTR(buf), NUM2LONG(len), "%s", RSTRING_PTR(str));
-    // rb_str_buf_append(buf, str);
+    snprintf(RSTRING_PTR(buf), NUM2LONG(len), "%s", RSTRING_PTR(str));
+    rb_str_buf_append(buf, str);
   }
+#endif
 
   return buf;
 }
@@ -180,39 +185,40 @@ VALUE string_spec_rb_str_ptr_iterate(VALUE self, VALUE str) {
   return Qnil;
 }
 
+#if defined(MAGLEV)
 // maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_rb_str_ptr_assign(VALUE self, VALUE str, VALUE chr) {
-//   int i;
-//   char c;
-//   const char* ptr;
-// 
-//   ptr = rb_str_ptr(str);
-//   c = FIX2INT(chr);
-// 
-//   for(i = 0; i < RSTRING_LEN(str); i++) {
-//     ptr[i] = c;
-//   }
-//   return Qnil;
-// }
+#else
+VALUE string_spec_rb_str_ptr_assign(VALUE self, VALUE str, VALUE chr) {
+  int i;
+  char c;
+  char* ptr;
 
-// maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_rb_str_ptr_assign_call(VALUE self, VALUE str) {
-//   const char *ptr = rb_str_ptr(str);
-// 
-//   ptr[1] = 'x';
-//   rb_str_concat(str, rb_str_new2("d"));
-//   return str;
-// }
+  ptr = rb_str_ptr(str);
+  c = FIX2INT(chr);
 
-// maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_rb_str_ptr_assign_funcall(VALUE self, VALUE str) {
-//   const char *ptr = rb_str_ptr(str);
-// 
-//   ptr[1] = 'x';
-//   rb_str_flush(str);
-//   rb_funcall(str, rb_intern("<<"), 1, rb_str_new2("e"));
-//   return str;
-// }
+  for(i = 0; i < RSTRING_LEN(str); i++) {
+    ptr[i] = c;
+  }
+  return Qnil;
+}
+
+VALUE string_spec_rb_str_ptr_assign_call(VALUE self, VALUE str) {
+  char *ptr = rb_str_ptr(str);
+
+  ptr[1] = 'x';
+  rb_str_concat(str, rb_str_new2("d"));
+  return str;
+}
+
+VALUE string_spec_rb_str_ptr_assign_funcall(VALUE self, VALUE str) {
+  char *ptr = rb_str_ptr(str);
+
+  ptr[1] = 'x';
+  rb_str_flush(str);
+  rb_funcall(str, rb_intern("<<"), 1, rb_str_new2("e"));
+  return str;
+}
+#endif
 #endif
 
 #ifdef HAVE_RB_STR_PTR_READONLY
@@ -227,20 +233,23 @@ VALUE string_spec_rb_str_ptr_readonly_iterate(VALUE self, VALUE str) {
   return Qnil;
 }
 
+#if defined(MAGLEV)
 // maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_rb_str_ptr_readonly_assign(VALUE self, VALUE str, VALUE chr) {
-//   int i;
-//   char c;
-//   const char* ptr;
-// 
-//   ptr = rb_str_ptr_readonly(str);
-//   c = FIX2INT(chr);
-// 
-//   for(i = 0; i < RSTRING_LEN(str); i++) {
-//     ptr[i] = c;
-//   }
-//   return Qnil;
-// }
+#else
+VALUE string_spec_rb_str_ptr_readonly_assign(VALUE self, VALUE str, VALUE chr) {
+  int i;
+  char c;
+  char* ptr;
+
+  ptr = rb_str_ptr_readonly(str);
+  c = FIX2INT(chr);
+
+  for(i = 0; i < RSTRING_LEN(str); i++) {
+    ptr[i] = c;
+  }
+  return Qnil;
+}
+#endif
 
 VALUE string_spec_rb_str_ptr_readonly_append(VALUE self, VALUE str, VALUE more) {
   const char *ptr = rb_str_ptr_readonly(str);
@@ -352,20 +361,23 @@ VALUE string_spec_RSTRING_PTR_iterate(VALUE self, VALUE str) {
   return Qnil;
 }
 
-// maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_RSTRING_PTR_assign(VALUE self, VALUE str, VALUE chr) {
-//  int i;
-//  char c;
-//  const char* ptr;
-// 
-//   ptr = RSTRING_PTR(str);
-//   c = FIX2INT(chr);
-// 
-//   for(i = 0; i < RSTRING_LEN(str); i++) {
-//     ptr[i] = c;
-//   }
-//   return Qnil;
-// }
+#if defined(MAGLEV)
+  // maglev, rb_str_ptr result is   const char*
+#else
+VALUE string_spec_RSTRING_PTR_assign(VALUE self, VALUE str, VALUE chr) {
+ int i;
+ char c;
+ char* ptr;
+
+  ptr = RSTRING_PTR(str);
+  c = FIX2INT(chr);
+
+  for(i = 0; i < RSTRING_LEN(str); i++) {
+    ptr[i] = c;
+  }
+  return Qnil;
+}
+#endif
 
 VALUE string_spec_RSTRING_PTR_after_funcall(VALUE self, VALUE str, VALUE cb) {
   /* Silence gcc 4.3.2 warning about computed value not used */
@@ -383,12 +395,15 @@ VALUE string_spec_STR2CSTR(VALUE self, VALUE str) {
   return rb_str_new2(STR2CSTR(str));
 }
 
+#if defined(MAGLEV)
 // maglev, rb_str_ptr result is   const char*
-// VALUE string_spec_STR2CSTR_replace(VALUE self, VALUE str) {
-//   const char* ptr = STR2CSTR(str);
-//   ptr[0] = 'f'; ptr[1] = 'o'; ptr[2] = 'o'; ptr[3] = 0;
-//   return Qnil;
-// }
+#else
+VALUE string_spec_STR2CSTR_replace(VALUE self, VALUE str) {
+  char* ptr = STR2CSTR(str);
+  ptr[0] = 'f'; ptr[1] = 'o'; ptr[2] = 'o'; ptr[3] = 0;
+  return Qnil;
+}
+#endif
 #endif
 
 #ifdef HAVE_STRINGVALUE
@@ -413,7 +428,9 @@ void Init_string_spec() {
 
 #ifdef HAVE_RB_STR2CSTR
   rb_define_method(cls, "rb_str2cstr", string_spec_rb_str2cstr, 2);
-  // rb_define_method(cls, "rb_str2cstr_replace", string_spec_rb_str2cstr_replace, 1);
+#if !defined(MAGLEV)
+  rb_define_method(cls, "rb_str2cstr_replace", string_spec_rb_str2cstr_replace, 1);
+#endif
 #endif
 
 #ifdef HAVE_RB_STR2INUM
@@ -490,17 +507,20 @@ void Init_string_spec() {
 
 #ifdef HAVE_RB_STR_PTR
   rb_define_method(cls, "rb_str_ptr_iterate", string_spec_rb_str_ptr_iterate, 1);
-  // rb_define_method(cls, "rb_str_ptr_assign", string_spec_rb_str_ptr_assign, 2);
-  // rb_define_method(cls, "rb_str_ptr_assign_call", string_spec_rb_str_ptr_assign_call, 1);
-  // rb_define_method(cls, "rb_str_ptr_assign_funcall", string_spec_rb_str_ptr_assign_funcall, 1);
-
+#if !defined(MAGLEV)
+  rb_define_method(cls, "rb_str_ptr_assign", string_spec_rb_str_ptr_assign, 2);
+  rb_define_method(cls, "rb_str_ptr_assign_call", string_spec_rb_str_ptr_assign_call, 1);
+  rb_define_method(cls, "rb_str_ptr_assign_funcall", string_spec_rb_str_ptr_assign_funcall, 1);
+#endif
 #endif
 
 #ifdef HAVE_RB_STR_PTR_READONLY
   rb_define_method(cls, "rb_str_ptr_readonly_iterate",
       string_spec_rb_str_ptr_readonly_iterate, 1);
-// rb_define_method(cls, "rb_str_ptr_readonly_assign", 
-// 	string_spec_rb_str_ptr_readonly_assign, 2);
+#if !defined(MAGLEV)
+  rb_define_method(cls, "rb_str_ptr_readonly_assign", 
+ 	string_spec_rb_str_ptr_readonly_assign, 2);
+#endif
   rb_define_method(cls, "rb_str_ptr_readonly_append",
       string_spec_rb_str_ptr_readonly_append, 2);
 #endif
@@ -545,14 +565,18 @@ void Init_string_spec() {
 
 #ifdef HAVE_RSTRING_PTR
   rb_define_method(cls, "RSTRING_PTR_iterate", string_spec_RSTRING_PTR_iterate, 1);
-//  rb_define_method(cls, "RSTRING_PTR_assign", string_spec_RSTRING_PTR_assign, 2);
+#if !defined(MAGLEV)
+  rb_define_method(cls, "RSTRING_PTR_assign", string_spec_RSTRING_PTR_assign, 2);
+#endif
   rb_define_method(cls, "RSTRING_PTR_after_funcall",
       string_spec_RSTRING_PTR_after_funcall, 2);
 #endif
 
 #ifdef HAVE_STR2CSTR
   rb_define_method(cls, "STR2CSTR", string_spec_STR2CSTR, 1);
-//  rb_define_method(cls, "STR2CSTR_replace", string_spec_STR2CSTR_replace, 1);
+#if !defined(MAGLEV)
+  rb_define_method(cls, "STR2CSTR_replace", string_spec_STR2CSTR_replace, 1);
+#endif
 #endif
 
 #ifdef HAVE_STRINGVALUE

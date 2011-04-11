@@ -1,22 +1,23 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe "Pointer" do
-  # it "Any object implementing #to_ptr can be passed as a :pointer parameter" do # Maglev does not conform
-		# can only use objects that are kind_of  CByteArray
-#   memory = FFI::MemoryPointer.new :long_long
-#   magic = 0x12345678
-#   memory.put_int32(0, magic)
-#   tp = FFISpecs::ToPtrTest.new(memory)
-#   FFISpecs::LibTest.ptr_ret_int32_t(tp, 0).should == magic
-# end
+ not_compliant_on :maglev do # can only use objects that are kind_of  CByteArray
+  it "Any object implementing #to_ptr can be passed as a :pointer parameter" do
+    memory = FFI::MemoryPointer.new :long_long
+    magic = 0x12345678
+    memory.put_int32(0, magic)
+    tp = FFISpecs::ToPtrTest.new(memory)
+    FFISpecs::LibTest.ptr_ret_int32_t(tp, 0).should == magic
+  end
 
-# it "A DelegateClass(Pointer) can be passed as a :pointer parameter" do # Maglev not supported yet
-#   memory = FFI::MemoryPointer.new :long_long
-#   magic = 0x12345678
-#   memory.put_int32(0, magic)
-#   ptr = FFISpecs::PointerDelegate.new(memory)
-#   FFISpecs::LibTest.ptr_ret_int32_t(ptr, 0).should == magic
-# end
+  it "A DelegateClass(Pointer) can be passed as a :pointer parameter" do
+    memory = FFI::MemoryPointer.new :long_long
+    magic = 0x12345678
+    memory.put_int32(0, magic)
+    ptr = FFISpecs::PointerDelegate.new(memory)
+    FFISpecs::LibTest.ptr_ret_int32_t(ptr, 0).should == magic
+  end
+ end
 
   it "Fixnum cannot be used as a Pointer argument" do
     lambda { FFISpecs::LibTest.ptr_ret_int32(0, 0) }.should raise_error
@@ -31,7 +32,7 @@ describe "Pointer" do
     describe "#read_pointer" do
       memory = FFI::MemoryPointer.new :pointer
       FFISpecs::LibTest.ptr_set_pointer(memory, 0, FFISpecs::LibTest.ptr_from_address(0xdeadbeef))
-       (mx = memory.read_pointer).address.should == 0xdeadbeef
+       memory.read_pointer.address.should == 0xdeadbeef
     end
 
     describe "#write_pointer" do
@@ -83,8 +84,14 @@ describe "Pointer" do
 
     it 'should raise an error when attempting read/write operations on it' do
       null_ptr = FFI::Pointer::NULL
-      lambda { null_ptr.read_int }.should raise_error(ArgumentError) # Maglev deviation, should raise FFI::NullPointerError
-      lambda { null_ptr.write_int(0xff1) }.should raise_error(ArgumentError) # Maglev deviation, should raise FFI::NullPointerError)
+     not_compliant_on :maglev do
+      lambda { null_ptr.read_int }.should raise_error(FFI::NullPointerError)
+      lambda { null_ptr.write_int(0xff1) }.should raise_error(FFI::NullPointerError)
+     end
+     deviates_on :maglev do
+      lambda { null_ptr.read_int }.should raise_error(ArgumentError)
+      lambda { null_ptr.write_int(0xff1) }.should raise_error(ArgumentError)
+     end
     end
   end
 end
@@ -100,44 +107,44 @@ describe "AutoPointer" do
     FFISpecs::AutoPointerTestHelper.gc_everything @loop_count
   end
 
-# it "cleanup via default release method" do # Maglev, release and finalizer logic not implemented yet
-#    FFI::AutoPointer.should_receive(:release).at_least(@loop_count - @wiggle_room).times 
-#   FFISpecs::AutoPointerTestHelper.reset
-#   @loop_count.times do
-#     # note that if we called
-#     # FFISpecs::AutoPointerTestHelper.method(:release).to_proc inline, we'd
-#     # have a reference to the pointer and it would never get GC'd.
-#     ptr = FFISpecs::LibTest.ptr_from_address(@magic)	#
-#     ap = FFI::AutoPointer.new				#  Maglev deviation
-#     ap.write_pointer(ptr)				#
-#   end
-# end
+ not_compliant_on :maglev do # release and finalizer not implem
+  it "cleanup via default release method" do
+    FFI::AutoPointer.should_receive(:release).at_least(@loop_count - @wiggle_room).times 
+    FFISpecs::AutoPointerTestHelper.reset
+    @loop_count.times do
+      # note that if we called
+      # FFISpecs::AutoPointerTestHelper.method(:release).to_proc inline, we'd
+      # have a reference to the pointer and it would never get GC'd.
+      ap = FFI::AutoPointer.new(FFISpecs::LibTest.ptr_from_address(@magic))
+    end
+  end
 
-# it "cleanup when passed a proc" do
-#   #  NOTE: passing a proc is touchy, because it's so easy to create a memory leak.
-#   #
-#   #  specifically, if we made an inline call to
-#   #
-#   #      FFISpecs::AutoPointerTestHelper.method(:release).to_proc
-#   #
-#   #  we'd have a reference to the pointer and it would
-#   #  never get GC'd.
-#   FFISpecs::AutoPointerTestHelper.should_receive(:release).at_least(@loop_count - @wiggle_room).times
-#   FFISpecs::AutoPointerTestHelper.reset
-#   @loop_count.times do
-#     ap = FFI::AutoPointer.new(FFISpecs::LibTest.ptr_from_address(@magic),
-#                               FFISpecs::AutoPointerTestHelper.finalizer)
-#   end
-# end
+  it "cleanup when passed a proc" do
+    #  NOTE: passing a proc is touchy, because it's so easy to create a memory leak.
+    #
+    #  specifically, if we made an inline call to
+    #
+    #      FFISpecs::AutoPointerTestHelper.method(:release).to_proc
+    #
+    #  we'd have a reference to the pointer and it would
+    #  never get GC'd.
+    FFISpecs::AutoPointerTestHelper.should_receive(:release).at_least(@loop_count - @wiggle_room).times
+    FFISpecs::AutoPointerTestHelper.reset
+    @loop_count.times do
+      ap = FFI::AutoPointer.new(FFISpecs::LibTest.ptr_from_address(@magic),
+                                FFISpecs::AutoPointerTestHelper.finalizer)
+    end
+  end
 
-# it "cleanup when passed a method" do
-#   FFISpecs::AutoPointerTestHelper.should_receive(:release).at_least(@loop_count - @wiggle_room).times
-#   FFISpecs::AutoPointerTestHelper.reset
-#   @loop_count.times do
-#     ap = FFI::AutoPointer.new(FFISpecs::LibTest.ptr_from_address(@magic),
-#                               FFISpecs::AutoPointerTestHelper.method(:release))
-#   end
-# end
+  it "cleanup when passed a method" do
+    FFISpecs::AutoPointerTestHelper.should_receive(:release).at_least(@loop_count - @wiggle_room).times
+    FFISpecs::AutoPointerTestHelper.reset
+    @loop_count.times do
+      ap = FFI::AutoPointer.new(FFISpecs::LibTest.ptr_from_address(@magic),
+                                FFISpecs::AutoPointerTestHelper.method(:release))
+    end
+  end
+ end # maglev
 end
 
 describe "AutoPointer#new" do

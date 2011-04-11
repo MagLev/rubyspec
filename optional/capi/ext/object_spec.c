@@ -110,7 +110,11 @@ static VALUE so_rb_obj_call_init(VALUE self, VALUE object,
 
 #ifdef HAVE_RB_OBJ_CLASSNAME
 static VALUE so_rbobjclassname(VALUE self, VALUE obj) {
+#if defined(MAGLEV)
   return rb_str_new2(rb_obj_classname_(obj));
+#else
+  return rb_str_new2(rb_obj_classname(obj));
+#endif
 }
 
 #endif
@@ -135,13 +139,21 @@ static VALUE object_spec_rb_obj_id(VALUE self, VALUE obj) {
 
 #ifdef HAVE_RB_OBJ_IS_INSTANCE_OF
 static VALUE so_instance_of(VALUE self, VALUE obj, VALUE klass) {
+#if defined(MAGLEV)
   return rb_obj_is_instance_of_(obj, klass) ? Qtrue : Qfalse ;
+#else
+  return rb_obj_is_instance_of(obj, klass) ? Qtrue : Qfalse ;
+#endif
 }
 #endif
 
 #ifdef HAVE_RB_OBJ_IS_KIND_OF
 static VALUE so_kind_of(VALUE self, VALUE obj, VALUE klass) {
+#if defined(MAGLEV)
   return rb_obj_is_kind_of_(obj, klass) ? Qtrue : Qfalse ;
+#else
+  return rb_obj_is_kind_of(obj, klass) ? Qtrue : Qfalse ;
+#endif
 }
 #endif
 

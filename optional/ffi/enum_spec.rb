@@ -30,7 +30,7 @@ end
 describe "A tagged typedef enum" do
   it "is accessible through its tag" do
     enx = FFI::Enums
-    (rx = (tx = FFISpecs::TestEnum3).enum_type(:enum_type1)).should_not == nil
+    FFISpecs::TestEnum3.enum_type(:enum_type1).should_not == nil
     FFISpecs::TestEnum3.enum_type(:enum_type2).should_not == nil
     FFISpecs::TestEnum3.enum_type(:enum_type3).should_not == nil
     FFISpecs::TestEnum3.enum_type(:enum_type4).should_not == nil

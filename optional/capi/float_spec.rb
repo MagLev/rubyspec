@@ -31,7 +31,7 @@ describe "CApiFloatSpecs" do
         f.should eql(4.0)
       end
     end
-   end #
+   end
   end
 
   describe "rb_Float" do

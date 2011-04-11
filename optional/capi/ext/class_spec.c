@@ -32,24 +32,14 @@ static VALUE class_spec_rbclass2name(VALUE self, VALUE klass) {
 #endif
 
 #ifdef HAVE_RB_PATH2CLASS
-#if defined(HAVE_RSTRING)
-static VALUE class_spec_rb_path2class(VALUE self, VALUE path) 
-{
+static VALUE class_spec_rb_path2class(VALUE self, VALUE path) {
   return rb_path2class(RSTRING_PTR(path));
 }
-#else
-static VALUE class_spec_rb_path2class(VALUE self, VALUE path) 
-{
-  const char* cstr = STR2CSTR(path);
-  VALUE res = rb_path2class(cstr);
-  return res;
-}
-#endif
 #endif
 
 #ifdef HAVE_RB_CLASS_INHERITED
 static VALUE class_spec_rb_class_inherited(VALUE self, VALUE super, VALUE klass) {
-  if (super == Qfalse) {
+  if(super == Qfalse) {
     return rb_class_inherited((VALUE)(0), klass);
   } else {
     return rb_class_inherited(super, klass);

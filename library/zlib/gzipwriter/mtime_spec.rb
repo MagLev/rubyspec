@@ -13,7 +13,9 @@ describe 'Zlib::GzipWriter#mtime=' do
       gzio.mtime.should == Time.at(1)
     end
 
-    # @io.string[4, 4].should == "\001\0\0\0"  # maglev not passing
+   not_compliant_on :maglev do # bug
+    @io.string[4, 4].should == "\001\0\0\0"
+   end
   end
 
   ruby_bug '253', '1.9.0' do
@@ -24,7 +26,9 @@ describe 'Zlib::GzipWriter#mtime=' do
       gzio.mtime.should == Time.at(1)
     end
 
-    # @io.string[4, 4].should == "\001\0\0\0" # maglev not passing
+   not_compliant_on :maglev do # bug
+    @io.string[4, 4].should == "\001\0\0\0" # maglev not passing
+   end
   end
   end
 

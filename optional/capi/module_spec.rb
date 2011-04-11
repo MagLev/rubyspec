@@ -100,7 +100,8 @@ describe "CApiModule" do
 
   describe "rb_const_defined" do
     # The fixture converts C boolean test to Ruby 'true' / 'false'
-    it "rb_const_defined: returns C non-zero if a constant is defined" do
+    # make messages from 'it' distinguishable within this file to help debugging
+    it "rb_const_defined returns C non-zero if a constant is defined" do
       @m.rb_const_defined(CApiModuleSpecs::A, :X).should be_true
     end
 
@@ -111,7 +112,7 @@ describe "CApiModule" do
 
   describe "rb_const_defined_at" do
     # The fixture converts C boolean test to Ruby 'true' / 'false'
-    it "rb_const_defined_at: returns C non-zero if a constant is defined" do
+    it "rb_const_defined_at returns C non-zero if a constant is defined" do
       @m.rb_const_defined_at(CApiModuleSpecs::A, :X).should be_true
     end
 
@@ -125,7 +126,7 @@ describe "CApiModule" do
   end
 
   describe "rb_const_get" do
-    it "rb_const_get: returns a constant defined in the module" do
+    it "rb_const_get returns a constant defined in the module" do
       @m.rb_const_get(CApiModuleSpecs::A, :X).should == 1
     end
 
@@ -137,14 +138,14 @@ describe "CApiModule" do
       @m.rb_const_get(CApiModuleSpecs::B, :X).should == 1
     end
 
-    it "AA calls #const_missing if the constant is not defined in the class or ancestors" do
+    it "rb_const_get calls #const_missing if the constant is not defined in the class or ancestors" do
       CApiModuleSpecs::A.should_receive(:const_missing).with(:CApiModuleSpecsUndefined)
       @m.rb_const_get(CApiModuleSpecs::A, :CApiModuleSpecsUndefined)
     end
   end
 
   describe "rb_const_get_from" do
-    it "rb_const_get_from: returns a constant defined in the module" do
+    it "rb_const_get_from returns a constant defined in the module" do
       @m.rb_const_get_from(CApiModuleSpecs::B, :Y).should == 2
     end
 
@@ -153,7 +154,7 @@ describe "CApiModule" do
     end
 
    not_compliant_on :maglev do # bug
-    it "calls #const_missing if the constant is not defined in the class or ancestors" do #
+    it "rb_const_get_from calls #const_missing if the constant is not defined in the class or ancestors" do
       CApiModuleSpecs::M.should_receive(:const_missing).with(:Fixnum)  
       @m.rb_const_get_from((mx = CApiModuleSpecs::M), :Fixnum)
     end
@@ -166,7 +167,7 @@ describe "CApiModule" do
     end
 
    not_compliant_on :maglev do # bug
-    it "calls #const_missing if the constant is not defined in the module" do #
+    it "calls #const_missing if the constant is not defined in the module" do
       CApiModuleSpecs::B.should_receive(:const_missing).with(:X)
       @m.rb_const_get_at(CApiModuleSpecs::B, :X)
     end
@@ -189,7 +190,9 @@ describe "CApiModule" do
   describe "rb_define_global_function" do
     it "defines a method on Object" do
       @m.rb_define_global_function("module_specs_global_function")
-      # Kernel.should have_method(:module_specs_global_function)  # maglev bug
+     not_compliant_on :maglev do  # bug
+      Kernel.should have_method(:module_specs_global_function)
+     end
       module_specs_global_function.should == :test_method
     end
   end
@@ -220,7 +223,7 @@ describe "CApiModule" do
     end
 
    not_compliant_on :maglev do
-    it "defines a private instance method" do #
+    it "defines a private instance method" do
       cls = Class.new
       cls.send :include, @mod
 
@@ -233,15 +236,19 @@ describe "CApiModule" do
     it "defines a private method on a class" do
       cls = Class.new
       @m.rb_define_private_method(cls, "test_method")
-      # cls.should have_private_instance_method(:test_method) # maglev bug
+     not_compliant_on :maglev do # bug
+      cls.should have_private_instance_method(:test_method)
+     end
       cls.new.send(:test_method).should == :test_method
     end
 
-  # it "defines a private method on a module" do
-  #   mod = Module.new
-  #   @m.rb_define_private_method(mod, "test_method")
-  #   # mod.should have_private_instance_method(:test_method) # maglev bug
-  # end
+   not_compliant_on :maglev do # bug
+    it "defines a private method on a module" do
+      mod = Module.new
+      @m.rb_define_private_method(mod, "test_method")
+      mod.should have_private_instance_method(:test_method)
+    end
+   end
   end
 
   describe "rb_define_protected_method" do
@@ -252,11 +259,13 @@ describe "CApiModule" do
       cls.new.send(:test_method).should == :test_method
     end
 
-  # it "defines a protected method on a module" do
-  #   mod = Module.new
-  #   @m.rb_define_protected_method(mod, "test_method")
-  #   mod.should have_protected_instance_method(:test_method)
-  # end
+   not_compliant_on :maglev do # bug
+    it "defines a protected method on a module" do
+      mod = Module.new
+      @m.rb_define_protected_method(mod, "test_method")
+      mod.should have_protected_instance_method(:test_method)
+    end
+   end
   end
 
   describe "rb_define_singleton_method" do

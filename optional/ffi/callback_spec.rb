@@ -233,7 +233,7 @@ describe "Callback" do
     FFISpecs::LibTest.cbVrS8 = proc
     FFISpecs::LibTest.testGVarCallbackVrS8(FFISpecs::LibTest.pVrS8).should == 0x1e
   end
- end #
+ end
 
   describe "When the callback is considered optional by the underlying library" do
     it "should handle receiving 'nil' in place of the closure" do
@@ -247,7 +247,7 @@ describe "Callback" do
     end
   end
 
- unless defined?(Maglev::System) # nested callback not supported yet by maglev # [
+ not_compliant_on :maglev do # nested callback not supported # [
   describe "as return value" do
     it "should not blow up when a callback is defined that returns a callback" do
       lambda {

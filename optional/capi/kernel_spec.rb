@@ -72,7 +72,7 @@ describe "C-API Kernel function" do
       end
     end
   end
- end #
+ end
 
   describe "rb_warn" do
     before :each do
@@ -99,17 +99,23 @@ describe "C-API Kernel function" do
   end
 
   describe "rb_sys_fail" do
-    it "rb_sys_fail:  raises an exception from the value of errno" do
+    it "raises an exception from the value of errno" do
       lambda do
         @s.rb_sys_fail("additional info")
       end.should raise_error(SystemCallError, /additional info/)
     end
 
     it "can take a NULL message" do
+     not_compliant_on :maglev do
       lambda do
         @s.rb_sys_fail(nil)
-      #end.should raise_error(Errno::EPERM)
+      end.should raise_error(Errno::EPERM)
+     end
+     deviates_on :maglev do
+      lambda do
+        @s.rb_sys_fail(nil)
       end.should raise_error( SystemCallError )
+     end
     end
   end
 
@@ -168,7 +174,7 @@ describe "C-API Kernel function" do
       @raise_proc_returns_arg = lambda {|*a| a }
       @arg_error_proc = lambda { |*_| raise ArgumentError, '' }
       @std_error_proc = lambda { |*_| raise StandardError, '' }
-      @exc_error_proc = lambda { |*_| puts "EXC_ERROR"; raise Exception, '' }
+      @exc_error_proc = lambda { |*_| raise Exception, '' }
     end
 
     it "executes passed function" do
@@ -205,9 +211,13 @@ describe "C-API Kernel function" do
     end
 
     it "makes $! available only during 'raise function' execution" do
-      # maglev deviation,  $! does not reflect exception being rescued by C code
-      #@s.rb_rescue(@std_error_proc, nil, lambda { |*_| $! }, nil).class.should == StandardError
+     not_compliant_on :maglev do
+      @s.rb_rescue(@std_error_proc, nil, lambda { |*_| $! }, nil).class.should == StandardError
+     end
+     deviates_on :maglev do
+      # maglev ,  $! does not reflect exception being rescued by C code
       $!.should == nil
+     end
     end
   end
 
@@ -254,13 +264,13 @@ describe "C-API Kernel function" do
     end
   end
 
- not_compliant_on :maglev do
-  describe "rb_eval_string" do  # bugs in Maglev not fixed yet
+#not_compliant_on :maglev do # bugs in rb_eval_string
+  describe "rb_eval_string" do
     it "evaluates a string of ruby code" do
       @s.rb_eval_string("1+1").should == 2
     end
   end
- end
+#end
 
  not_supported_on :maglev do
   describe "rb_block_proc" do
@@ -270,7 +280,7 @@ describe "C-API Kernel function" do
       proc.call.should == 2
     end
   end
- end #
+ end
 
  not_supported_on :maglev do
   ruby_version_is "1.8.7" do
@@ -299,5 +309,5 @@ describe "C-API Kernel function" do
       @s.rb_f_sprintf(["%d %f %s", 10, 2.5, "test"]).should == "10 2.500000 test"
     end
   end
- end #
+ end
 end

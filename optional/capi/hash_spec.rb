@@ -8,7 +8,7 @@ describe "C-API Hash function" do
   end
 
 not_compliant_on :maglev do
-  describe "rb_hash" do #
+  describe "rb_hash" do
     it "calls #hash on the object" do
       obj = mock("rb_hash")
       obj.should_receive(:hash).and_return(5)
@@ -88,8 +88,8 @@ end
     end
   end
 
-not_compliant_on :maglev do
-  describe "rb_hash_delete_if" do #
+ not_compliant_on :maglev do
+  describe "rb_hash_delete_if" do
     it "removes an entry if the block returns true" do
       h = { :a => 1, :b => 2, :c => 3 }
       @s.rb_hash_delete_if(h) { |k, v| v == 2 }
@@ -108,11 +108,12 @@ not_compliant_on :maglev do
       end
     end
   end
-end
+ end
 
   describe "rb_hash_foreach" do
     it "iterates over the hash" do
       hsh = {:name => "Evan", :sign => :libra}
+
       out = @s.rb_hash_foreach(hsh)
       out.equal?(hsh).should == false
       out.should == hsh
@@ -125,7 +126,7 @@ end
       out.size.should == 1
     end
 
-not_compliant_on :maglev do # rb_hash_foreach_delete not implem
+   not_compliant_on :maglev do # rb_hash_foreach_delete not implem
     it "deletes via the callback" do
       hsh = {:name => "Evan", :sign => :libra}
 
@@ -133,7 +134,7 @@ not_compliant_on :maglev do # rb_hash_foreach_delete not implem
       out.should == {:name => "Evan", :sign => :libra}
       hsh.should == {}
     end
-end #
+   end
   end
 
   # rb_hash_size is a static symbol in MRI

@@ -3,11 +3,7 @@ require File.expand_path('../spec_helper', __FILE__)
 describe "FFI::Library" do
   it "attach_function with no library specified" do
     lambda {
-      begin
-        new_module { attach_function :getpid, [ ], :uint }
-      rescue => ex
-        nil.pause
-      end
+      new_module { attach_function :getpid, [ ], :uint }
     }.should_not raise_error
   end
 
@@ -18,28 +14,30 @@ describe "FFI::Library" do
     }.should_not raise_error
   end
 
-  it "attach_function :getpid from [ 'c', 'libc.so.6' ] " do
+  it "attach_function :getpid from [ 'c', 'libc.so.6'] " do
     lambda {
-      libnam = 'libc.so'
-      if RUBY_PLATFORM.match('solaris')
+      not_compliant_on :maglev do
+        mod = new_module('c', 'libc.so.6') { attach_function :getpid, [ ], :uint }
+        mod.getpid.should == Process.pid
+      end
+      deviates_on :maglev do
         libnam = 'libc.so'
+        if RUBY_PLATFORM.match('linux')
+          libnam = '/lib/libc.so.6'
+        end
+        mod = new_module(libnam) { attach_function :getpid, [ ], :uint } 
+        mod.getpid.should == Process.pid
       end
-      if RUBY_PLATFORM.match('linux')
-        libnam = '/lib/libc.so.6'
-      end
-      mod = new_module(libnam) { attach_function :getpid, [ ], :uint } 
-      mod.getpid.should == Process.pid
     }.should_not raise_error
   end
 
   it "attach_function :getpid from [ 'libc.so.6', 'c' ] " do
-      libnam = 'libc.so'
-      if RUBY_PLATFORM.match('solaris')
-        libnam = 'libc.so'
-      end
+    libnam = 'libc.so'
+    deviates_on :maglev do
       if RUBY_PLATFORM.match('linux')
         libnam = '/lib/libc.so.6'
       end
+    end
     lambda {
       mod = new_module(libnam, 'c') { attach_function :getpid, [ ], :uint } 
       mod.getpid.should == Process.pid
@@ -60,7 +58,7 @@ describe "FFI::Library" do
     }.should raise_error(LoadError)
   end
 
-if false # Maglev , global vars not implem yet
+ not_compliant_on :maglev do # global vars not implem yet
   it "Pointer variable" do
     lib = gvar_lib("pointer", :pointer)
     val = FFI::MemoryPointer.new :long
@@ -144,13 +142,17 @@ if false # Maglev , global vars not implem yet
       end
     end
   end
-end #Maglev
+ end # maglev
 
   def self.new_module(*libs, &block)
     Module.new do
       extend FFI::Library
-      # ffi_lib(*libs) unless libs.empty?
+     not_compliant_on :maglev do
+      ffi_lib(*libs) unless libs.empty?
+     end
+     deviates_on :maglev do
       ffi_lib(*libs)  # Maglev patch , need to clear previous global setting
+     end
       module_eval(&block)
     end
   end

@@ -13,7 +13,7 @@ typedef signed long sL;
 typedef unsigned long uL;
 typedef float f32;
 typedef double f64;
-/* typedef unsigned long ulong; */
+/* typedef unsigned long ulong; */ /* assume defined by system headers*/
 typedef void* pointer;
 typedef void* P;
 

@@ -128,17 +128,19 @@ describe :rational_exponent, :shared => true do
     rational ** obj
   end
 
-# it "calls #** on the coerced Rational with the coerced Object" do # Maglev failing
-#   rational = Rational(3, 4)
+#not_compliant_on :maglev do
+  it "calls #** on the coerced Rational with the coerced Object" do
+    rational = Rational(3, 4)
 
-#   coerced_rational = mock("Coerced Rational")
-#   coerced_rational.should_receive(:**).and_return(:result)
-#   
-#   coerced_obj = mock("Coerced Object")
-#   
-#   obj = mock("Object")
-#   obj.should_receive(:coerce).and_return(rx = [coerced_rational, coerced_obj])
+    coerced_rational = mock("Coerced Rational")
+    coerced_rational.should_receive(:**).and_return(:result)
+    
+    coerced_obj = mock("Coerced Object")
+    
+    obj = mock("Object")
+    obj.should_receive(:coerce).and_return(rx = [coerced_rational, coerced_obj])
 
-#   (rational ** obj).should == :result  # Mock claims MNU, bugs in Mock
-# end
+    (rational ** obj).should == :result
+  end
+#end
 end

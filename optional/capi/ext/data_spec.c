@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#if defined(HAVE_RDATA) && defined(HAVE_DATA_WRAP_STRUCT)
+#if defined(HAVE_DATA_WRAP_STRUCT)
 struct sample_wrapped_struct {
     int foo;
 };
@@ -40,15 +40,22 @@ VALUE sws_get_struct(VALUE self, VALUE obj) {
 
 VALUE sws_get_struct_rdata(VALUE self, VALUE obj) {
   struct sample_wrapped_struct* bar;
-  bar = (struct sample_wrapped_struct*) /*RDATA(obj)->data*/ rb_rdata_fetch(obj);
+#if defined(HAVE_RDATA)
+  bar = (struct sample_wrapped_struct*) RDATA(obj)->data;
+#else
+  bar = (struct sample_wrapped_struct*) rb_rdata_fetch(obj);
+#endif
   return INT2FIX(bar->foo);
 }
 
 VALUE sws_change_struct(VALUE self, VALUE obj, VALUE new_val) {
   struct sample_wrapped_struct* new_struct = (struct sample_wrapped_struct *)malloc(sizeof(struct sample_wrapped_struct));
   new_struct->foo = FIX2INT(new_val);
-  // RDATA(obj)->data = new_struct;
+#if defined(HAVE_RDATA)
+  RDATA(obj)->data = new_struct;
+#else
   rb_rdata_store(obj, new_struct);
+#endif
   return Qnil;
 }
 

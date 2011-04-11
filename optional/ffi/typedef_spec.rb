@@ -19,13 +19,17 @@ describe "Custom type definitions" do
     @mod.typedef :uint, :fubar_t
     @mod.attach_function :pack_varargs, [ :buffer_out, :string, :varargs ], :void
 
-#   buf = FFI::Buffer.new :uint, 10
-#   @mod.pack_varargs(buf, "i", :fubar_t, 0x12345678)
-#   buf.get_int64(0).should == 0x12345678
-    buf = FFI::Buffer.new( :int64, 10 )		# maglev patches to spec
+   not_compliant_on :maglev do
+    buf = FFI::Buffer.new :uint, 10
+    @mod.pack_varargs(buf, "i", :fubar_t, 0x12345678)
+    buf.get_int64(0).should == 0x12345678
+   end
+   deviates_on :maglev do  # 64 bit VM
+    buf = FFI::Buffer.new( :int64, 10 )	
     @mod.pack_varargs(buf, "ij", :int, 88, :int64, 0x12345678)  
     buf.get_int64(0).should == 88
     buf.get_int64(8).should == 0x12345678
+   end
   end
 
   it "Callback with custom typedef parameter" do  

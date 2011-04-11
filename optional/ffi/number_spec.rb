@@ -128,7 +128,7 @@ describe "Function with primitive integer arguments" do
       end
     end
   end
-end 
+end
 
 describe "Integer parameter range checking" do
   [ 128, -129 ].each do |i|
@@ -171,9 +171,14 @@ end
 describe "Three different size Integer arguments" do
   def self.verify(p, off, t, v)
     if t == 'f32'
-      act = p.get_float32(off)	# maglev uses native float to double rounding in CByteArray prims
-      err = ((act - v) / v)     #
-      err.should <= 1.0e-7      #
+     not_compliant_on :maglev do
+      p.get_float32(off).should == v
+     end
+     deviates_on :maglev do
+      act = p.get_float32(off) # maglev C float  to double rounding in CByteArray prims
+      err = ((act - v) / v)
+      err.should <= 1.0e-7
+     end
     elsif t == 'f64'
       p.get_float64(off).should == v
     else
@@ -184,7 +189,7 @@ describe "Three different size Integer arguments" do
  it "test PACK_VALUES" do
   vdict = FFISpecs::PACK_VALUES
   pvkeys = vdict.keys
-  a1 = 5
+  a1 = 5   # declare here for debugging
   a2 = 5
   a3 = 5
   pvkeys.each do |t1|
@@ -193,16 +198,15 @@ describe "Three different size Integer arguments" do
         (a1 = vdict[t1]).each do |v1|
           (a2 = vdict[t2]).each do |v2|
             (a3 = vdict[t3]).each do |v3|
-#              puts "call(#{FFISpecs::TYPE_MAP[t1]} (#{v1}), #{FFISpecs::TYPE_MAP[t2]} (#{v2}), #{FFISpecs::TYPE_MAP[t3]} (#{v3}))"  # do
+# puts "call(#{FFISpecs::TYPE_MAP[t1]} (#{v1}), #{FFISpecs::TYPE_MAP[t2]} (#{v2}), #{FFISpecs::TYPE_MAP[t3]} (#{v3}))"  # uncomment for debugging
                 p = FFI::Buffer.new :long_long, 3
-                bxx = [a1, a2, a3]
+                bxx = [a1, a2, a3]  # make debugging easier
                 axx = [v1, v2, v3]
                 fct_name = "pack_#{t1}#{t2}#{t3}_s64"
                 FFISpecs::LibTest.send(fct_name , v1, v2, v3, p)
                 verify(p, 0, t1, v1)
                 verify(p, 8, t2, v2)
                 verify(p, 16, t3, v3)
-              # 
             end
           end
         end

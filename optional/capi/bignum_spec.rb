@@ -39,7 +39,7 @@ describe "CApiBignumSpecs" do
       lambda { @s.rb_big2ll(ensure_bignum(@max_long << 40)) }.should raise_error(RangeError)
       lambda { @s.rb_big2ll(ensure_bignum(@min_long << 40)) }.should raise_error(RangeError)
     end
-   end #
+   end
   end
 
   describe "rb_big2ulong" do
@@ -49,11 +49,14 @@ describe "CApiBignumSpecs" do
     end
 
     it "wraps around if passed a negative bignum" do
-      # @s.rb_big2ulong(ensure_bignum(-1)).should == @max_ulong
-      # @s.rb_big2ulong(ensure_bignum(@min_long + 1)).should == -(@min_long - 1)
-      # maglev raises error
+     not_compliant_on :maglev do
+      @s.rb_big2ulong(ensure_bignum(-1)).should == @max_ulong
+      @s.rb_big2ulong(ensure_bignum(@min_long + 1)).should == -(@min_long - 1)
+     end
+     deviates_on :maglev do
       lambda { @s.rb_big2ulong(ensure_bignum(-1)) }.should raise_error(RangeError)
       lambda { @s.rb_big2ulong(ensure_bignum(@min_long + 1)) }.should raise_error(RangeError)
+     end
     end
 
     it "raises RangeError if passed Bignum overflow long" do
@@ -95,8 +98,8 @@ describe "CApiBignumSpecs" do
   end
 
   ruby_version_is "1.8.7" do
-not_compliant_on :maglev do
-    describe "RBIGNUM_SIGN" do #
+   not_compliant_on :maglev do  # RBIGNUM_SIGN not implemented in ruby.h
+    describe "RBIGNUM_SIGN" do
       it "returns C true if the Bignum has a positive sign" do
         @s.RBIGNUM_SIGN(bignum_value()).should be_true
       end
@@ -105,6 +108,6 @@ not_compliant_on :maglev do
         @s.RBIGNUM_SIGN(-bignum_value()).should be_false
       end
     end
-end
+   end
   end
 end

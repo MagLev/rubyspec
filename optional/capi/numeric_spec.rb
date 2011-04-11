@@ -63,8 +63,8 @@ describe "CApiNumericSpecs" do
     end
   end
 
- not_compliant_on :maglev do
-  describe "rb_ll2inum" do  # not implem yet
+ not_compliant_on :maglev do # rb_ll2inum not implemented
+  describe "rb_ll2inum" do
     it "should create a new Fixnum from a small signed long long" do
       i = @s.rb_ll2inum_14()
       i.should be_kind_of(Fixnum)
@@ -134,7 +134,7 @@ describe "CApiNumericSpecs" do
     end
   end
 
-  describe "rb_cmpint" do #
+  describe "rb_cmpint" do
     it "returns a Fixnum if passed one" do
       @s.rb_cmpint(1, 2).should == 1
     end

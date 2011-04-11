@@ -104,7 +104,7 @@ describe "CApiObject" do
     h = Hash.new
     @o.rb_check_array_type(ac).should == []
     @o.rb_check_array_type(ao).should == []
-    @o.rb_check_array_type(h).should == nil  # ??
+    @o.rb_check_array_type(h).should == nil
   end
 
   it "rb_check_convert_type should try to coerce to a type, otherwise return nil" do
@@ -114,7 +114,7 @@ describe "CApiObject" do
     # note that I force the ary information in the spec extension
     @o.rb_check_convert_type(ac).should == []
     @o.rb_check_convert_type(ao).should == []
-    @o.rb_check_convert_type(h).should == nil # ??
+    @o.rb_check_convert_type(h).should == nil
   end
 
   it "rb_check_string_type should try to coerce to a string, otherwise return nil" do
@@ -123,7 +123,7 @@ describe "CApiObject" do
     h = {:hello => :goodbye}
     @o.rb_check_string_type(sc).should == "Hello"
     @o.rb_check_string_type(so).should == "Hello"
-    @o.rb_check_string_type(h).should == nil # ??
+    @o.rb_check_string_type(h).should == nil
   end
 
   it "rb_convert_type should try to coerce to a type, otherwise raise a TypeError" do
@@ -167,8 +167,12 @@ describe "CApiObject" do
     @o.rb_is_type_array(DescArray.new).should == true
     @o.rb_is_type_module(ObjectTest).should == false
     @o.rb_is_type_class(ObjectTest).should == true
-    # @o.rb_is_type_data(Time.now).should == true
-    @o.rb_is_type_data(Time.now).should == false  # maglev deviation
+   not_compliant_on :maglev do
+    @o.rb_is_type_data(Time.now).should == true
+   end
+   deviates_on :maglev do
+    @o.rb_is_type_data(Time.now).should == false
+   end
   end
 
   describe "RTEST" do
@@ -233,7 +237,7 @@ describe "CApiObject" do
     end
   end
 
- not_compliant_on :maglev do
+ not_supported_on :maglev do  # no taint propagation
   describe "OBJ_TAINT" do
     it "taints the object" do
       obj = mock("tainted")
@@ -288,7 +292,7 @@ describe "CApiObject" do
     end
   end
 
- not_compliant_on :maglev do
+ not_supported_on :maglev do # no taint propagation
   describe "rb_obj_taint" do
     it "marks the object passed as tainted" do
       obj = ""
@@ -309,7 +313,7 @@ describe "CApiObject" do
       end
     end
   end
- end #
+ end
 
   describe "rb_check_frozen" do
     ruby_version_is ""..."1.9" do

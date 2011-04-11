@@ -48,27 +48,27 @@ describe :rational_divide_float, :shared => true do
 end
 
 describe :rational_divide, :shared => true do
-  # it "calls #coerce on the passed argument with self" do 
-  #     This spec incompatible with  raising a TypeError if arg not a Numeric 
-  #  rational = Rational(3, 4)
-  #  obj = mock("Object")
-  #  obj.should_receive(:coerce).with(rational).and_return([1, 2])
-  #  
-  #  rational.send(@method, obj)
-  #end
+ not_compliant_on :maglev do # specs incompatible with raising TypeError if arg not a Numeric
+  it "calls #coerce on the passed argument with self" do 
+    rational = Rational(3, 4)
+    obj = mock("Object")
+    obj.should_receive(:coerce).with(rational).and_return([1, 2])
+    
+    rational.send(@method, obj)
+  end
 
-# it "calls #/ on the coerced Rational with the coerced Object" do
-  #     This spec incompatible with  raising a TypeError if arg not a Numeric 
-#   rational = Rational(3, 4)
+  it "calls #/ on the coerced Rational with the coerced Object" do
+    rational = Rational(3, 4)
 
-#   coerced_rational = mock("Coerced Rational")
-#   coerced_rational.should_receive(:/).and_return(:result)
-#   
-#   coerced_obj = mock("Coerced Object")
-#   
-#   obj = mock("Object")
-#   obj.should_receive(:coerce).and_return([coerced_rational, coerced_obj])
+    coerced_rational = mock("Coerced Rational")
+    coerced_rational.should_receive(:/).and_return(:result)
+    
+    coerced_obj = mock("Coerced Object")
+    
+    obj = mock("Object")
+    obj.should_receive(:coerce).and_return([coerced_rational, coerced_obj])
 
-#   rational.send(@method, obj).should == :result
-# end
+    rational.send(@method, obj).should == :result
+  end
+ end
 end

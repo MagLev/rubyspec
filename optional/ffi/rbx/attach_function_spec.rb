@@ -3,19 +3,18 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe FFI::Library, "#attach_function" do
   before :all do
     @klass = Class.new(FFI::Struct)
-    #@klass.layout :tv_sec, :ulong, 0, :tv_usec, :ulong, 4
-    @klass.layout :tv_sec, :ulong, 0, :tv_usec, :ulong, 8 # maglev,  longs are 8 bytes
+    long_size_bytes = FFI::Platform::LONG_SIZE / 8
+    @klass.layout(:tv_sec, :ulong, 0, :tv_usec, :ulong, long_size_bytes)
 
     @libc = Module.new do
       extend FFI::Library
-      libnam = 'libc.so'
-      if RUBY_PLATFORM.match('solaris')
-        libnam = 'libc.so' # maglev needs
+      deviates_on :maglev do
+        libnam = 'libc.so'
+        if RUBY_PLATFORM.match('linux')
+          libnam = '/lib/libc.so.6' # maglev
+        end
+        ffi_lib( libnam )
       end
-      if RUBY_PLATFORM.match('linux')
-        libnam = '/lib/libc.so.6'
-      end
-      ffi_lib( libnam )
       attach_function :gettimeofday, [:pointer, :pointer], :int
     end
   end

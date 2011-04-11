@@ -17,8 +17,14 @@ describe "GzipWriter#write" do
     end
 
     # skip gzip header for now
-    #@io.string[10..-1].should == @zip[10..-1]
+   not_compliant_on :maglev do
+    @io.string[10..-1].should == @zip[10..-1]
+   end
+   deviates_on :maglev do
+    ax = @io.string
+    bx = @zip
     @io.string[12..-1].should == @zip[10..-1]  # maglev gzip header variations
+   end
   end
 
 end

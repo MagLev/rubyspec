@@ -17,7 +17,12 @@ describe 'Zlib::GzipFile#close' do
         raise_error(Zlib::GzipFile::Error, 'closed gzip stream')
     end
 
+   not_compliant_on :maglev do
     io.string[10..-1].should == "\003\000\000\000\000\000\000\000\000\000" 
+   end
+   deviates_on :maglev do # bug ?
+    io.string.should == ""
+   end
   end
 end
 

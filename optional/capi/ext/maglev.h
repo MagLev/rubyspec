@@ -50,4 +50,6 @@
 #undef HAVE_RB_SET_END_PROC
 #undef HAVE_RB_F_SPRINTF
 
+#undef HAVE_RDATA
+
 #endif

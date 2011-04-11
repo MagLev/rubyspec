@@ -32,9 +32,13 @@ describe 'Union' do
   end
 
   it 'should return a size equals to the size of the biggest field' do
-    # maglev solarix x86 deviations
+   not_compliant_on :maglev do
+    FFISpecs::LibTest::TestUnion.size.should == FFISpecs::LibTest.union_size
+   end
+   deviates_on :maglev do  # on 64 bit we get this
     FFISpecs::LibTest::TestUnion.size.should == 10
     ux = FFISpecs::LibTest.union_size 
-    ux.should == 16 # Get this from gcc compiler on x86 solaris
+    ux.should == 16 # Get this from gcc compiler on x86 solaris or linux
+   end
   end
 end

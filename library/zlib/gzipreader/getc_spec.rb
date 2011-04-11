@@ -49,8 +49,12 @@ describe "GzipReader#getc" do
     gz.read
     pos = gz.pos
     gz.getc.should be_nil
-    #gz.pos.should == pos
-    gz.pos.should == 0 # maglev deviation
+   not_compliant_on :maglev do
+    gz.pos.should == pos
+   end
+   deviates_on :maglev do # bug
+    gz.pos.should == 0
+   end
   end
 
 end

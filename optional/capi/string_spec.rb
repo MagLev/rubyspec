@@ -33,9 +33,12 @@ describe "C-API String function" do
 
       it "inserts a NULL byte at the length" do
         @s.rb_str_set_len(@str, 5).should == "abcde"
-        sx = @str  # maglev debugging
-        #@s.rb_str_set_len(@str, 8).should == "abcde\x00gh"
-        @s.rb_str_set_len(@str, 8).should == "abcde\x00\x00\x00" # maglev deviation
+       not_compliant_on :maglev do
+        @s.rb_str_set_len(@str, 8).should == "abcde\x00gh"
+       end
+       deviates_on :maglev do
+        @s.rb_str_set_len(@str, 8).should == "abcde\x00\x00\x00"
+       end
       end
 
       it "updates the string's attributes visible in C code" do
@@ -60,42 +63,54 @@ describe "C-API String function" do
       ("abcde" + str).should == "abcde"
     end
 
-  not_compliant_on :maglev do
-    it "returns a string whose bytes can be accessed by RSTRING_PTR" do #
+    it "returns a string whose bytes can be accessed by RSTRING_PTR" do
       str = @s.rb_str_buf_new(10, "abcdefghi")
-      @s.rb_str_new(str, 10).should == "abcdefghi\x00"  # accesses undefined memory past end of str 
+     not_compliant_on :maglev do
+      @s.rb_str_new(str, 10).should == "abcdefghi\x00"
+     end
+     deviates_on :maglev do
+      str.length.should == 0
+     end
     end
-  end
 
     ruby_version_is ""..."1.9" do
-      it "returns a string that can be modified by rb_str_resize" do #
+      it "returns a string that can be modified by rb_str_resize" do
         str = @s.rb_str_buf_new(10, "abcde")
-      # @s.rb_str_resize(str, 4).should == "abcd"
-        @s.rb_str_resize(str, 4).should == "\000\000\000\000" # maglev deviation
+       not_compliant_on :maglev do
+        @s.rb_str_resize(str, 4).should == "abcd"
+       end
+       deviates_on :maglev do
+        str.should == ""
+        @s.rb_str_resize(str, 4).should == "\000\000\000\000"
+       end
         @s.RSTRING_LEN(str).should == 4
       end
 
-  not_compliant_on :maglev do
-      it "returns a string which can be assigned to from C" do #
+     not_compliant_on :maglev do
+      it "returns a string which can be assigned to from C" do
         str = "hello"
         buf = @s.rb_str_buf_new(str.size, nil)
         @s.RSTRING_ptr_write(buf, str)
         buf.should == str
       end
-  end
+     end
     end
 
     ruby_version_is "1.8.7" do
       it "returns a string that can be modified by rb_str_set_len" do
         str = @s.rb_str_buf_new(10, "abcdef")
+       not_compliant_on :maglev do
         @s.rb_str_set_len(str, 4)
-      # str.should == "abcd"
-        str.should == "\000\000\000\000" # maglev deviation
-
+        str.should == "abcd"
         @s.rb_str_set_len(str, 8)
-      # str[0, 6].should == "abcd\x00f"
-        str[0, 6].should == "\000\000\000\000\000\000" # maglev deviation
+        str[0, 6].should == "abcd\x00f"
         @s.RSTRING_LEN(str).should == 8
+       end
+       deviates_on :maglev do
+        str.should == ""
+        @s.rb_str_set_len(str, 4)
+        str[0, 8].should == "\000\000\000\000"
+       end
       end
     end
   end
@@ -294,7 +309,7 @@ describe "C-API String function" do
         @s.RSTRING_len("dewdrops").should == 8
       end
     end
-   end #
+   end
   end
 
   describe "RSTRING_PTR" do
@@ -414,13 +429,13 @@ describe "C-API String function" do
       end
 
      not_supported_on :maglev do
-      it "allows changing the characters in the string" do #
+      it "allows changing the characters in the string" do
         str = 'any str'
         # Hardcoded to set "foo\0"
-        @s.rb_str2cstr_replace(str) #
+        @s.rb_str2cstr_replace(str)
         str.should == "foo\0str"
       end
-     end #
+     end
     end
 
     describe "STR2CSTR" do
@@ -497,6 +512,13 @@ describe "C-API String function" do
       end
     end
 
+    describe "rb_str_len" do
+      it "returns the string's length" do
+        @s.rb_str_len("dewdrops").should == 8
+      end
+    end
+  end
+  extended_on :maglev do
     describe "rb_str_len" do
       it "returns the string's length" do
         @s.rb_str_len("dewdrops").should == 8

@@ -6,9 +6,7 @@ describe "FFI::Buffer#total" do
   [1,2,3].each do |i|
     h = { :char => 1, :uchar => 1, :short => 2, :ushort => 2, :int => 4,
       :uint => 4, :long => FFISpecs::LongSize, :ulong => FFISpecs::LongSize,
-      :long_long => 8, :ulong_long => 8, 
-      :float => 4,
-       :double => 8
+      :long_long => 8, :ulong_long => 8, :float => 4, :double => 8
     }
     h.each_pair do |t, s|
       it "FFI::Buffer.alloc_in(#{t}, #{i}).total == #{i * s}" do

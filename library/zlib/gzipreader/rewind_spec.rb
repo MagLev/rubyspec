@@ -18,7 +18,9 @@ describe "GzipReader#rewind" do
 
     gz.rewind
     gz.pos.should == 0
-    # gz.lineno.should == 0 # maglev, lineno MNU
+   not_compliant_on :maglev do  # lineno not implemented
+    gz.lineno.should == 0 
+   end
   end
 
   it "resets the position of the stream pointer to data previously read" do
@@ -32,13 +34,15 @@ describe "GzipReader#rewind" do
     # first, prepare the mock object:
     (obj = mock("io")).should_receive(:get_io).any_number_of_times.and_return(@io)
     def obj.read(args); get_io.read(args); end
-    #def obj.seek(pos, whence = 0)
-    #  ScratchPad.record :seek
-    #  get_io.seek(pos, whence)
-    #end
-    def obj.rewind	# maglev uses rewind
+    def obj.seek(pos, whence = 0)
       ScratchPad.record :seek
-      get_io.rewind
+      get_io.seek(pos, whence)
+    end
+    deviates_on :maglev do  
+      def obj.rewind	# maglev uses rewind
+        ScratchPad.record :seek
+        get_io.rewind
+      end
     end
 
     gz = Zlib::GzipReader.new(obj)

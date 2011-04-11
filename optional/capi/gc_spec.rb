@@ -14,5 +14,5 @@ describe "CApiGCSpecs" do
     @f.registered_reference_address.should == "Globally registered data"
     @f.registered_reference_address.object_id.should == @f.registered_reference_address.object_id
   end
- end #
+ end
 end

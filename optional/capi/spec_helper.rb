@@ -58,17 +58,20 @@ def compile_extension(path, name)
   # avoid problems where compilation failed but previous shlib exists
   File.delete lib if File.exists? lib
 
-  #cc        = RbConfig::CONFIG["CC"]
-  #cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
-  plat = RUBY_PLATFORM
-  if plat == 'x86_64-linux'
-    cc = 'gcc'
-  elsif plat == 'sparc-solaris' || plat == 'x86_64-solaris'
-    cc = "/opt/sunstudio12.1/bin/cc"   # maglev x86 solaris
-  else 
-    cc = RbConfig::CONFIG["CC"]
+  if RUBY_NAME == 'maglev'
+    plat = RUBY_PLATFORM
+    if plat == 'x86_64-linux'
+      cc = 'gcc'
+    elsif plat == 'sparc-solaris' || plat == 'x86_64-solaris'
+      cc = "/opt/sunstudio12.1/bin/cc"   # maglev x86 solaris
+    else 
+      cc = RbConfig::CONFIG["CC"]
+    end
+    cflags = "-m64 -fPIC -g"
+  else
+    cc        = RbConfig::CONFIG["CC"]
+    cflags    = (ENV["CFLAGS"] || RbConfig::CONFIG["CFLAGS"]).dup
   end
-  cflags = "-m64 -fPIC -g"
 
   cflags   += " -fPIC" unless cflags.include?("-fPIC")
   incflags  = "-I#{path} -I#{hdrdir}"
@@ -84,24 +87,25 @@ def compile_extension(path, name)
     raise "Unable to compile \"#{source}\""
   end
   if output.index('warning')
+    # C code of specs should compile without warnings
     puts "WARNINGS:\n#{output}"
     raise "Warnings in compile \"#{source}\""
   end   
 
-  ldshared  = RbConfig::CONFIG["LDSHARED"]
   libpath   = "-L#{path}"
-  libs      = RbConfig::CONFIG["LIBS"]
-  dldflags  = RbConfig::CONFIG["DLDFLAGS"]
-
-  # maglev x86 solaris
-  ldshared = "#{cc} -shared"
-  libs = "-lrt -ldl -lm -lc"  
-  dldflags = "-m64 -L."   
+  if RUBY_NAME == 'maglev'
+    ldshared = "#{cc} -shared"
+    libs = "-lrt -ldl -lm -lc"  
+    dldflags = "-m64 -L."   
+  else
+    ldshared  = RbConfig::CONFIG["LDSHARED"]
+    libs      = RbConfig::CONFIG["LIBS"]
+    dldflags  = RbConfig::CONFIG["DLDFLAGS"]
+  end
 
   cmd = `#{ldshared} #{obj} #{libpath} #{dldflags} #{libs} -o #{lib}`
   puts "EXECUTING #{cmd}"
   output = `#{cmd}`
-
 
   if $?.exitstatus != 0
     puts "ERROR:\n#{output}"

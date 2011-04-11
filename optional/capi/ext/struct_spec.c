@@ -1,6 +1,8 @@
 #include "ruby.h"
-// include "intern.h"
 #include "rubyspec.h"
+#if !defined(MAGLEV)
+#include "intern.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

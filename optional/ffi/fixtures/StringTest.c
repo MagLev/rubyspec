@@ -38,16 +38,16 @@ void
 string_set(char* s1, const char* s2)
 {
     strcpy(s1, s2);
-    return;
+    return;  // place to set breakpoint
 }
 void
 string_concat(char* dst, const char* src)
 {
     strcat(dst, src);
-    return;
+    return;  // place to set breakpoint
 }
 void
 string_dummy(char* dummy)
 {
-   return;
+   return;  // place to set breakpoint
 }

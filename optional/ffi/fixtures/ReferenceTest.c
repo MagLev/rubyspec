@@ -27,6 +27,8 @@
 
 #include <stdint.h>
 
+/* put return statements in function bodies for debugging ease */
+
 #define REF(T) void ref_##T(T arg, T* result) { *result = arg; return; }
 #define ADD(T) void ref_add_##T(T arg1, T arg2, T* result) { *result = arg1 + arg2; return; }
 #define SUB(T) void ref_sub_##T(T arg1, T arg2, T* result) { *result = arg1 - arg2; return; }

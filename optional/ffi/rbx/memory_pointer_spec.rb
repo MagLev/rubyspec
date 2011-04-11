@@ -9,8 +9,12 @@ require File.expand_path('../../spec_helper', __FILE__)
 describe "MemoryPointer" do
   it "makes a pointer from a string" do
     m = FFI::MemoryPointer.from_string("FFI is Awesome")
-    # m.type_size.should == 15
-    m.type_size.should == 1  # maglev deviation,  String is an array of chars, thus size 1
+  not_compliant_on :maglev do
+    m.type_size.should == 15
+  end
+  deviates_on :maglev do
+    m.type_size.should == 1  # String is an array of chars, thus size 1
+  end
   end
 
   it "reads back a string" do
@@ -27,10 +31,14 @@ describe "MemoryPointer" do
   it "allows access to an element of the pointer (as an array)" do
     m = FFI::MemoryPointer.new(:int, 2)
     m.write_array_of_int([1,2])
- #  m[0].read_int.should == 1
- #  m[1].read_int.should == 2
-    m[0].should == 1 # Maglev patches to spec
+   not_compliant_on :maglev do
+    m[0].read_int.should == 1
+    m[1].read_int.should == 2
+   end
+   deviates_on :maglev do
+    m[0].should == 1
     m[1].should == 2
+   end
   end
 
   it "allows writing as an int" do
@@ -75,17 +83,19 @@ describe "MemoryPointer" do
     m.read_array_of_int(2).should == [1,2]
   end
 
-# it "makes a pointer for an object responding to #size" do  # Maglev not supported yet
-#   m = FFI::MemoryPointer.new(::Struct.new(:size).new(8))
-#   m.write_array_of_int([1,2])
-#   m.read_array_of_int(2).should == [1,2]
-# end
+ not_compliant_on :maglev do # not supported yet
+  it "makes a pointer for an object responding to #size" do
+    m = FFI::MemoryPointer.new(::Struct.new(:size).new(8))
+    m.write_array_of_int([1,2])
+    m.read_array_of_int(2).should == [1,2]
+  end
 
-# it "makes a pointer for a number of an object responding to #size" do  # Maglev not supported yet
-#   m = FFI::MemoryPointer.new(::Struct.new(:size).new(4), 2)
-#   m.write_array_of_int([1,2])
-#   m.read_array_of_int(2).should == [1,2]
-# end
+  it "makes a pointer for a number of an object responding to #size" do
+    m = FFI::MemoryPointer.new(::Struct.new(:size).new(4), 2)
+    m.write_array_of_int([1,2])
+    m.read_array_of_int(2).should == [1,2]
+  end
+ end
 
   it "MemoryPointer#address returns correct value" do
     m = FFI::MemoryPointer.new(:long_long)
@@ -97,8 +107,12 @@ describe "MemoryPointer" do
   it "MemoryPointer#null? returns true for zero value" do
     m = FFI::MemoryPointer.new(:long_long)
     m.write_long(0)
-    # m.read_pointer.null?.should == true
-    (ax = m.read_pointer).should == nil # maglev deviation
+   not_compliant_on :maglev do
+    m.read_pointer.null?.should == true
+   end
+   deviates_on :maglev do
+    m.read_pointer.should == nil # maglev deviation
+   end
   end
 
   it "MemoryPointer#null? returns false for non-zero value" do

@@ -33,23 +33,28 @@ module FFISpecs
     attach_function :testCallbackVrU64, :testClosureVrLL, [ :cbVrU64 ], :ulong_long
     attach_function :testCallbackVrP, :testClosureVrP, [ :cbVrP ], :pointer
     attach_function :testCallbackCrV, :testClosureBrV, [ :cbCrV, :char ], :void
-# maglev no support for attach_variable yet
-#    attach_variable :cbVrS8, :gvar_pointer, :cbVrS8
-#    attach_variable :pVrS8, :gvar_pointer, :pointer
+    # maglev no support for attach_variable yet
+    unless RUBY_NAME == 'maglev' 
+      attach_variable :cbVrS8, :gvar_pointer, :cbVrS8
+      attach_variable :pVrS8, :gvar_pointer, :pointer
+    end
     attach_function :testGVarCallbackVrS8, :testClosureVrB, [ :pointer ], :char
     attach_function :testOptionalCallbackCrV, :testOptionalClosureBrV, [ :cbCrV, :char ], :void
 
-# maglev, anonymous callback not supported yet
-#    attach_function :testCallbackVrS8, :testClosureVrB, [ callback([ ], :char) ], :char
+    # maglev, anonymous callback not supported yet
+    unless RUBY_NAME == 'maglev'
+      attach_function :testCallbackVrS8, :testClosureVrB, [ callback([ ], :char) ], :char
+    end
     attach_function :testCallbackVrS8, :testClosureVrB, [  :cbVrS8 ], :char
 
-# maglev callback as  return type not implem yet
-#    callback( :cb_return_type, [ :int ], :int )
-#    callback( :cb_lookup, [ ], :cb_return_type )
-#    attach_function( :testReturnsCallback, :testReturnsClosure, [ :cb_lookup, :int ], :int )
-#
-#    callback( :funcptr, [ :int ], :int )
-#    attach_function( :testReturnsFunctionPointer, [  ], :funcptr )
+    # maglev callback as  return type not implem yet
+    unless RUBY_NAME == 'maglev'
+      callback( :cb_return_type, [ :int ], :int )
+      callback( :cb_lookup, [ ], :cb_return_type )
+      attach_function( :testReturnsCallback, :testReturnsClosure, [ :cb_lookup, :int ], :int )
+      callback( :funcptr, [ :int ], :int )
+      attach_function( :testReturnsFunctionPointer, [  ], :funcptr )
+    end
 
     # callback :cbS8rV, [ :char ], :void  # duplicates cbCrV
     callback :cbU8rV, [ :uchar ], :void
@@ -125,7 +130,7 @@ module FFISpecs
     attach_function :ptr_from_address, [ FFI::Platform::ADDRESS_SIZE == 32 ? :uint : :ulong_long ], :pointer
   end
 
-if false # Maglev , ManagedStruct not impl yet
+unless RUBY_NAME == 'maglev'
   class NoRelease < ManagedStruct
     layout :i, :int
   end
@@ -236,7 +241,7 @@ end # Maglev
     end
   end
 
-if false # Maglev, Pointer not impl
+unless RUBY_NAME == 'maglev'
   require 'delegate'
   class PointerDelegate < DelegateClass(FFI::Pointer)
     def initialize(ptr)
@@ -331,19 +336,22 @@ end
     layout :string, :string
   end
 
-# module CallbackMember # maglev, callback as field of struct not implem yet
-#   extend FFI::Library
-#   ffi_lib LIBRARY
-#   callback( :add, [ :int, :int ], :int )
-#   callback( :sub, [ :int, :int ], :int )
+  # maglev, callback as field of struct not implem yet
+unless RUBY_NAME == 'maglev'
+  module CallbackMember 
+    extend FFI::Library
+    ffi_lib LIBRARY
+    callback( :add, [ :int, :int ], :int )
+    callback( :sub, [ :int, :int ], :int )
 
-#   class TestStruct < FFI::Struct
-#     layout( :add, :add, :sub, :sub )
-#   end
+    class TestStruct < FFI::Struct
+      layout( :add, :add, :sub, :sub )
+    end
 
-#   attach_function( :struct_call_add_cb, [TestStruct, :int, :int], :int )
-#   attach_function( :struct_call_sub_cb, [TestStruct, :int, :int], :int )
-# end
+    attach_function( :struct_call_add_cb, [TestStruct, :int, :int], :int )
+    attach_function( :struct_call_sub_cb, [TestStruct, :int, :int], :int )
+  end
+end
 
   module LibTest
     class NestedStruct < FFI::Struct

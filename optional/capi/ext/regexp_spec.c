@@ -1,6 +1,8 @@
 #include "ruby.h"
 #include "rubyspec.h"
-// #include "re.h"
+#if !defined(MAGLEV)
+#include "re.h"
+#endif
 
 #include <string.h>
 

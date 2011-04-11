@@ -5,11 +5,13 @@ describe "String tests" do
     mp = FFI::MemoryPointer.new 1024
     mp.put_string(0, "test\0")
     str = mp.get_string(0)
-    # str.tainted?.should == true # maglev no tainting
+   not_compliant_on :maglev do # no taint propagation
+    str.tainted?.should == true
+   end
     str.should == 'test'
   end
 
-if false # Maglev, no taint propagation
+ not_supported_on :maglev do # no taint propagation
   it "String returned by a method is tainted" do
     mp = FFI::MemoryPointer.new :pointer
     sp = FFI::MemoryPointer.new 1024
@@ -22,29 +24,38 @@ if false # Maglev, no taint propagation
 
     str = FFISpecs::LibTest.ptr_ret_pointer(mp, 0)
     str.should == "test"
-    # str.tainted?.should == true # maglev no tainting
+    str.tainted?.should == true
   end
-end
+ end
 
   it "Poison null byte raises error" do
     s = "123\0abc"
-    # lambda { FFISpecs::LibTest.string_equals(s, s) }.should raise_error
+   not_compliant_on :maglev do
+    lambda { FFISpecs::LibTest.string_equals(s, s) }.should raise_error
+   end
+   deviates_on :maglev do
     FFISpecs::LibTest.string_equals(s, s).should == 1 # Maglev deviation
+   end
   end
 
-# it "Tainted String parameter should throw a SecurityError" do # Maglev no taint support
-#   $SAFE = 1
-#   str = "test"
-#   str.taint
-#   begin
-#     FFISpecs::LibTest.string_equals(str, str).should == false
-#   rescue SecurityError => e
-#   end
-# end if false
+ not_supported_on :maglev do #  SAFE not supported
+  it "Tainted String parameter should throw a SecurityError" do 
+    $SAFE = 1
+    str = "test"
+    str.taint
+    begin
+      FFISpecs::LibTest.string_equals(str, str).should == false
+    rescue SecurityError => e
+    end
+  end
 
   it "casts nil as NULL pointer" do
-    #lambda { FFISpecs::LibTest.string_dummy(nil) }.should_not raise_error
-    lambda { FFISpecs::LibTest.string_dummy(nil) }.should raise_error(ArgumentError) # maglev deviation
+   not_compliant_on :maglev do
+    lambda { FFISpecs::LibTest.string_dummy(nil) }.should_not raise_error
+   end
+   deviates_on :maglev do
+    lambda { FFISpecs::LibTest.string_dummy(nil) }.should raise_error(ArgumentError)
+   end
   end
 
   it "reads an array of strings until encountering a NULL pointer" do
@@ -57,7 +68,7 @@ end
     end
     ary.insert(3, nil)
     ptrary.write_array_of_pointer(ary)
-    (ax = ptrary.get_array_of_string(0)).should == ["foo", "bar", "baz"]
+    ptrary.get_array_of_string(0).should == ["foo", "bar", "baz"]
   end
 
   it "reads an array of strings of the size specified, substituting nil when a pointer is NULL" do
@@ -108,5 +119,5 @@ end
     ptrary.write_array_of_pointer(ary)
     lambda { ptrary.get_array_of_string(-1) }.should raise_error
   end
-
+ end # maglev
 end

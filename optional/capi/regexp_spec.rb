@@ -41,19 +41,19 @@ describe "C-API Regexp function" do
     end
   end
 
- not_compliant_on :maglev do
+ not_compliant_on :maglev do # matches from C do no set $1, $2
   it "allows matching in C, properly setting the back references" do
     mail_regexp = /\b([A-Z0-9._%+-]+)@([A-Z0-9.-]+\.[A-Z]{2,4})\b/i
     name = "john.doe"
     domain = "example.com"
     @p.match(mail_regexp, "#{name}@#{domain}")
-    $1.should == name   # not implem in maglev yet for matching in C
-    $2.should == domain   # not implem in maglev yet for matching in C
+    $1.should == name
+    $2.should == domain
   end
- end #
+ end 
 
-not_compliant_on :maglev do
-  describe "rb_reg_match" do #
+ not_compliant_on :maglev do
+  describe "rb_reg_match" do
     it "returns the matched position or nil" do
       @p.rb_reg_match(/a/, 'ab').should == 0
       @p.rb_reg_match(/b/, 'ab').should == 1
@@ -61,7 +61,7 @@ not_compliant_on :maglev do
     end
   end
 
-  describe "rb_backref_get" do #
+  describe "rb_backref_get" do
     it "returns the last MatchData" do
       md = /a/.match('ab')
       @p.rb_backref_get.should == md
@@ -71,5 +71,5 @@ not_compliant_on :maglev do
       @p.rb_backref_get.should == md
     end
   end
-end
+ end
 end

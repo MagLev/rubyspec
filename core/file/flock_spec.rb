@@ -1,5 +1,14 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
+  
+do_test = true
+deviates_on :maglev do  
+  if RUBY_PLATFORM.match('solaris')
+    do_test = false # flock not supported
+  end
+end
+
+if do_test
 describe "File#flock" do
   before :each do
     @name = tmp("flock_test")
@@ -33,13 +42,8 @@ describe "File#flock" do
       f2.flock(File::LOCK_EX | File::LOCK_NB).should == false
      end
      deviates_on :maglev do
-      if (RUBY_PLATFORM.match('solaris')) 
-        status = f2.flock(File::LOCK_EX | File::LOCK_NB)  #
-        (status == 0 || status == false).should == true   # Maglev deviation, Solaris
-      else
-        # linux
+        # not solaris 
         lambda { status = f2.flock(File::LOCK_EX | File::LOCK_NB)  } .should raise_error(SystemCallError)  # EAGAIN
-      end
      end
     end
   end
@@ -78,4 +82,5 @@ describe "File#flock" do
       end.should raise_error(Errno::EBADF)
     end
   end
+end
 end

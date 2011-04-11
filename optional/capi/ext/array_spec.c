@@ -40,7 +40,6 @@ static VALUE array_spec_RARRAY_ptr_assign_funcall(VALUE self, VALUE array) {
 }
 
 static VALUE array_spec_RARRAY_len(VALUE self, VALUE array) {
-  # return INT2FIX(RARRAY(array)->len);
   return INT2FIX(RARRAY(array)->len);
 }
 
@@ -88,30 +87,21 @@ static VALUE array_spec_RARRAY_LEN(VALUE self, VALUE array) {
 }
 #endif
 
-#if defined(HAVE_RB_ARY_AREF) 
-static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self) 
-{
-  // VALUE ary, args;
-  // rb_scan_args(argc, argv, "1*", &ary, &args);
-  // return rb_ary_aref(RARRAY_LEN(args), RARRAY_PTR(args), ary);
-
-  // rewrite to work without rb_scan_args
-  VALUE args[2];
-  VALUE ary = argv[0];
-  if (argc == 2) {
-    args[0] = argv[1] ;
-    return rb_ary_aref(1, args, ary);
-  } else if (argc == 3) {
-    args[0] = argv[1] ;
-    args[1] = argv[2] ;
-    return rb_ary_aref(2, args, ary);
-  } else {
-    rb_raise_(rb_eArgError, "rb_ary_aref needs 1 or 2 args after array");
-    return Qnil;
+#if defined(HAVE_RB_ARY_AREF)
+static VALUE array_spec_rb_ary_aref(int argc, VALUE *argv, VALUE self) {
+  VALUE ary, args;
+  rb_scan_args(argc, argv, "1*", &ary, &args);
+  VALUE buf[2];
+  int len = RARRAY_LEN(args);
+  if (len >= 1) {
+    buf[0] = rb_ary_entry(args, 0); 
+    if (len >= 2) {
+      buf[1] = rb_ary_entry(args, 1);
+    } 
   }
+  return rb_ary_aref(len, buf, ary);
 }
 #endif
-
 
 #ifdef HAVE_RB_ARY_CLEAR
 static VALUE array_spec_rb_ary_clear(VALUE self, VALUE array) {
