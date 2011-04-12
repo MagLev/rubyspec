@@ -87,4 +87,19 @@ describe "YAML.load" do
     expected = { :"user name" => "This is the user name."}
     YAML.load(string).should == expected
   end
+
+  describe "with iso8601 timestamp" do
+    it "computes the microseconds" do
+      [ [YAML.load("2011-03-22t23:32:11.2233+01:00"),   223300],
+        [YAML.load("2011-03-22t23:32:11.0099+01:00"),   9900],
+        [YAML.load("2011-03-22t23:32:11.000076+01:00"), 76]
+      ].should be_computed_by(:usec)
+    end
+
+    ruby_bug "#4571", "1.9.2" do
+      it "rounds values smaller than 1 usec to 0 " do
+        YAML.load("2011-03-22t23:32:11.000000342222+01:00").usec.should == 0
+      end
+    end
+  end
 end

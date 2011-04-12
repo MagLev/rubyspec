@@ -220,6 +220,11 @@ describe :dir_glob, :shared => true do
     files.should == %w!brace/a.js.rjs brace/a.html.erb!
   end
 
+  it "respects the optional nested {} expressions" do
+    files = Dir.send(@method, "brace/a{.{js,html},}{.{erb,rjs},}")
+    files.should == %w!brace/a.js.rjs brace/a.js brace/a.html.erb brace/a.erb brace/a!
+  end
+
   it "matches special characters by escaping with a backslash with '\\<character>'" do
     Dir.mkdir 'foo^bar'
 
@@ -257,6 +262,14 @@ describe :dir_glob, :shared => true do
 
     Dir.send(@method, "deeply/nested/directory/structure//**/*.ext").should ==
       %w!deeply/nested/directory/structure//file_one.ext!
+  end
+
+  it "ignores matching through directories that doen't exist" do
+    Dir.send(@method, "deeply/notthere/blah*/whatever").should == []
+  end
+
+  it "ignores matching only directories under an nonexistant path" do
+    Dir.send(@method, "deeply/notthere/blah/").should == []
   end
 end
 
