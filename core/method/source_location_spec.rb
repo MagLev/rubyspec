@@ -58,12 +58,7 @@ ruby_version_is t_ver do
       
       method = cls.new.method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
-       not_compliant_on :maglev do
-         method.source_location[1].should == line
-       end
-       deviates_on :maglev do
-         method.source_location[1].should == 1
-       end
+       method.source_location[1].should == line
     end
   end
 end

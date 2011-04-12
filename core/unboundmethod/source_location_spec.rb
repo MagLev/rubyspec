@@ -17,12 +17,7 @@ describe "UnboundMethod#source_location" do
       
       method = cls.instance_method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
-     not_compliant_on :maglev do 
       method.source_location[1].should == line
-     end
-     deviates_on :maglev do 
-      method.source_location[1].should == 1
-     end
     end
   end
     
