@@ -15,10 +15,20 @@ describe "Socket#connect_nonblock" do
   end
 
  not_compliant_on :maglev do # bugs
-  it "takes an encoded socket address and starts the connection to it" do
-    lambda {
-      @socket.connect_nonblock(@addr)
-    }.should raise_error(Errno::EINPROGRESS)
+  platform_is_not :freebsd do
+    it "takes an encoded socket address and starts the connection to it" do
+      lambda {
+        @socket.connect_nonblock(@addr)
+      }.should raise_error(Errno::EINPROGRESS)
+    end
+  end
+
+  platform_is :freebsd do
+    it "takes an encoded socket address and starts the connection to it" do
+      lambda {
+        @socket.connect_nonblock(@addr)
+      }.should raise_error(Errno::ECONNREFUSED)
+    end
   end
  end
 
