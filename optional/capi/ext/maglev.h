@@ -30,7 +30,9 @@
 #undef HAVE_RB_OBJ_TAINT
 
 // following neither in maglev, nor jruby 
+#undef HAVE_RB_ALIAS
 #undef HAVE_RB_ARY_TO_S
+#undef HAVE_RB_ARY_TO_ARY
 #undef HAVE_RB_MEM_CLEAR
 #undef HAVE_RB_INSPECTING_P
 #undef HAVE_RB_PROTECT_INSPECT

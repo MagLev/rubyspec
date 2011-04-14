@@ -431,6 +431,7 @@ end
     end
   end
 
+not_compliant_on :maglev do
   describe "rb_ary_to_ary" do
 
     describe "with an array" do
@@ -472,5 +473,6 @@ end
     end
 
   end
+end # maglev
 
 end

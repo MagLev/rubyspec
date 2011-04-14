@@ -150,12 +150,14 @@ describe "String#chomp! with separator" do
       lambda { c.chomp!("a") }.should raise_error(TypeError)
     end
 
+   not_compliant_on :maglev do # exception only on actual modification attempt
     it "does raise an exception when no change would be done and no argument is passed in" do
       b = "string"
       b.freeze
 
       lambda { b.chomp! }.should raise_error(TypeError)
     end
+   end
 
     it "does not raise an exception when no change would be done and no argument is passed in on an empty string" do
       b = ""

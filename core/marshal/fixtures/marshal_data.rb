@@ -245,12 +245,10 @@ module MarshalSpec
     "marshal_dump object" => [UserMarshalWithIvar.new,
                               "\004\bU:\030UserMarshalWithIvar[\006\"\fmy data"],
     "Regexp" => [/\A.\Z/,
-#                "\004\b/\n\\A.\\Z\000"
-   "\004\bI/\n\\A.\\Z\000\a:\020@_st_source\"\n\\A.\\Z:\021@_st_optionsi\000"
+                 "\004\b/\n\\A.\\Z\000"
              ],
     "Regexp subclass /i" => [UserRegexp.new('', Regexp::IGNORECASE),
-#                            "\004\bC:\017UserRegexp/\000\001"
-"\004\bIC:\017UserRegexp/\000\001\a:\020@_st_source\"\000:\021@_st_optionsi\006"
+                             "\004\bC:\017UserRegexp/\000\001"
           ],
     "Float 0.0" => [0.0,
                     "\004\bf\0060"],

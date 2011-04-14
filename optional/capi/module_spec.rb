@@ -187,6 +187,7 @@ describe "CApiModule" do
     end
   end
 
+not_compliant_on :maglev do
   describe "rb_alias" do
     it "defines an alias for an existing method" do
       cls = Class.new do
@@ -199,6 +200,7 @@ describe "CApiModule" do
       cls.new.method_alias.should == :method_to_be_aliased
     end
   end
+end
 
   describe "rb_define_global_function" do
     it "defines a method on Object" do
