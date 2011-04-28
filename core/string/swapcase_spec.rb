@@ -67,6 +67,6 @@ describe "String#swapcase!" do
         a.freeze
         lambda { a.swapcase! }.should raise_error(RuntimeError)
       end
-    end  
+    end
   end
 end

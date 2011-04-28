@@ -7,14 +7,14 @@ describe "Class#dup" do
       def hello
         "hello"
       end
-      
+
       def self.message
         "text"
       end
     end
 
     klass_dup = klass.dup
-    
+
     klass_dup.new.hello.should == "hello"
     klass_dup.message.should == "text"
   end
@@ -24,7 +24,7 @@ describe "Class#dup" do
       def hello
         "hello"
       end
-      
+
       def self.message
         "text"
       end
@@ -32,7 +32,7 @@ describe "Class#dup" do
 
     klass = Class.new(super_klass)
     klass_dup = klass.dup
-    
+
     klass_dup.new.hello.should == "hello"
     klass_dup.message.should == "text"
   end

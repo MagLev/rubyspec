@@ -72,9 +72,9 @@ describe "Kernel#p" do
     lambda { p(*[]) }.should output("")
   end
 
-=begin Not sure how to spec this, but wanted to note the behavior here  
+=begin Not sure how to spec this, but wanted to note the behavior here
   it "does not flush if receiver is not a TTY or a File" do
-  end 
+  end
 =end
 end
 

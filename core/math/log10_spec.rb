@@ -3,10 +3,10 @@ require File.expand_path('../fixtures/classes', __FILE__)
 
 # The common logarithm, having base 10
 describe "Math.log10" do
-  it "returns a float" do 
+  it "returns a float" do
     Math.log10(1).should be_kind_of(Float)
   end
-  
+
   it "return the base-10 logarithm of the argument" do
     Math.log10(0.0001).should be_close(-4.0, TOLERANCE)
     Math.log10(0.000000000001e-15).should be_close(-27.0, TOLERANCE)
@@ -49,7 +49,7 @@ describe "Math.log10" do
   it "raises a TypeError if the argument is nil" do
     lambda { Math.log10(nil) }.should raise_error(TypeError)
   end
-  
+
   it "accepts any argument that can be coerced with Float()" do
     Math.log10(MathSpecs::Float.new).should be_close(0.0, TOLERANCE)
   end

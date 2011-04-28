@@ -289,7 +289,7 @@ end
     attach_function :string_equals, [ :string, :string ], :int
     attach_function :string_dummy, [ :string ], :void
   end
-  
+
   #
   # Struct initialize fixtures
   #
@@ -410,7 +410,7 @@ end
     }
     class TestUnion < FFI::Union
       layout( :a, [:char, 10],
-              :i, :int, 
+              :i, :int,
               :f, :float,
               :d, :double,
               :s, :short,

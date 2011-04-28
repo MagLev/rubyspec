@@ -21,7 +21,7 @@ describe :thread_exit, :shared => true do
     ScratchPad.recorded.should == :after_sleep
    end
   end
-  
+
   it "kills current thread" do
     thread = Thread.new do
       Thread.current.send(@method)
@@ -30,7 +30,7 @@ describe :thread_exit, :shared => true do
     thread.join
     ScratchPad.recorded.should == nil
   end
-  
+
   it "runs ensure clause" do
     thread = ThreadSpecs.dying_thread_ensures(@method) { ScratchPad.record :in_ensure_clause }
     thread.join
@@ -70,13 +70,13 @@ describe :thread_exit, :shared => true do
     ScratchPad.recorded.should include(:inner_ensure_clause)
     ScratchPad.recorded.should include(:outer_ensure_clause)
   end
-  
+
   it "does not set $!" do
     thread = ThreadSpecs.dying_thread_ensures(@method) { ScratchPad.record $! }
     thread.join
     ScratchPad.recorded.should == nil
   end
-   
+
   it "cannot be rescued" do
     thread = Thread.new do
       begin
@@ -89,7 +89,7 @@ describe :thread_exit, :shared => true do
     thread.join
     ScratchPad.recorded.should == nil
   end
- 
+
   ruby_version_is "" ... "1.9" do 
 
    not_compliant_on :maglev do # Maglev bug, scheduler deadlock
@@ -181,7 +181,7 @@ describe :thread_exit, :shared => true do
     end
   end
   end
-  
+
   # This case occurred in JRuby where native threads are used to provide
   # the same behavior as MRI green threads. Key to this issue was the fact
   # that the thread which called #exit in its block was also being explicitly

@@ -16,7 +16,7 @@ describe :hash_each, :shared => true do
     h.send(@method) { |k,v| r[k.to_s] = v.to_s }.should equal(h)
     r.should == new_hash("a" => "1", "b" => "2", "c" => "3", "d" => "5")
   end
-  
+
   it "yields the key only to a block expecting |key,|" do
     ary = []
     h = new_hash("a" => 1, "b" => 2, "c" => 3)
@@ -37,4 +37,4 @@ describe :hash_each, :shared => true do
     keys.should == h.keys
     values.should == h.values
   end
-end  
+end

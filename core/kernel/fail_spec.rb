@@ -27,7 +27,7 @@ describe "Kernel.fail" do
   end
 
   it "uses the specified message" do
-    lambda { 
+    lambda {
       begin
         fail "the duck is not irish."
       rescue => e

@@ -111,7 +111,7 @@ end
     File.exists?(@file).should == true
   end
 
-  ruby_bug "[ruby-dev:40397]", "1.8.8" do 
+  ruby_bug "[ruby-dev:40397]", "1.8.8" do
     it "returns a new File when use File::APPEND mode" do
      not_compliant_on :maglev do
       @fh = File.new(@file, File::APPEND)
@@ -170,12 +170,12 @@ end
       File.exists?(@file).should == true
     end
   end
-  
+
   it "raises a TypeError if the first parameter can't be coerced to a string" do
     lambda { File.new(true) }.should raise_error(TypeError)
     lambda { File.new(false) }.should raise_error(TypeError)
   end
-  
+
   it "raises a TypeError if the first parameter is nil" do
     lambda { File.new(nil) }.should raise_error(TypeError)
   end

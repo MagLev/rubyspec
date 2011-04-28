@@ -10,7 +10,7 @@ describe "Kernel#exec" do
   
   it "raises a SystemCallError if cmd cannot execute" do
     lambda { exec "" }.should raise_error(SystemCallError)
-  end  
+  end
 end
 
 describe "Kernel.exec" do

@@ -14,13 +14,13 @@ describe "UnboundMethod#source_location" do
         line = __LINE__ + 1
         define_method(:foo) { }
       end
-      
+
       method = cls.instance_method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
       method.source_location[1].should == line
     end
   end
-    
+
   ruby_version_is "1.9" do
     it "works for define_singleton_method methods" do
       line = nil
@@ -28,7 +28,7 @@ describe "UnboundMethod#source_location" do
         line = __LINE__ + 1
         define_singleton_method(:foo) { }
       end
-      
+
       method = cls.method(:foo)
       method.source_location[0].should =~ /#{__FILE__}/
       method.source_location[1].should == line

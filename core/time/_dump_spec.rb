@@ -48,7 +48,7 @@ describe "Time#_dump" do
            @t.usec
     low.should == @s.unpack("VV").last
   end
-  
+
   it "dumps like MRI's marshaled time format" do
     t = Time.utc(2000, 1, 15, 20, 1, 1, 203).localtime
    not_compliant_on :maglev do 

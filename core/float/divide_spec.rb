@@ -17,7 +17,7 @@ describe "Float#/" do
       lambda { 5.0 / FloatSpecs::CanCoerce.new(5) }.should raise_error(TypeError)
     end
   end
-  
+
   it "properly handles BigDecimal argument" do
     require 'bigdecimal'
     (2.0 / BigDecimal.new('5.0')).should be_close(0.4, TOLERANCE)
@@ -27,7 +27,7 @@ describe "Float#/" do
     (2.0 / BigDecimal.new('-0.0')).infinite?.should == -1
     (2.0 / BigDecimal.new('NaN')).nan?.should == true
   end
-  
+
   it "does NOT raise ZeroDivisionError if other is zero" do
     (1.0 / 0.0).to_s.should == 'Infinity'
     (-1.0 / 0.0).to_s.should == '-Infinity'

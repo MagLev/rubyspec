@@ -46,9 +46,9 @@ ruby_version_is t_ver do
         c.should == 'f'
       end
       @string.ungetc(c).should == nil
-      
+
       @string.readpartial(2).should == "f"
-      @string.rewind 
+      @string.rewind
       # now, also check that the ungot char is cleared and
       # not returned again
       @string.write("b").should == 1
@@ -86,6 +86,6 @@ ruby_version_is t_ver do
     it "immediately returns an empty string if the length argument is 0" do
       @string.readpartial(0).should == ""
     end
-    
+
   end
-end  
+end

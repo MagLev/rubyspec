@@ -12,7 +12,7 @@ describe "Kernel#`" do
     ip = 'world'
     `echo disc #{ip}`.should == "disc world\n"
   end
-  
+
   it "tries to convert the given argument to String using #to_str" do
     (obj = mock('echo test')).should_receive(:to_str).and_return("echo test")
     Kernel.`(obj).should == "test\n"

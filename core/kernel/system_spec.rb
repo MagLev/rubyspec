@@ -82,7 +82,7 @@ describe "Kernel#system" do
     result = system("#{RUBY_EXE} #{@helper_script} #{@shell_var} foo")
     result.should be_true
   end
-  
+
   it "does not expand shell variables when given multiples arguments" do
     result = system("#{RUBY_EXE}", @helper_script, @shell_var, "foo")
     result.should be_false

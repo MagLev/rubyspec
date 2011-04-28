@@ -12,6 +12,10 @@ module ProcSpecs
   end
  end
 
+  def self.new_proc_from_amp(&block)
+    block
+  end
+
   class ProcSubclass < Proc
   end
 

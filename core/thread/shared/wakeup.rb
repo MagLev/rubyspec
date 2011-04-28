@@ -1,3 +1,5 @@
+# Maglev todo : edit to use not_compliant_on
+
 describe :thread_wakeup, :shared => true do
   it "is not queued" do
     exit_loop = false
@@ -12,7 +14,7 @@ describe :thread_wakeup, :shared => true do
       
       sleep
       after_sleep1 = true
-      
+
       sleep
       after_sleep2 = true
     end
@@ -30,7 +32,7 @@ describe :thread_wakeup, :shared => true do
     after_sleep2.should == false # t should be blocked on the second sleep
     t.send(@method)
     Thread.pass while after_sleep2 != true
-    
+
     t.join
   end
 
@@ -48,7 +50,7 @@ describe :thread_wakeup, :shared => true do
       end
       Thread.pass
     end
-    
+
     1.should == 1 # test succeeds if we reach here
   end
 

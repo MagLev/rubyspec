@@ -112,7 +112,7 @@ describe "String#delete!" do
     a.should == "hello"
   end
 
-  ruby_version_is ""..."1.9" do 
+  ruby_version_is ""..."1.9" do
     it "raises a TypeError when self is frozen" do
       a = "hello"
       a.freeze
@@ -124,7 +124,7 @@ describe "String#delete!" do
     end
   end
 
-  ruby_version_is "1.9" do 
+  ruby_version_is "1.9" do
     it "raises a RuntimeError when self is frozen" do
       a = "hello"
       a.freeze

@@ -20,14 +20,14 @@ describe "BigDecimal#ceil" do
     @zero_pos = BigDecimal("+0")
     @zero_neg = BigDecimal("-0")
   end
-  
+
   ruby_version_is "" ... "1.9" do
     it "returns a BigDecimal" do
       @mixed.ceil.kind_of?(BigDecimal).should == true
       @pos_int.ceil(2).kind_of?(BigDecimal).should == true
     end
   end
-  
+
   ruby_version_is "1.9" do
     it "returns an Integer, if n is unspecified" do
       @mixed.ceil.kind_of?(Integer).should == true

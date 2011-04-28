@@ -24,7 +24,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.4
 
 TEST_SRCS = $(wildcard $(SRC_DIR)/*.c)
 TEST_OBJS := $(patsubst $(SRC_DIR)/%.c, $(TEST_BUILD_DIR)/%.o, $(TEST_SRCS))
-	
+
 #
 # Compiler/linker flags from:
 #   http://weblogs.java.net/blog/kellyohair/archive/2006/01/compilation_of_1.html
@@ -66,10 +66,16 @@ ifeq ($(OS), linux)
 endif
 
 ifeq ($(OS), solaris)
+<<<<<<< HEAD
   CC = /usr/sfw/bin/gcc -std=c99 -m64 -save-temps
   PreProcessFlags = -E
   LD = /usr/ccs/bin/ld -64
   SOFLAGS = -shared -static-libgcc 
+=======
+  CC = /usr/sfw/bin/gcc -std=c99
+  LD = /usr/ccs/bin/ld
+  SOFLAGS = -shared -static-libgcc
+>>>>>>> master
 endif
 
 ifeq ($(OS), aix)

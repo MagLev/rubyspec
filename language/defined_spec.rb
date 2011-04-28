@@ -1265,7 +1265,7 @@ describe "The defined? keyword for super" do
     it "returns 'super' from a block in a #define_method when a superclass method exists" do
       DefinedSpecs::Super.new.define_method_block_no_args.should == "super"
     end
-  
+
     it "returns 'super' when the method exists in a supermodule" do
       DefinedSpecs::SuperWithIntermediateModules.new.method_no_args.should == "super"
     end
@@ -1304,7 +1304,7 @@ describe "The defined? keyword for super" do
       DefinedSpecs::Super.new.define_method_block_args.should == "super"
     end
   end
-  
+
   describe "within an included module's method" do
     it "returns 'super' when a superclass method exists in the including hierarchy" do
       DefinedSpecs::Child.new.defined_super.should == "super"

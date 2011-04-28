@@ -65,12 +65,12 @@ describe "A method call" do
      end
       a.should == 14
     end
- 
+
     it "evaluates block pass after receiver" do
       p1 = proc {true}
       p2 = proc {false}
       p1.should_not == p2
-  
+
       p = p1
       (p = p2; @obj).foo0(&p).should == [false]
       p = p1

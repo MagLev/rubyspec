@@ -119,5 +119,5 @@ describe "String tests" do
     ptrary.write_array_of_pointer(ary)
     lambda { ptrary.get_array_of_string(-1) }.should raise_error
   end
- end # maglev
+ end 
 end

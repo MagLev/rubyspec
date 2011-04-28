@@ -4,9 +4,9 @@ require File.expand_path('../fixtures/classes', __FILE__)
 describe "Module#alias_method" do
   before(:each) do
     @class = Class.new(ModuleSpecs::Aliasing)
-    @object = @class.new 
+    @object = @class.new
   end
-  
+
   it "makes a copy of the method" do
     @class.make_alias :uno, :public_one
     @class.make_alias :double, :public_two
@@ -60,7 +60,7 @@ describe "Module#alias_method" do
   it "works in module" do
     ModuleSpecs::Allonym.new.publish.should == :report
   end
-  
+
   it "works on private module methods in a module that has been reopened" do
     ModuleSpecs::ReopeningModule.foo.should == true
     lambda { ModuleSpecs::ReopeningModule.foo2 }.should_not raise_error(NoMethodError)

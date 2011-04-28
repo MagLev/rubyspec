@@ -61,7 +61,7 @@ deviates_on :maglev do
     float.to_yaml.should == "--- 1.2\n...\n"
 end
   end
-  
+
   it "returns the YAML representation of an Integer object" do
     int = 20
     int.should be_kind_of(Integer)
@@ -72,7 +72,7 @@ deviates_on :maglev do
     int.to_yaml.should == "--- 20\n...\n"
 end
   end
-  
+
   it "returns the YAML representation of a NilClass object" do
     nil_klass = nil
     nil_klass.should be_kind_of(NilClass)
@@ -83,7 +83,7 @@ deviates_on :maglev do
     nil_klass.to_yaml.should == "--- !!null \n...\n"
 end
   end
-  
+
   it "returns the YAML represenation of a RegExp object" do
 not_compliant_on :maglev do
     Regexp.new('^a-z+:\\s+\w+').to_yaml.should == "--- !ruby/regexp /^a-z+:\\s+\\w+/\n"
@@ -92,7 +92,7 @@ deviates_on :maglev do
     Regexp.new('^a-z+:\\s+\w+').to_yaml.should == "--- !ruby/regexp /^a-z+:\\s+\\w+/\n...\n"
 end
   end
-  
+
   it "returns the YAML representation of a String object" do
 not_compliant_on :maglev do
     "I love Ruby".to_yaml.should == "--- I love Ruby\n"
@@ -115,7 +115,7 @@ deviates_on :maglev do
     :symbol.to_yaml.should ==  "--- :symbol\n...\n"
 end
   end
-  
+
   it "returns the YAML representation of a Time object" do
 not_compliant_on :maglev do
     Time.utc(2000,"jan",1,20,15,1).to_yaml.should ==        "--- 2000-01-01 20:15:01 Z\n"
@@ -124,7 +124,7 @@ deviates_on :maglev do
     (ax = Time.utc(2000,"jan",1,20,15,1).to_yaml).should == "--- 2000-01-01 20:15:01.000000Z\n...\n"
 end
   end
-  
+
   it "returns the YAML representation of a TrueClass" do
     true_klass = true
     true_klass.should be_kind_of(TrueClass)

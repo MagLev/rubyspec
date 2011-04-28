@@ -9,7 +9,7 @@ describe :enum_rewind, :shared => true do
    deviates_on :maglev do
     @enum = 1.upto(3)	# new is subclass responsibility, use a NumericEnumerator
    end
-  end  
+  end
 
   it "resets the enumerator to its initial state" do
     @enum.next.should == 1
@@ -33,5 +33,5 @@ describe :enum_rewind, :shared => true do
     @enum.rewind
     @enum.next.should == 1
   end
-  
+
 end

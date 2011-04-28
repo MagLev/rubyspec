@@ -17,7 +17,7 @@ describe "Kernel#public_methods" do
        KernelSpecs::Methods.new.public_methods(false).sort.should include()
      end
     end
-    
+
     it "returns a list of the names of publicly accessible methods in the object and its ancestors and mixed-in modules" do
      not_compliant_on :maglev do
       (KernelSpecs::Methods.public_methods(false) & KernelSpecs::Methods.public_methods).sort.should include(
@@ -44,7 +44,7 @@ describe "Kernel#public_methods" do
         :ichi, :juu, :juu_ni, :new, :roku, :san, :shi, :superclass)
       KernelSpecs::Methods.new.public_methods(false).sort.should include(:juu_san, :ni)
     end
-    
+
     it "returns a list of the names of publicly accessible methods in the object and its ancestors and mixed-in modules" do
       (KernelSpecs::Methods.public_methods(false) & KernelSpecs::Methods.public_methods).sort.should include(
         :allocate, :hachi, :ichi, :juu, :juu_ni, :new, :roku, :san, :shi, :superclass)

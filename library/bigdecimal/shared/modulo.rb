@@ -113,7 +113,7 @@ end
       @frac_2.send(@method, @infinity_minus).should == @frac_2
     end
   end
-  
+
   it "raises TypeError if the argument cannot be coerced to BigDecimal" do
     lambda {
       @one.send(@method, '2')

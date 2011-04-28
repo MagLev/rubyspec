@@ -13,7 +13,7 @@ describe "Fixnum#to_s when given a base" do
       12345.to_s(36).should == "9IX" 
     end
   end
-  
+
   it "raises an ArgumentError if the base is less than 2 or higher than 36" do
     lambda { 123.to_s(-1) }.should raise_error(ArgumentError)
     lambda { 123.to_s(0)  }.should raise_error(ArgumentError)

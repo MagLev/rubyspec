@@ -48,7 +48,7 @@ describe "String#upcase!" do
     a.should == "HELLO"
   end
 
-  ruby_version_is ""..."1.9" do 
+  ruby_version_is ""..."1.9" do
     it "raises a TypeError when self is frozen" do
       lambda { "HeLlo".freeze.upcase! }.should raise_error(TypeError)
      not_compliant_on :maglev do 
@@ -60,7 +60,7 @@ describe "String#upcase!" do
     end
   end
 
-  ruby_version_is "1.9" do 
+  ruby_version_is "1.9" do
     it "raises a RuntimeError when self is frozen" do
       lambda { "HeLlo".freeze.upcase! }.should raise_error(RuntimeError)
       lambda { "HELLO".freeze.upcase! }.should raise_error(RuntimeError)
