@@ -35,6 +35,7 @@ describe "Kernel#binding" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do  # send of binding not supported
     it "uses the receiver of #binding as self in the binding" do
       m = mock(:whatever)
       eval('self', m.send(:binding)).should == m
@@ -45,6 +46,7 @@ describe "Kernel#binding" do
       cls = Class.new { ScratchPad.record eval('self', m.send(:binding)) }
       ScratchPad.recorded.should == m
     end
+   end
   end
 
   ruby_version_is "1.9" do
