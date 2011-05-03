@@ -26,13 +26,8 @@ describe "Kernel.srand" do
   end
 
   it "accepts and uses a seed of 0" do
-   not_compliant_on :maglev do
     srand(0) 
     srand.should == 0
-   end
-   deviates_on :maglev do
-    lambda { srand(0)}.should raise_error 
-   end
   end
 
  not_compliant_on :maglev do
