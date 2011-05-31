@@ -78,7 +78,7 @@ module SocketSpecs
     attr_accessor :hostname, :port, :logger
 
     def initialize(host=nil, port=nil, logger=nil)
-      @host = host || SocketSpecs.hostname
+      @hostname = host || SocketSpecs.hostname
       @port = port || SocketSpecs.port
       @logger = logger
       @shutdown = false
@@ -90,8 +90,8 @@ module SocketSpecs
 
     def start
       @main = Thread.new do
-        log "SpecTCPServer starting on #{@host}:#{@port}"
-        @server = TCPServer.new @host, @port
+        log "SpecTCPServer starting on #{@hostname}:#{@port}"
+        @server = TCPServer.new @hostname, @port
 
         wait_for @server do
           socket = @server.accept
