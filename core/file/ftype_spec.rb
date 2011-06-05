@@ -53,11 +53,7 @@ describe "File.ftype" do
         File.ftype(link).should == 'link'
        end
        deviates_on :maglev do
-         if (RUBY_PLATFORM.match('solaris'))
-           File.ftype(link).should == 'blockSpecial' 
-         else
-           File.ftype(link).should == 'characterSpecial'
-         end
+         File.ftype(link).should == 'blockSpecial' 
        end
       end
     end
