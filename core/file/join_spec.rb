@@ -32,26 +32,14 @@ describe "File.join" do
 
   it "inserts the separator in between empty strings and arrays" do
     File.join("").should == ""
-   not_compliant_on :maglev do
     File.join("", "").should == "/"  
     File.join(["", ""]).should == "/" 
-   end
-   deviates_on :maglev do
-    File.join("", "").should == ""  
-    File.join(["", ""]).should == "" 
-   end
     File.join("a", "").should == "a/"
     File.join("", "a").should == "/a"
 
     File.join([]).should == ""
-   not_compliant_on :maglev do
     File.join([], []).should == "/"
     File.join([[], []]).should == "/"
-   end
-   deviates_on :maglev do
-    File.join([], []).should == "" 
-    File.join([[], []]).should == ""
-   end
     File.join("a", []).should == "a/"
     File.join([], "a").should == "/a"
   end
@@ -82,20 +70,12 @@ describe "File.join" do
     File.join("usr/",   "bin")   .should == "usr/bin"
     File.join("usr/",   "/bin")  .should == "usr/bin"
     File.join("usr//",  "/bin")  .should == "usr/bin"
-   not_compliant_on :maglev do
     File.join("usr//",  "//bin") .should == "usr//bin"
     File.join("usr//",  "///bin").should == "usr///bin"
     File.join("usr///", "//bin") .should == "usr//bin"
-   end
-   deviates_on :maglev do
-    File.join("usr//",  "//bin") .should == "usr/bin" # Maglev bug, should be "usr//bin"
-    File.join("usr//",  "///bin").should ==  "usr/bin"
-    File.join("usr///", "//bin") .should ==  "usr/bin"
-   end
   end
 
   # TODO: See MRI svn r23306. Add patchlevel when there is a release.
-not_compliant_on :maglev do   # no error on recursive array
   ruby_bug "redmine #1418", "1.8.8" do
     it "raises an ArgumentError if passed a recursive array" do
       a = ["a"]
@@ -103,7 +83,6 @@ not_compliant_on :maglev do   # no error on recursive array
       lambda { File.join a }.should raise_error(ArgumentError)
     end
   end
-end
 
   it "doesn't remove File::SEPARATOR from the middle of arguments" do
     path = File.join "file://usr", "bin"
