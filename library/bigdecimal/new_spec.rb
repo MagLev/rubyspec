@@ -13,7 +13,7 @@ describe "BigDecimal.new" do
       BigDecimal.new("1000000E-#{i}").should == 10**(6-i)
      end
      deviates_on :maglev do
-      BigDecimal.new("1000000E-#{i}").should be_close(10**(6-i), 1.0e-15)
+      BigDecimal.new("1000000E-#{i}").should be_close(10**(6-i).to_f , 1.0e-15)
      end
     }
     (1..9).each {|i|
