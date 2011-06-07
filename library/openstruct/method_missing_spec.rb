@@ -50,12 +50,15 @@ ruby_bug "redmine:4179", "1.9.2" do
   describe "OpenStruct#method_missing when called with method name '[]'" do
     it "raises a NoMethodError" do
       os = OpenStruct.new
+not_compliant_on :maglev do
       lambda { os.method_missing(:[]) }.should raise_error(NoMethodError)
+end
       lambda { os.method_missing(:[], 1) }.should raise_error(NoMethodError)
       lambda { os.method_missing(:[], 1, 2) }.should raise_error(NoMethodError)
     end
   end
 
+not_compliant_on :maglev do
   describe "OpenStruct#method_missing when called with method name '[]='" do
     it "raises a NoMethodError" do
       os = OpenStruct.new
@@ -65,3 +68,5 @@ ruby_bug "redmine:4179", "1.9.2" do
     end
   end
 end
+end # maglev
+
