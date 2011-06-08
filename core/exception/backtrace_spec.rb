@@ -19,16 +19,11 @@ describe "Exception#backtrace" do
   end
 
   it "includes the filename of the location where self raised in the first element" do
-    @backtrace.first.should =~ /common\.rb/
+    (fx = (bx = @backtrace).first).should =~ /common\.rb/
   end
 
   it "includes the line number of the location where self raised in the first element" do
-   not_compliant_on :maglev do
-    @backtrace.first.should =~ /:22:in /
-   end
-   deviates_on :maglev do
-     @backtrace[1].should =~ /.*:20:in/ 
-   end  
+   @backtrace.first.should =~ /:22:in /
   end
 
   it "includes the name of the method from where self raised in the first element" do
@@ -45,7 +40,7 @@ describe "Exception#backtrace" do
     @backtrace[1].should =~ /backtrace_spec\.rb/ 
    end
    deviates_on :maglev do
-    @backtrace[3].should =~ /backtrace_spec\.rb/ 
+    @backtrace[2].should =~ /backtrace_spec\.rb/ 
    end
   end
 
@@ -54,7 +49,7 @@ describe "Exception#backtrace" do
     @backtrace[1].should =~ /:6(:in )?/
    end
    deviates_on :maglev do
-    @backtrace[3].should =~ /:6(:in )?/
+    @backtrace[2].should =~ /:6(:in )?/
    end
   end
 

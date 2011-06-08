@@ -69,7 +69,8 @@ describe "Kernel#caller in a Proc or eval" do
         stack[1].should =~ /caller_spec\.rb:60/
       end
       deviates_on :maglev do
-        stack[1].should =~ /.*caller_spec\.rb:66/ 
+        stack[0].should =~ /caller_fixture1\.rb:31:in `third'/
+        stack[2].should =~ /caller_spec\.rb:66/
       end
     end
 
@@ -90,8 +91,8 @@ describe "Kernel#caller in a Proc or eval" do
         stack[1].should =~ /caller_spec\.rb:74/ 
       end
       deviates_on :maglev do
-        stack[2].should =~ /23:in \`__evalCaller\'/
-        stack[6].should =~ /caller_spec\.rb:87/
+        stack[1].should =~ /25:in \`__compileEval\'/
+        stack[4].should =~ /caller_spec\.rb:88/
       end
     end
 
@@ -101,7 +102,7 @@ describe "Kernel#caller in a Proc or eval" do
         stack[0].should =~ /caller_spec\.rb:80/
       end
       deviates_on :maglev do
-        stack[5].should =~ /.*caller_spec\.rb:99/ 
+        stack[3].should =~ /.*caller_spec\.rb:100/ 
       end
     end
 
@@ -115,8 +116,8 @@ describe "Kernel#caller in a Proc or eval" do
       end
       deviates_on :maglev do
         stack[0].should =~ /\(eval\).*_compileEval/ # Maglev deviation
-        stack[4].should =~/.*caller_fixture2\.rb:23/  # Maglev deviations
-        stack[6].should =~/.*caller_spec\.rb:109/
+        stack[3].should =~/.*caller_fixture2\.rb:23/  # Maglev deviations
+        stack[4].should =~/.*caller_spec\.rb:110/
       end
     end
   end
