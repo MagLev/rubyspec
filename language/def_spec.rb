@@ -211,10 +211,8 @@ describe "A method defined with extreme default arguments" do
 
     d = DefSpecs.new
     d.foo(42).should == 42
-   not_compliant_on :maglev do # getting an ExecBlock
     d.foo.should == 1
     d.foo.should == 'hello'
-   end
   end
 
   it "may use an fcall as a default" do
@@ -340,14 +338,10 @@ describe "A nested method definition" do
     end
 
     lambda { DefSpecNested.a_class_method }.should raise_error(NoMethodError)
-   not_compliant_on :maglev do 
-    DefSpecNested.create_class_method.should == DefSpecNested # a_class_method MNU
-    DefSpecNested.a_class_method.should == DefSpecNested # MNU
-   end
-   deviates_on :maglev do  # bugs
+    DefSpecNested.create_class_method.should == DefSpecNested
+    DefSpecNested.a_class_method.should == DefSpecNested
     lambda { Object.a_class_method }.should raise_error(NoMethodError)
     lambda { DefSpecNested.new.a_class_method }.should raise_error(NoMethodError)
-   end
   end
 
   it "creates a singleton method when evaluated in the metaclass of an instance" do

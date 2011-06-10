@@ -174,12 +174,7 @@ describe "C-API Class function" do
     end
 
     it "returns true if the class instance variable is defined" do
-     not_compliant_on :maglev do
       @s.rb_cvar_defined(CApiClassSpecs::CVars, "@c_ivar").should be_true
-     end
-     deviates_on :maglev do # bug
-      @s.rb_cvar_defined(CApiClassSpecs::CVars, "@c_ivar").should be_false # bug
-     end
     end
   end
 
