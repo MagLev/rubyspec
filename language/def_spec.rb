@@ -427,14 +427,11 @@ describe "A method definition in an eval" do
       end
     end
 
-   not_compliant_on :maglev do 
     DefSpecNestedB.eval_class_method.should == DefSpecNestedB
     DefSpecNestedB.an_eval_class_method.should == DefSpecNestedB
-   end
-   deviates_on :maglev do 
+
     lambda { Object.an_eval_class_method }.should raise_error(NoMethodError)
     lambda { DefSpecNestedB.new.an_eval_class_method}.should raise_error(NoMethodError)
-   end
   end
 
   it "creates a singleton method" do
