@@ -85,7 +85,7 @@ describe "String#%" do
     end
   end
 
-  it "replaces trailing absolute argument specifier without type with percent sign" do #
+  it "replaces trailing absolute argument specifier without type with percent sign" do
    not_compliant_on :maglev do
     ("hello %1$" % "foo").should == "hello %"
    end
@@ -223,7 +223,7 @@ describe "String#%" do
 
  not_compliant_on :maglev do
   ruby_bug "#", "1.8.6.228" do
-    it "tries to convert the argument to Array by calling #to_ary" do #
+    it "tries to convert the argument to Array by calling #to_ary" do
       obj = mock('[1,2]')
       def obj.to_ary() [1, 2] end
       def obj.to_s() "obj" end
@@ -250,7 +250,7 @@ describe "String#%" do
   end
 
  not_supported_on :maglev do  # no  taint propagation
-  it "always taints the result when the format string is tainted" do #
+  it "always taints the result when the format string is tainted" do
     universal = mock('0')
     def universal.to_int() 0 end
     def universal.to_str() "0" end
@@ -288,15 +288,16 @@ describe "String#%" do
   ruby_version_is ""..."1.9" do
     it "supports binary formats using %b for negative numbers" do
       ("%b" % -5).should == "..1011"
-      ("%0b" % -5).should == "1011"
       ("%.4b" % 2).should == "0010"
-       ("%.1b" % -5).should == "1011" 
-     not_compliant_on :maglev do 
-       ("%.7b" % -5).should == "1111011"
-        ("%.10b" % -5).should == "1111111011"
-        ("% b" % -5).should == "-101"
-        ("%+b" % -5).should == "-101"
-        ("%b" % -(2 ** 64 + 5)).should == "..101111111111111111111111111111111111111111111111111111111111111011"
+     not_compliant_on :maglev do
+      ("%0b" % -5).should == "1011"
+      ("%.1b" % -5).should == "1011"
+      ("%.7b" % -5).should == "1111011"
+      ("%.10b" % -5).should == "1111111011"
+      ("% b" % -5).should == "-101"
+      ("%+b" % -5).should == "-101"
+      ("%b" % -(2 ** 64 + 5)).should ==
+      "..101111111111111111111111111111111111111111111111111111111111111011"
      end
     end
   end
@@ -368,7 +369,7 @@ describe "String#%" do
 
   ruby_version_is "1.8.6.278" do
    not_compliant_on :maglev do
-    it "calls #to_ary on argument for %c formats" do #
+    it "calls #to_ary on argument for %c formats" do
       obj = mock('65')
       obj.should_receive(:to_ary).and_return([65])
       ("%c" % obj).should == ("%c" % [65])
@@ -407,17 +408,21 @@ describe "String#%" do
     # The following version inconsistency in negative-integers is explained in
     # http://ujihisa.blogspot.com/2009/12/string-differs-between-ruby-18-and-19.html
     ruby_version_is ""..."1.9" do
+     not_compliant_on :maglev do
       it "supports negative integers using #{format}, giving priority to `0`" do
         ("%-03#{f}" % -5).should == "-05"
         ("%+-03#{f}" % -5).should == "-05"
       end
+     end
     end
 
     ruby_version_is "1.9" do
+     not_compliant_on :maglev do
       it "supports negative integers using #{format}, giving priority to `-`" do
         ("%-03#{f}" % -5).should == "-5 "
         ("%+-03#{f}" % -5).should == "-5 "
       end
+     end
     end
   end
 
@@ -584,18 +589,20 @@ describe "String#%" do
   end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do
     it "supports octal formats using %o for negative numbers" do
       # These are incredibly wrong. -05 == -5, not 7177777...whatever
-      ("%o" % -5).should ==  "..7777777777773" # Maglev,  was "..73"  
-      ("%0o" % -5).should == "7777777777773" # was "73"
+      ("%o" % -5).should == "..73"
+      ("%0o" % -5).should == "73"
       ("%.4o" % 20).should == "0024"
-      ("%.1o" % -5).should == "7777777777773" # was"73"
-      ("%.7o" % -5).should == "7777777777773" # was "7777773"
-      ("%.10o" % -5).should == "7777777777773" # was "7777777773"
+      ("%.1o" % -5).should == "73"
+      ("%.7o" % -5).should == "7777773"
+      ("%.10o" % -5).should == "7777777773"
 
-      #("% o" % -26).should == "-32"  # Maglev uses .. prefix
-      # ("%+o" % -26).should == "-32"
-      ("%o" % -(2 ** 64 + 5)).should == "..775777777777777777777773" # was "..75777777777777777777773"
+      ("% o" % -26).should == "-32"
+      ("%+o" % -26).should == "-32"
+      ("%o" % -(2 ** 64 + 5)).should == "..75777777777777777777773"
+   end
     end
   end
 
@@ -635,7 +642,7 @@ describe "String#%" do
   end
 
  not_supported_on :maglev do #  taint not propagated
-  it "taints result for %p when argument.inspect is tainted" do #
+  it "taints result for %p when argument.inspect is tainted" do
     obj = mock('x')
     def obj.inspect() "x".taint end
 
@@ -672,7 +679,7 @@ describe "String#%" do
   end
 
  not_supported_on :maglev do # taint not propagated
-  it "taints result for %s when argument is tainted" do #
+  it "taints result for %s when argument is tainted" do
     ("%s" % "x".taint).tainted?.should == true
     ("%s" % mock('x').taint).tainted?.should == true
     ("%s" % 5.0.taint).tainted?.should == true
@@ -682,7 +689,7 @@ describe "String#%" do
   # MRI crashes on this one.
   # See http://groups.google.com/group/ruby-core-google/t/c285c18cd94c216d
  not_compliant_on :maglev do  # no error, but no crash
-  it "raises an ArgumentError for huge precisions for %s" do #
+  it "raises an ArgumentError for huge precisions for %s" do
     block = lambda { "%.25555555555555555555555555555555555555s" % "hello world" }
     block.should raise_error(ArgumentError)
   end

@@ -5,30 +5,32 @@ describe "Module#method_defined?" do
   it "returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules" do
     # Defined in Child
     ModuleSpecs::Child.method_defined?(:public_child).should == true
-   not_compliant_on :maglev do
     ModuleSpecs::Child.method_defined?("private_child").should == false
-   end
     ModuleSpecs::Child.method_defined?(:accessor_method).should == true
 
     # Defined in Parent
     ModuleSpecs::Child.method_defined?("public_parent").should == true
-   not_compliant_on :maglev do
     ModuleSpecs::Child.method_defined?(:private_parent).should == false
-   end
 
     # Defined in Module
     ModuleSpecs::Child.method_defined?(:public_module).should == true
-    ModuleSpecs::Child.method_defined?(:protected_module).should == true
    not_compliant_on :maglev do
-    ModuleSpecs::Child.method_defined?(:private_module).should == false 
+    ModuleSpecs::Child.method_defined?(:protected_module).should == true
    end
+   deviates_on :maglev do
+    ModuleSpecs::Child.method_defined?(:protected_module).should == false
+   end
+    ModuleSpecs::Child.method_defined?(:private_module).should == false
 
     # Defined in SuperModule
     ModuleSpecs::Child.method_defined?(:public_super_module).should == true
-    ModuleSpecs::Child.method_defined?(:protected_super_module).should == true
    not_compliant_on :maglev do
-    ModuleSpecs::Child.method_defined?(:private_super_module).should == false
+    ModuleSpecs::Child.method_defined?(:protected_super_module).should == true
    end
+   deviates_on :maglev do
+    ModuleSpecs::Child.method_defined?(:protected_super_module).should == false
+   end
+    ModuleSpecs::Child.method_defined?(:private_super_module).should == false
   end
 
   # unlike alias_method, module_function, public, and friends,

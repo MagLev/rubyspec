@@ -27,8 +27,7 @@ describe "Kernel#sprintf" do
 
     sprintf("%#x", 123).should == "0x7b"
     sprintf("%#0x", 123).should == "0x7b"
-   not_compliant_on :maglev do # needs fixes
-    sprintf("%# x", 123).should == " 0x7b"    #
+    sprintf("%# x", 123).should == " 0x7b"
     sprintf("%#+x", 123).should == "+0x7b"
     sprintf("%#+0x", 123).should == "+0x7b"
     sprintf("%#+ x", 123).should == "+0x7b"
@@ -65,13 +64,12 @@ describe "Kernel#sprintf" do
     sprintf("%+010.8x", 123).should == " +0000007b"
     sprintf("%+ 10.8x", 123).should == " +0000007b"
     sprintf("% 010.8x", 123).should == "  0000007b"
-   end
   end
 
+not_compliant_on :maglev do # bugs
   ruby_bug "svn r29502", "1.9.2.135" do
     describe "with negative values" do
       describe "with format %x" do
-       not_compliant_on :maglev do # bugs
         it "precedes the number with '..'" do
           [ ["%0x",     "..f85"],
             ["%#0x",    "0x..f85"],
@@ -83,11 +81,9 @@ describe "Kernel#sprintf" do
             ["%010.8x", "  ..ffff85"],
           ].should be_computed_by_function(:sprintf, -123)
         end
-       end #
       end
 
       describe "with format %u" do
-       not_compliant_on :maglev do # bugs
         it "precedes the number with '-'" do
           [ ["%u",        "-123"],
             ["%0u",       "-123"],
@@ -110,26 +106,23 @@ describe "Kernel#sprintf" do
             ["%#30.24u",  "     -000000000000000000000123"],
             ["%#030.24u", "     -000000000000000000000123"],
           ].should be_computed_by_function(:sprintf, -123)
-        end
        end
       end
 
       describe "with format %b or %B" do
-     not_compliant_on :maglev do # bugs
         it "precedes the number with '..'" do
           [ ["%.7b", "..11011"],
             ["%.7B", "..11011"],
             ["%0b",  "..1011"],
           ].should be_computed_by_function(:sprintf, -5)
         end
-     end
       end
     end
   end
+end #
 
   it "passes some tests for negative %x" do
     sprintf("%x", -123).should == "..f85"
-   not_compliant_on :maglev do # maglev needs fixes
     sprintf("% x", -123).should == "-7b"  
     sprintf("%+x", -123).should == "-7b"
     sprintf("%+0x", -123).should == "-7b"
@@ -168,7 +161,6 @@ describe "Kernel#sprintf" do
     sprintf("%+010.8x", -123).should == " -0000007b"
     sprintf("%+ 10.8x", -123).should == " -0000007b"
     sprintf("% 010.8x", -123).should == " -0000007b"
-   end
   end
 
   it "passes some tests for negative %u" do
@@ -236,7 +228,7 @@ describe "Kernel#sprintf" do
         sprintf("%#08u", -123).should == "18446744073709551493"
 
         sprintf("%30u", -123).should == "        ..18446744073709551493"
-not_compliant_on :maglev do # bug, fixes needed
+  not_compliant_on :maglev do # bug, fixes needed
         sprintf("%030u", -123).should == "..........18446744073709551493"
 
         sprintf("%#30u", -123).should == "        ..18446744073709551493"
@@ -254,7 +246,7 @@ not_compliant_on :maglev do # bug, fixes needed
 
         sprintf("%#30.24u", -123).should == "      ....18446744073709551493"
         sprintf("%#030.24u", -123).should == "      ....18446744073709551493"
-end
+  end
       end
     end
   end
@@ -307,14 +299,10 @@ end
 
 
     sprintf("%30.24u", 123).should == "      000000000000000000000123"
-not_compliant_on :maglev do # bug
     sprintf("%030.24u", 123).should == "      000000000000000000000123"
-end
 
     sprintf("%#30.24u", 123).should == "      000000000000000000000123"
-not_compliant_on :maglev do # bug
-    maglev bug #sprintf("%#030.24u", 123).should == "      000000000000000000000123"
-end
+    sprintf("%#030.24u", 123).should == "      000000000000000000000123"
   end
 
   it "passes some tests for positive %f" do
@@ -345,9 +333,10 @@ end
     sprintf("%010.0f", -123.5).should == "-000000124"
   end
 
- not_compliant_on :maglev do #
   it "passes kstephens's tests" do # bugs
+   not_compliant_on :maglev do
     sprintf("%*1$.*2$3$d", 10, 5, 1).should == "     00001"
+   end
     sprintf("%b", 0).should == "0"
     sprintf("%B", 0).should == "0"
     sprintf("%b", -5).should == "..1011"
@@ -376,7 +365,6 @@ end
     sprintf("%+03d", 123).should == "+123"
     sprintf("%+03d", -123).should == "-123"
   end
- end #
 end
 
 describe "Kernel.sprintf" do
