@@ -53,7 +53,9 @@ describe "File.ftype" do
         File.ftype(link).should == 'link'
        end
        deviates_on :maglev do
-         File.ftype(link).should == 'blockSpecial' 
+         ty = File.ftype(link)  # varies on different machines and OS versions
+         ok = ty == 'characterSpecial' || ty == 'blockSpecial'
+         ok.should == true
        end
       end
     end
