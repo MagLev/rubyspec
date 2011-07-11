@@ -10,7 +10,12 @@ describe "Socket::BasicSocket#getsockname" do
   it "returns the sockaddr associacted with the socket" do
     @socket = TCPServer.new("127.0.0.1", SocketSpecs.port)
     sockaddr = Socket.unpack_sockaddr_in(@socket.getsockname)
+   not_compliant_on :maglev do
     sockaddr.should == [SocketSpecs.port, "127.0.0.1"]
+   end
+   deviates_on :maglev do
+    sockaddr.should == [SocketSpecs.port, "::ffff:127.0.0.1"]
+   end
  end
 
   it "works on sockets listening in ipaddr_any" do
@@ -20,7 +25,7 @@ describe "Socket::BasicSocket#getsockname" do
     ["::", "0.0.0.0", "::ffff:0.0.0.0"].include?(sockaddr[1]).should be_true
    end
    deviates_on :maglev do
-    ["::", "127.0.0.1"].include?(sockaddr[1]).should be_true # maglev accomodate solaris
+    ["::", "::ffff:127.0.0.1"].include?(sockaddr[1]).should be_true # maglev accomodate solaris
    end
     sockaddr[0].should == SocketSpecs.port
   end

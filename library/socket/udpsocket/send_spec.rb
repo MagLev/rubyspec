@@ -26,9 +26,15 @@ describe "UDPSocket.send" do
     @server_thread.join
 
     @msg[0].should == "ad hoc"
-    @msg[1][0].should == "AF_INET"
     @msg[1][1].should be_kind_of(Fixnum)
+not_compliant_on :maglev do
+    @msg[1][0].should == "AF_INET"
     @msg[1][3].should == "127.0.0.1"
+end
+deviates_on :maglev do
+    @msg[1][0].should == "AF_INET6"
+    @msg[1][3].should == "::ffff:127.0.0.1"
+end
   end
 
   it "sends data in ad hoc mode (with port given as a String)" do
@@ -38,9 +44,15 @@ describe "UDPSocket.send" do
     @server_thread.join
 
     @msg[0].should == "ad hoc"
-    @msg[1][0].should == "AF_INET"
     @msg[1][1].should be_kind_of(Fixnum)
+not_compliant_on :maglev do
+    @msg[1][0].should == "AF_INET"
     @msg[1][3].should == "127.0.0.1"
+end
+deviates_on :maglev do
+    @msg[1][0].should == "AF_INET6"
+    @msg[1][3].should == "::ffff:127.0.0.1"
+end
   end
 
   it "sends data in connection mode" do
@@ -51,8 +63,14 @@ describe "UDPSocket.send" do
     @server_thread.join
 
     @msg[0].should == "connection-based"
-    @msg[1][0].should == "AF_INET"
     @msg[1][1].should be_kind_of(Fixnum)
+not_compliant_on :maglev do
+    @msg[1][0].should == "AF_INET"
     @msg[1][3].should == "127.0.0.1"
+end
+deviates_on :maglev do
+    @msg[1][0].should == "AF_INET6"
+    @msg[1][3].should == "::ffff:127.0.0.1"
+end
   end
 end

@@ -5,12 +5,18 @@ describe "Socket::IPSocket#getaddress" do
 
   it "returns the IP address of hostname" do
     addr_local = IPSocket.getaddress(SocketSpecs.hostname)
-    ["127.0.0.1", "::1"].include?(addr_local).should == true
+    ["127.0.0.1", "::1", "::ffff:127.0.0.1"].include?(addr_local).should == true
   end
 
   it "returns the IP address when passed an IP" do
+not_compliant_on :maglev do
     IPSocket.getaddress("127.0.0.1").should == "127.0.0.1"
     IPSocket.getaddress("0.0.0.0").should == "0.0.0.0"
+end
+deviates_on :maglev do
+    IPSocket.getaddress("127.0.0.1").should == "::ffff:127.0.0.1"
+    IPSocket.getaddress("0.0.0.0").should == "::ffff:0.0.0.0"
+end
   end
 
   # There is no way to make this fail-proof on all machines, because

@@ -22,7 +22,12 @@ describe "UDPSocket.bind" do
 
     port, host = Socket.unpack_sockaddr_in(@socket.getsockname)
 
+not_compliant_on :maglev do
     host.should == "127.0.0.1"
+end
+deviates_on :maglev do
+    host.should == "::ffff:127.0.0.1"
+end
     port.should == SocketSpecs.port
   end
 
@@ -30,6 +35,11 @@ describe "UDPSocket.bind" do
     sx = @socket.bind("", SocketSpecs.port)
     sx.should == 0
     port, host = Socket.unpack_sockaddr_in(@socket.getsockname)
+not_compliant_on :maglev do
     host.should == "0.0.0.0"
+end
+deviates_on :maglev do
+    host.should == "::"
+end
   end
 end

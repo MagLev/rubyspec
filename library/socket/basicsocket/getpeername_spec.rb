@@ -14,7 +14,13 @@ describe "Socket::BasicSocket#getpeername" do
   end
 
   it "returns the sockaddr of the other end of the connection" do
+   server_sockaddr = nil
+   not_compliant_on :maglev do
     server_sockaddr = Socket.pack_sockaddr_in(SocketSpecs.port, "127.0.0.1")
+   end
+   deviates_on :maglev do
+    server_sockaddr = Socket.pack_sockaddr_in(SocketSpecs.port, "::ffff:127.0.0.1")
+   end
     @client.getpeername.should == server_sockaddr
   end
 
