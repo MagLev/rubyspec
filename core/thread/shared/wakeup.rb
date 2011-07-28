@@ -1,17 +1,17 @@
 # Maglev todo : edit to use not_compliant_on
 
 describe :thread_wakeup, :shared => true do
-  it "is not queued" do
+  it "can interrupt Kernel#sleep" do
     exit_loop = false
     after_sleep1 = false
     after_sleep2 = false
+
     t = Thread.new do
-#      loop do   # Maglev infinite loop here, because non-preemptive scheduling
-#        if exit_loop == true
-#          break
-#        end
-#      end
-      
+# maglev infinite loop here because of non-premptive scheduling
+#     while true
+#       break if exit_loop == true
+#     end
+
       sleep
       after_sleep1 = true
 
@@ -19,7 +19,8 @@ describe :thread_wakeup, :shared => true do
       after_sleep2 = true
     end
 
-#    10.times { t.send(@method); Thread.pass } # These will all get ignored because the thread is not sleeping yet
+#   10.times { t.send(@method); Thread.pass } # These will all get ignored because the thread is not sleeping yet
+    t.status.should_not == "sleep"
 
     exit_loop = true
     
@@ -31,7 +32,6 @@ describe :thread_wakeup, :shared => true do
     Thread.pass while (st = t.status) and st != 'sleep' and st != 'run'
     after_sleep2.should == false # t should be blocked on the second sleep
     t.send(@method)
-    Thread.pass while after_sleep2 != true
 
     t.join
   end

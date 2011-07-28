@@ -56,6 +56,7 @@ describe "Thread#status" do
    end
   end
 
+  quarantine! do
   it "reports aborting on a killed thread" do
    not_compliant_on :maglev do
     ThreadSpecs.status_of_aborting_thread.status.should == 'aborting'
@@ -63,5 +64,6 @@ describe "Thread#status" do
    deviates_on :maglev do
     ThreadSpecs.status_of_aborting_thread.status.should == nil
    end
+  end
   end
 end

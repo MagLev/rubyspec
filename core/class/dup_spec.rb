@@ -1,4 +1,5 @@
 require File.expand_path('../../../spec_helper', __FILE__)
+require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Class#dup" do
  not_compliant_on :maglev do  # Class#dup not implemented
@@ -36,6 +37,26 @@ describe "Class#dup" do
     klass_dup.new.hello.should == "hello"
     klass_dup.message.should == "text"
   end
+
+  ruby_version_is ""..."1.9" do
+    it "sets the name from the class to \"\" if not assigned to a constant" do
+      copy = CoreClassSpecs::Record.dup
+      copy.name.should == ""
+    end
+  end
+
+  ruby_version_is "1.9" do
+    it "sets the name from the class to nil if not assigned to a constant" do
+      copy = CoreClassSpecs::Record.dup
+      copy.name.should be_nil
+    end
+  end
+
+  it "stores the new name if assigned to a constant" do
+    CoreClassSpecs::RecordCopy = CoreClassSpecs::Record.dup
+    CoreClassSpecs::RecordCopy.name.should == "CoreClassSpecs::RecordCopy"
+  end
+
  end
  deviates_on :maglev do
    it "Class#dup not implemented yet" do
@@ -47,4 +68,5 @@ describe "Class#dup" do
     lambda { klass_dup = klass.dup }.should raise_error(NotImplementedError)
    end
  end
+
 end

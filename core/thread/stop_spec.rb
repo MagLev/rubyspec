@@ -73,6 +73,7 @@ describe "Thread#stop?" do
    end
   end
 
+  quarantine! do
   it "reports aborting on a killed thread" do
    not_compliant_on :maglev do 
     ThreadSpecs.status_of_aborting_thread.stop?.should == false
@@ -80,5 +81,6 @@ describe "Thread#stop?" do
    deviates_on :maglev do 
     ThreadSpecs.status_of_aborting_thread.stop?.should == true # Maglev bug
    end
+  end
   end
 end

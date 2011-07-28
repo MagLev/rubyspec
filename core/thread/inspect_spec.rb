@@ -70,6 +70,7 @@ describe "Thread#inspect" do
   end
  end
 
+  quarantine! do
   it "reports aborting on a killed thread" do
    not_compliant_on :maglev do
     ThreadSpecs.status_of_aborting_thread.inspect.should include('aborting')
@@ -77,5 +78,6 @@ describe "Thread#inspect" do
    deviates_on :maglev do
     ThreadSpecs.status_of_aborting_thread.inspect.should include('nil')
    end
+  end
   end
 end

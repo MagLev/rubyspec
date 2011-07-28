@@ -32,6 +32,10 @@ module ThreadSpecs
     end
   end
 
+  def self.spin_until_sleeping(t)
+    Thread.pass while t.status and t.status != "sleep"
+  end
+
   def self.sleeping_thread
     Thread.new do
       begin
@@ -118,23 +122,6 @@ module ThreadSpecs
   end
 
   def self.status_of_aborting_thread
-   t = nil
-   not_compliant_on :maglev do 
-    t = Thread.new { begin; sleep; ensure; Thread.pass; end }
-   end
-   deviates_on :maglev do 
-    t = Thread.new { sleep }
-   end
-    begin
-      Thread.critical = true if Thread.respond_to? :critical
-     not_compliant_on :maglev do
-      Thread.pass while t.status and t.status != 'sleep'
-     end
-      t.kill
-      Status.new t
-    ensure
-      Thread.critical = false if Thread.respond_to? :critical
-    end
   end
 
   def self.status_of_killed_thread

@@ -31,4 +31,29 @@ describe "Thread.new" do
   end
  end
 
+  it "calls #initialize and raises an error if super not used" do
+    c = Class.new(Thread) do
+      def initialize
+      end
+    end
+
+    lambda {
+      c.new
+    }.should raise_error(ThreadError)
+  end
+
+  it "calls and respects #initialize for the block to use" do
+    c = Class.new(Thread) do
+      def initialize
+        ScratchPad.record [:good]
+        super { ScratchPad << :in_thread }
+      end
+    end
+
+    t = c.new
+    t.join
+
+    ScratchPad.recorded.should == [:good, :in_thread]
+  end
+
 end

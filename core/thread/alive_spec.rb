@@ -48,4 +48,22 @@ describe "Thread#alive?" do
     ThreadSpecs.status_of_aborting_thread.alive?.should == false # a killed thread is not alive
    end
   end
+
+  it "return true for a killed but still running thread" do
+    exit = false
+    t = Thread.new do
+      begin
+        sleep
+      ensure
+        true while !exit # spin until told to exit
+      end
+    end
+
+    ThreadSpecs.spin_until_sleeping(t)
+
+    t.kill
+    t.alive?.should == true
+    exit = true
+    t.join
+  end
 end
