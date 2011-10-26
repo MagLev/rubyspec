@@ -98,7 +98,12 @@ describe "CApiNumericSpecs" do
       end
 
       it "converts a negative Bignum into an unsigned number" do
+not_compliant_on :maglev do
         @s.rb_num2ulong(-9223372036854734331).should == 9223372036854817285
+end
+deviates_on :maglev do
+	lambda { @s.rb_num2ulong(-9223372036854734331) }.should raise_error(RangeError)
+end
       end
 
       it "raises a RangeError if the value is more than 64bits" do

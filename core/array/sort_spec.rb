@@ -72,7 +72,12 @@ describe "Array#sort" do
   end
 
   it "raises an error when a given block returns nil" do
+   not_compliant_on :maglev do
     lambda { [1, 2].sort {} }.should raise_error(ArgumentError)
+   end
+   deviates_on :maglev do
+    lambda { [1, 2].sort {} }.should raise_error(NoMethodError)
+   end
   end
 
   it "does not call #<=> on contained objects when invoked with a block" do

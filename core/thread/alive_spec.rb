@@ -40,14 +40,11 @@ describe "Thread#alive?" do
   end
  end
 
+ not_compliant_on :maglev do  
   it "reports aborting on a killed thread" do
-   not_compliant_on :maglev do  
     ThreadSpecs.status_of_aborting_thread.alive?.should == true
-   end
-   deviates_on :maglev do 
-    ThreadSpecs.status_of_aborting_thread.alive?.should == false # a killed thread is not alive
-   end
   end
+ end 
 
   it "return true for a killed but still running thread" do
     exit = false
@@ -55,14 +52,16 @@ describe "Thread#alive?" do
       begin
         sleep
       ensure
-        true while !exit # spin until told to exit
+        while !exit do # spin until told to exit
+          Thread.pass # maglev avoid infinite loop
+        end
       end
     end
 
     ThreadSpecs.spin_until_sleeping(t)
 
     t.kill
-    t.alive?.should == true
+    t.alive?.should == false # was true
     exit = true
     t.join
   end

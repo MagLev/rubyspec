@@ -207,11 +207,13 @@ describe "Invoking a private setter method" do
 end
 
 describe "Invoking a private getter method" do
+ not_compliant_on :maglev do  # method is allowed
   it "does not permit self as a receiver" do
     receiver = LangSendSpecs::PrivateGetter.new
     lambda { receiver.call_self_foo }.should raise_error(NoMethodError)
     lambda { receiver.call_self_foo_or_equals(6) }.should raise_error(NoMethodError)
   end
+ end
 end
 
 language_version __FILE__, "send"

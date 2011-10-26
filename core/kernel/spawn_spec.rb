@@ -1,6 +1,11 @@
 require File.expand_path('../../../spec_helper', __FILE__)
 
-ruby_version_is "1.9" do
+t_ver = "1.9"
+deviates_on :maglev do
+  t_ver = "1.8.7"
+end
+
+ruby_version_is t_ver do 
   describe "Kernel.spawn" do
     before :each do
       @name = tmp("kernel_spawn.txt")
@@ -13,6 +18,7 @@ ruby_version_is "1.9" do
 
     it "executes the given command" do
       pid = spawn("#{RUBY_EXE} -e 'print :spawn' >#{@name}")
+      px = Process
       Process.wait pid
       @name.should have_data("spawn")
     end
@@ -33,7 +39,12 @@ ruby_version_is "1.9" do
       start = Time.now
       pid = spawn("#{RUBY_EXE} -e 'sleep 10'")
       (Time.now - start).should < 5
+     not_compliant_on :maglev do
       Process.kill :KILL, pid
+     end
+     deviates_on :maglev do
+      Process.kill :TERM, pid
+     end
       Process.wait pid
     end
 
@@ -51,12 +62,14 @@ ruby_version_is "1.9" do
         pgid.should == Process.getpgid(Process.pid)
       end
 
+     not_compliant_on :maglev do
       it "joins a new process group if :pgroup => true" do
         pid = spawn("#{RUBY_EXE} -e 'print Process.getpgid(Process.pid)' >#{@name}", {:pgroup => true})
         Process.wait pid
         pgid = File.read(@name).to_i
         pgid.should_not == Process.getpgid(Process.pid)
       end
+     end
     end
 
     it "uses the current working directory as its working directory" do
@@ -73,6 +86,7 @@ ruby_version_is "1.9" do
       @name.should have_data(dir)
     end
 
+   not_compliant_on :maglev do  # :out, :err , :pgroup not implemented yet
     it "redirects STDOUT to the given file descriptior if :out => Fixnum" do
       file = File.open(@name, 'w')
       pid = spawn("#{RUBY_EXE} -e 'print(:glark)'", {:out => file.fileno})
@@ -147,5 +161,6 @@ ruby_version_is "1.9" do
       Process.wait spawn('echo', 'a b', :out => @name)
       File.read(@name).should == "a b\n"
     end
+   end # maglev 
   end
 end

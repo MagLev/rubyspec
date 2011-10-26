@@ -909,7 +909,9 @@ describe "String#%" do
   end
 
   %w(e E f g G).each do |f|
-    format = "%" + f
+    format = "%" + f  # For Maglev Trac 934 , we made copying blocks less agressive
+		# but that means 'format' is no longer copied by inner blocks below here
+                # and in Maglev, format is in the VC of the home method...
 
     ruby_version_is "1.8.6.278" do
      not_compliant_on :maglev do
@@ -922,6 +924,7 @@ describe "String#%" do
     end
 
     it "behaves as if calling Kernel#Float for #{format} arguments, when the passed argument does not respond to #to_ary" do
+      format = "%" + f  # workaround Maglev Trac 934 fix
       (format % 10).should == (format % 10.0)
       (format % "-10.4e-20").should == (format % -10.4e-20)
       (format % ".5").should == (format % 0.5)
@@ -952,6 +955,7 @@ describe "String#%" do
     end
     ruby_version_is ""..."1.9.2" do
       it "behaves as if calling Kernel#Float for #{format} arguments, when the passed argument is hexadecimal string" do
+        format = "%" + f  # workaround Maglev Trac 934 fix
         if is_solaris
           lambda { format % "0xA" }.should raise_error(ArgumentError)
         else
@@ -969,6 +973,7 @@ describe "String#%" do
     end
 
     it "doesn't taint the result for #{format} when argument is tainted" do
+      format = "%" + f  # workaround Maglev Trac 934 fix
       (format % "5".taint).tainted?.should == false
     end
   end

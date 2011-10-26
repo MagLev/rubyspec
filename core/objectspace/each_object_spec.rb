@@ -17,21 +17,25 @@ describe "ObjectSpace.each_object" do
     new_obj.should_not == nil
   end
 
+ not_compliant_on :maglev do #  k.class returns ruby Class, not the actual meta class
   it "calls the block once for each class, module in the Ruby process" do
     class ObjectSpaceSpecEachClass; end
     module ObjectSpaceSpecEachModule; end
 
-    [ObjectSpaceSpecEachClass, ObjectSpaceSpecEachModule].each do |k|
+     [ObjectSpaceSpecEachClass, ObjectSpaceSpecEachModule].each do |k|
       yields = 0
       got_it = false
+      kx = k.class
       count = ObjectSpace.each_object(k.class) do |obj|
         got_it = true if obj == k
         yields += 1
+        kx = kx
       end
       got_it.should == true
       count.should == yields
     end
   end
+ end
 
   ruby_version_is '1.8.7' do
     it "returns an enumerator if not given a block" do

@@ -55,12 +55,14 @@ describe "module" do
     LangModuleSpec::C3::C4.should == 4
   end
 
+ not_compliant_on :maglev do
   it "reopens a module included into Object" do
     module LangModuleTop
     end
 
-    LangModuleTop.should == LangModuleSpecInObject::LangModuleTop
+    (ax = LangModuleTop).should == (bx = LangModuleSpecInObject::LangModuleTop)
   end
+ end
 end
 
 describe "An anonymous module" do

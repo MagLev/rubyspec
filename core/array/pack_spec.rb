@@ -2395,9 +2395,11 @@ describe "Array#pack with format 'x'" do
 end
 
 describe "Array#pack with format 'P'" do
+ not_compliant_on :maglev do
   it "returns a String who's size is equal to the number of bytes in a machine word" do
     [nil].pack("P").size.should == 1.size
   end
+ end
 end
 
 describe "String#unpack with 'w' directive" do

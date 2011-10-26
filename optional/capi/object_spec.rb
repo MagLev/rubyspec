@@ -134,6 +134,7 @@ describe "CApiObject" do
 
     @o.rb_check_to_integer(5, "non_existing").should == 5
     @o.rb_check_to_integer(5, "to_int").should == 5
+    @o.rb_check_to_integer(5.0 , "to_int").should == 5
     @o.rb_check_to_integer(x, "to_int").should == 5
     @o.rb_check_to_integer(y, "to_int").should == nil
     @o.rb_check_to_integer("Hello", "to_int").should == nil

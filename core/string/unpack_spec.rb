@@ -552,6 +552,7 @@ describe "String#unpack with 'w' directive" do
 end
 
 describe "String#unpack with 'P' directive" do
+ not_compliant_on :maglev do # 'P' not supported
   it "returns a random object after consume a words worth of byte" do
     lambda {
       if 1.size == 8
@@ -561,4 +562,5 @@ describe "String#unpack with 'P' directive" do
       end
     }.should_not raise_error(Exception)
   end
+ end
 end

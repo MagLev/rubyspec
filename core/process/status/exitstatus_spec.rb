@@ -7,7 +7,7 @@ describe "Process::Status#exitstatus" do
   end
 
   it "returns the process exit code" do
-    $?.exitstatus.should == 42
+    (ax = $?).exitstatus.should == 42
   end
 
 end

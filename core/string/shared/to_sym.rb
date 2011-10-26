@@ -7,12 +7,15 @@ describe :string_to_sym, :shared => true do
     "abc=".send(@method).should == :abc=
   end
 
+ not_compliant_on :maglev do
   it "special cases +(binary) and -(binary)" do
     "+(binary)".to_sym.should == :+
     "-(binary)".to_sym.should == :-
   end
+ end
 
   ruby_version_is ""..."1.9" do
+   not_compliant_on :maglev do
     it "special cases !@ and ~@" do
       "!@".to_sym.should == :"!"
       "~@".to_sym.should == :~
@@ -27,6 +30,7 @@ describe :string_to_sym, :shared => true do
       "+(unary)".to_sym.should == :"+@"
       "-(unary)".to_sym.should == :"-@"
     end
+   end # maglev
 
     it "raises an ArgumentError when self can't be converted to symbol" do
       lambda { "".send(@method)           }.should raise_error(ArgumentError)
@@ -36,7 +40,11 @@ describe :string_to_sym, :shared => true do
     end
   end
 
-  ruby_version_is "1.9" do
+  t_ver = "1.9"
+  deviates_on :maglev do
+    t_ver = "1.8.7" # behaves like 1.9
+  end
+  ruby_version_is t_ver do
     it "does not special case certain operators" do
       [ ["!@", :"!@"],
         ["~@", :"~@"],

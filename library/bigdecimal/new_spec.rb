@@ -32,7 +32,12 @@ describe "BigDecimal.new" do
 
       platform_is :wordsize => 64 do
         it "doesn't segfault when using a very large string to build the number" do
+not_compliant_on :maglev do # _dump not implemented
           BigDecimal.new("1" + "0"*10000000)._dump.should == "10000017:0.1E10000001"
+end
+deviates_on :maglev do #
+          BigDecimal.new("1" + "0"*10000000).class.should == BigDecimal
+end
         end
       end
     end

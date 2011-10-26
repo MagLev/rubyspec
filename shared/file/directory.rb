@@ -58,11 +58,13 @@ describe :file_directory_io, :shared => true do
     end
   end
 
+ not_compliant_on :maglev do
   it "calls #to_io to convert a non-IO object" do
     io = mock('FileDirectoryIO')
     io.should_receive(:to_io).and_return(STDIN)
     @object.send(@method, io).should be_false
   end
+ end
 
   ruby_version_is ""..."1.9" do
     it "raises a TypeError when passed a Dir instance" do

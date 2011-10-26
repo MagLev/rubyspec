@@ -425,7 +425,11 @@ describe "Marshal::load" do
       Marshal.load("\004\bS:\021Struct::Ure1\a:\006a0:\006b0").should == obj
     end
 
-    ruby_version_is ""..."1.9" do
+    t_ver = "1.9"
+    deviates_on :maglev do
+      t_ver = "1.8.7"
+    end
+    ruby_version_is ""... t_ver  do
       it "calls initialize on the unmarshaled struct" do
         s = MarshalSpec::StructWithUserInitialize.new('foo')
         Thread.current[MarshalSpec::StructWithUserInitialize::THREADLOCAL_KEY].should == ['foo']
@@ -439,7 +443,7 @@ describe "Marshal::load" do
       end
     end
 
-    ruby_version_is "1.9" do
+    ruby_version_is t_ver do
       it "does not call initialize on the unmarshaled struct" do
         threadlocal_key = MarshalSpec::StructWithUserInitialize::THREADLOCAL_KEY
         
